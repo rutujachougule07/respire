@@ -106,6 +106,8 @@ export default function Membership({ plans = [] }) {
             : p.branchId === 'vishrambag'
         );
 
+  const is5Cols = activePlans.length === 5;
+
   const features = [
     {
       icon: Clock,
@@ -139,7 +141,14 @@ export default function Membership({ plans = [] }) {
         overflow: 'hidden',
       }}
     >
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+      <div
+        className="container"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          maxWidth: '1440px',
+        }}
+      >
         {/* Section Header */}
         <div className="section-header">
           <div className="section-eyebrow">
@@ -364,17 +373,9 @@ export default function Membership({ plans = [] }) {
           </div>
         </div>
 
-        {/* Dynamic Official Fee Structure Cards */}
+        {/* Dynamic Official Fee Structure Cards - Guaranteed Single Line on Desktop */}
         <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns:
-              activePlans.length === 5
-                ? 'repeat(auto-fit, minmax(230px, 1fr))'
-                : 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '24px',
-            marginBottom: '44px',
-          }}
+          className={`membership-cards-grid ${is5Cols ? 'cols-5' : 'cols-4'}`}
         >
           {activePlans.map((tier) => {
             const isPopular = Boolean(tier.isPopular);
@@ -410,11 +411,11 @@ export default function Membership({ plans = [] }) {
                 key={tier.id}
                 style={{
                   background: isPopular ? popularGradient : '#FFFFFF',
-                  borderRadius: '22px',
+                  borderRadius: '20px',
                   border: isPopular
                     ? popularBorder
                     : '1.5px solid rgba(0, 184, 74, 0.18)',
-                  padding: '30px 22px',
+                  padding: is5Cols ? '24px 14px' : '30px 22px',
                   display: 'flex',
                   flexDirection: 'column',
                   position: 'relative',
@@ -429,18 +430,19 @@ export default function Membership({ plans = [] }) {
                   <div
                     style={{
                       position: 'absolute',
-                      top: '-14px',
+                      top: '-13px',
                       left: '50%',
                       transform: 'translateX(-50%)',
                       backgroundColor: isVijaynagar ? '#00C952' : '#172C83',
                       color: '#FFFFFF',
-                      padding: '5px 16px',
+                      padding: '4px 14px',
                       borderRadius: '999px',
-                      fontSize: '0.73rem',
+                      fontSize: '0.7rem',
                       fontWeight: 900,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
                       boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     MOST POPULAR
@@ -448,38 +450,43 @@ export default function Membership({ plans = [] }) {
                 )}
 
                 {/* Duration & Plan Name */}
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: is5Cols ? '12px' : '16px' }}>
                   <span
                     style={{
                       display: 'inline-block',
-                      fontSize: '0.74rem',
+                      fontSize: '0.72rem',
                       fontWeight: 800,
                       color: isPopular ? '#D1FAE5' : '#008A38',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
-                      marginBottom: '6px',
+                      marginBottom: '4px',
                     }}
                   >
                     {tier.badge || currentBranch.shortName}
                   </span>
                   <h3
                     style={{
-                      fontSize: '1.5rem',
+                      fontSize: is5Cols ? '1.38rem' : '1.5rem',
                       fontWeight: 900,
                       color: isPopular ? '#FFFFFF' : '#0F172A',
-                      marginBottom: '6px',
+                      marginBottom: '4px',
+                      lineHeight: 1.2,
                     }}
                   >
                     {durationText}
                   </h3>
                   <div
                     style={{
-                      fontSize: '0.84rem',
+                      fontSize: '0.8rem',
                       color: isPopular
                         ? 'rgba(255, 255, 255, 0.88)'
                         : '#64748B',
                       fontWeight: 600,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
+                    title={tier.name}
                   >
                     {tier.name}
                   </div>
@@ -494,29 +501,31 @@ export default function Membership({ plans = [] }) {
                     border: isPopular
                       ? '1px solid rgba(255, 255, 255, 0.3)'
                       : '1px solid rgba(0, 184, 74, 0.25)',
-                    borderRadius: '14px',
-                    padding: '16px 18px',
-                    marginBottom: '22px',
+                    borderRadius: '12px',
+                    padding: is5Cols ? '12px 10px' : '16px 18px',
+                    marginBottom: is5Cols ? '16px' : '22px',
+                    textAlign: 'center',
                   }}
                 >
                   <div
                     style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.68rem',
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       color: isPopular ? '#D1FAE5' : '#008A38',
-                      marginBottom: '4px',
+                      marginBottom: '2px',
                     }}
                   >
                     Official Fee
                   </div>
                   <div
                     style={{
-                      fontSize: '2.1rem',
+                      fontSize: is5Cols ? '1.78rem' : '2.1rem',
                       fontWeight: 900,
                       color: isPopular ? '#FFFFFF' : '#0F172A',
                       lineHeight: 1.1,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     ₹{Number(tier.price).toLocaleString('en-IN')}/-
@@ -528,8 +537,8 @@ export default function Membership({ plans = [] }) {
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
-                    marginBottom: '26px',
+                    gap: is5Cols ? '8px' : '10px',
+                    marginBottom: is5Cols ? '18px' : '26px',
                     flexGrow: 1,
                   }}
                 >
@@ -539,15 +548,15 @@ export default function Membership({ plans = [] }) {
                       style={{
                         display: 'flex',
                         alignItems: 'flex-start',
-                        gap: '10px',
-                        fontSize: '0.86rem',
+                        gap: '8px',
+                        fontSize: is5Cols ? '0.8rem' : '0.86rem',
                         color: isPopular ? '#FFFFFF' : '#334155',
                         fontWeight: 500,
-                        lineHeight: 1.45,
+                        lineHeight: 1.35,
                       }}
                     >
                       <CheckCircle2
-                        size={16}
+                        size={15}
                         color={isPopular ? '#D1FAE5' : '#00B84A'}
                         style={{ flexShrink: 0, marginTop: '2px' }}
                       />
@@ -557,7 +566,7 @@ export default function Membership({ plans = [] }) {
                 </div>
 
                 {/* CTAs */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <a
                     href={waDirectLink}
                     target="_blank"
@@ -565,16 +574,17 @@ export default function Membership({ plans = [] }) {
                     className={`btn ${isPopular ? 'btn-white' : 'btn-primary'}`}
                     style={{
                       width: '100%',
-                      fontSize: '0.84rem',
-                      padding: '12px 14px',
+                      fontSize: is5Cols ? '0.78rem' : '0.84rem',
+                      padding: is5Cols ? '10px 8px' : '12px 14px',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '8px',
+                      gap: '6px',
                       textDecoration: 'none',
+                      whiteSpace: 'nowrap',
                     }}
                   >
-                    <MessageCircle size={15} />
+                    <MessageCircle size={14} />
                     <span>Join {durationText} Plan</span>
                   </a>
 
@@ -584,10 +594,10 @@ export default function Membership({ plans = [] }) {
                       background: 'transparent',
                       border: 'none',
                       color: isPopular ? 'rgba(255, 255, 255, 0.85)' : '#64748B',
-                      fontSize: '0.78rem',
+                      fontSize: '0.74rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      padding: '6px',
+                      padding: '4px',
                       textDecoration: 'underline',
                     }}
                   >
@@ -1046,6 +1056,40 @@ export default function Membership({ plans = [] }) {
           </div>
         </div>
       </div>
+
+      <style>{`
+        .membership-cards-grid {
+          display: grid;
+          width: 100%;
+          margin-bottom: 44px;
+        }
+        @media (min-width: 1024px) {
+          .membership-cards-grid.cols-5 {
+            grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+          }
+          .membership-cards-grid.cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 20px !important;
+          }
+        }
+        @media (min-width: 641px) and (max-width: 1023px) {
+          .membership-cards-grid.cols-5 {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+          }
+          .membership-cards-grid.cols-4 {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 16px !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .membership-cards-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
