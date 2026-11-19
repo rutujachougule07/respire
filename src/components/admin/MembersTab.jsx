@@ -700,6 +700,39 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                     );
                   })}
                 </div>
+
+                {form.addOns.includes('Personal Training') && (
+                  <div
+                    style={{
+                      marginTop: '10px',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      backgroundColor: form.branchId === 'branch2' ? '#EEF2FF' : '#ECFDF3',
+                      border:
+                        form.branchId === 'branch2'
+                          ? '1px solid #C7D2FE'
+                          : '1px solid #A7F3D0',
+                      fontSize: '0.78rem',
+                      color: form.branchId === 'branch2' ? '#1E1B4B' : '#065F46',
+                    }}
+                  >
+                    <div style={{ fontWeight: 800, marginBottom: '4px' }}>
+                      Official Personal Training (PT) Charges for{' '}
+                      {form.branchId === 'branch2' ? 'Vijaynagar Branch' : 'Vishrambag Branch'}:
+                    </div>
+                    {form.branchId === 'branch2' ? (
+                      <div style={{ lineHeight: 1.5 }}>
+                        • <strong>Junior Personal Trainer:</strong> Alternate: ₹4,500/- | Daily: ₹8,000/-<br />
+                        • <strong>Senior Personal Trainer:</strong> Alternate: ₹5,500/- | Daily: ₹10,000/-
+                      </div>
+                    ) : (
+                      <div style={{ lineHeight: 1.5 }}>
+                        • <strong>General Personal Training:</strong> Alternate: ₹7,000/- | Daily: ₹10,000/-<br />
+                        • <strong>Premium Personal Training:</strong> Alternate: ₹9,000/- | Daily: ₹13,000/-
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Body Metrics */}

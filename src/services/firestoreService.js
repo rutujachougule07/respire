@@ -17,6 +17,7 @@ import {
   INITIAL_PLANS,
   INITIAL_TRAINERS,
   INITIAL_ADDON_REVENUE,
+  PERSONAL_TRAINING_RATES,
 } from '../components/admin/initialData';
 
 /**
@@ -81,6 +82,16 @@ export async function seedInitialDataIfEmpty() {
       const addonRef = doc(db, 'addons', addon.id);
       await setDoc(addonRef, { ...addon, updatedAt: serverTimestamp() }, { merge: true });
     }
+
+    // 5. Seed Official Personal Training (PT) Rates (idempotent setDoc)
+    await setDoc(
+      doc(db, 'system', 'pt_rates'),
+      {
+        ...PERSONAL_TRAINING_RATES,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
 
     // Mark system seed lock doc as completed
     await setDoc(

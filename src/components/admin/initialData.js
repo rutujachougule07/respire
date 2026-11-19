@@ -215,6 +215,166 @@ export const VIJAYNAGAR_MANAGEMENT = {
 
 export const OFFICIAL_FEE_RULES = VISHRAMBAG_RULES;
 
+// --- Official Branch-wise Personal Training (PT) Fee Structure ---
+export const PERSONAL_TRAINING_RATES = {
+  vishrambag: {
+    branchId: 'vishrambag',
+    branchName: 'Respire Vishrambag Branch',
+    location: '7th Floor, R City Mall, Opp. Safa Bakery, Vishrambag, Sangli',
+    phone: '7798001777',
+    waNumber: '917798001777',
+    categories: [
+      {
+        id: 'pt-vb-general',
+        title: 'GENERAL PERSONAL TRAINING',
+        badge: 'Certified Coach',
+        description: 'Comprehensive 1-on-1 training for steady fat loss, strength gain, and biomechanical posture control.',
+        pricing: [
+          {
+            planName: 'Alternate Days',
+            frequency: 'Alternate Days',
+            sessions: '3 Days / Week (~12–14 Sessions/mo)',
+            duration: '1 Month',
+            price: 7000,
+            priceDisplay: '₹7,000/-',
+            tag: 'Flexible Schedule',
+          },
+          {
+            planName: 'Daily Personal Training',
+            frequency: 'Daily Coaching',
+            sessions: '6 Days / Week (~24–26 Sessions/mo)',
+            duration: '1 Month',
+            price: 10000,
+            priceDisplay: '₹10,000/-',
+            tag: 'High Consistency',
+            isPopular: true,
+          },
+        ],
+        features: [
+          'Dedicated General Personal Trainer',
+          'Biomechanical form correction & spot assistance',
+          'Custom weekly routine splits (Push/Pull/Legs)',
+          'Cardio & endurance conditioning',
+          'Standard diet & daily protein target guidance',
+        ],
+      },
+      {
+        id: 'pt-vb-premium',
+        title: 'PREMIUM PERSONAL TRAINING',
+        badge: 'Elite Transformation Specialist',
+        isPremium: true,
+        description: 'Elite sports science mentorship, deep muscle hypertrophy, clinical scans, and VIP recovery perks.',
+        pricing: [
+          {
+            planName: 'Alternate Days',
+            frequency: 'Alternate Days',
+            sessions: '3 Days / Week (~12–14 Sessions/mo)',
+            duration: '1 Month',
+            price: 9000,
+            priceDisplay: '₹9,000/-',
+            tag: 'High Performance',
+          },
+          {
+            planName: 'Daily Personal Training',
+            frequency: 'Daily Coaching',
+            sessions: '6 Days / Week (~24–26 Sessions/mo)',
+            duration: '1 Month',
+            price: 13000,
+            priceDisplay: '₹13,000/-',
+            tag: 'VIP Body Transformation',
+            isPopular: true,
+          },
+        ],
+        features: [
+          'Senior Sports Science Specialist Trainer',
+          'InBody 570 clinical body composition audit',
+          'Personalized macro-nutrient meal & supplementation plan',
+          'Advanced progressive overload & hypertrophy monitoring',
+          'Steam bath & recovery session priority access',
+          '24/7 Trainer WhatsApp support & meal logging review',
+        ],
+      },
+    ],
+  },
+  branch2: {
+    branchId: 'branch2',
+    branchName: 'Respire Vijaynagar Branch',
+    location: '3rd Floor, Krishna Heights, Opp. KFC, Vijaynagar, Sangli',
+    phone: '9172848777',
+    waNumber: '919172848777',
+    categories: [
+      {
+        id: 'pt-vjn-junior',
+        title: 'JUNIOR PERSONAL TRAINER',
+        badge: 'Junior Fitness Coach',
+        description: 'Guided one-on-one personal training for building workout habits, safe posture, and regular fitness.',
+        pricing: [
+          {
+            planName: 'Alternate Days',
+            frequency: 'Alternate Days',
+            sessions: 'Alternate Days (~12–14 Sessions/mo)',
+            duration: '1 Month',
+            price: 4500,
+            priceDisplay: '₹4,500/-',
+            tag: 'Affordable Starter PT',
+          },
+          {
+            planName: 'Daily Personal Training',
+            frequency: 'Daily Sessions',
+            sessions: 'Daily Sessions (~24–26 Sessions/mo)',
+            duration: '1 Month',
+            price: 8000,
+            priceDisplay: '₹8,000/-',
+            tag: 'Daily Guided Support',
+            isPopular: true,
+          },
+        ],
+        features: [
+          'Certified Junior Personal Trainer',
+          'Safe machine setup & form correction',
+          'Daily supervised cardio & strength routine',
+          'Beginner friendly body toning & weight control',
+        ],
+      },
+      {
+        id: 'pt-vjn-senior',
+        title: 'SENIOR PERSONAL TRAINER',
+        badge: 'Senior Master Coach (Since 2012)',
+        isPremium: true,
+        description: 'High-level transformation coaching with deep bodybuilding and sports conditioning expertise.',
+        pricing: [
+          {
+            planName: 'Alternate Days',
+            frequency: 'Alternate Days',
+            sessions: 'Alternate Days (~12–14 Sessions/mo)',
+            duration: '1 Month',
+            price: 5500,
+            priceDisplay: '₹5,500/-',
+            tag: 'Experienced Coaching',
+          },
+          {
+            planName: 'Daily Personal Training',
+            frequency: 'Daily Sessions',
+            sessions: 'Daily Sessions (~24–26 Sessions/mo)',
+            duration: '1 Month',
+            price: 10000,
+            priceDisplay: '₹10,000/-',
+            tag: 'Master Transformation',
+            isPopular: true,
+          },
+        ],
+        features: [
+          'Senior Master Coach with 7+ Years Experience',
+          'Intense bodybuilding & fat burning protocols',
+          'Tailored calorie & macronutrient nutrition plan',
+          'Core stability, posture alignment & flexibility drills',
+          'Continuous progress checks & performance tracking',
+        ],
+      },
+    ],
+  },
+};
+
 export const INITIAL_TRAINERS = [
   {
     id: 'tr-1',

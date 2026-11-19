@@ -10,8 +10,10 @@ import {
   Calendar,
   X,
   Info,
+  Dumbbell,
+  Award,
 } from 'lucide-react';
-import { OFFICIAL_FEE_RULES } from './initialData';
+import { OFFICIAL_FEE_RULES, PERSONAL_TRAINING_RATES } from './initialData';
 import { savePlanToFirestore, deletePlanFromFirestore, saveMemberToFirestore } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
@@ -489,6 +491,150 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               {OFFICIAL_FEE_RULES.map((r, i) => (
                 <div key={i}>* {r}</div>
               ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 1.5: OFFICIAL BRANCH-WISE PERSONAL TRAINING (PT) CHARGES */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          border: '1.5px solid #E2E8F0',
+          borderRadius: '20px',
+          overflow: 'hidden',
+          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.05)',
+        }}
+      >
+        <div
+          style={{
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+            padding: '16px 22px',
+            color: '#FFFFFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '10px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(0, 201, 82, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#00D256',
+              }}
+            >
+              <Dumbbell size={18} />
+            </div>
+            <div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 900 }}>
+                Official Personal Training (PT) Fee Structure
+              </div>
+              <div style={{ fontSize: '0.76rem', color: '#94A3B8' }}>
+                Branch-specific 1-on-1 coaching rates for Vishrambag & Vijaynagar
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            padding: '22px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          {/* Vishrambag Branch Box */}
+          <div
+            style={{
+              padding: '18px 20px',
+              borderRadius: '16px',
+              backgroundColor: '#F4FBF7',
+              border: '1.5px solid rgba(0, 184, 74, 0.25)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ fontWeight: 900, fontSize: '1.05rem', color: '#008A38' }}>
+                Vishrambag Branch (R City Mall)
+              </div>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', backgroundColor: '#ECFDF3', color: '#008A38' }}>
+                Phone: 7798001777
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1px solid #D1FAE5' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>GENERAL PERSONAL TRAINING</span>
+                  <span style={{ fontSize: '0.72rem', color: '#008A38', fontWeight: 700 }}>Certified Coach</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                  <span>• Alternate Days: <strong>₹7,000/-</strong></span>
+                  <span>• Daily Training: <strong>₹10,000/-</strong></span>
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1.5px solid #00C952' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>PREMIUM PERSONAL TRAINING</span>
+                  <span style={{ fontSize: '0.72rem', color: '#008A38', fontWeight: 800, backgroundColor: '#ECFDF3', padding: '2px 6px', borderRadius: '4px' }}>Elite Specialist</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                  <span>• Alternate Days: <strong>₹9,000/-</strong></span>
+                  <span>• Daily Training: <strong>₹13,000/-</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Vijaynagar Branch Box */}
+          <div
+            style={{
+              padding: '18px 20px',
+              borderRadius: '16px',
+              backgroundColor: '#F5F7FD',
+              border: '1.5px solid rgba(23, 44, 131, 0.22)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div style={{ fontWeight: 900, fontSize: '1.05rem', color: '#172C83' }}>
+                Vijaynagar Branch (Krishna Heights)
+              </div>
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '3px 8px', borderRadius: '6px', backgroundColor: '#EEF2FF', color: '#172C83' }}>
+                Phone: 9172848777
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1px solid #E0E7FF' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>JUNIOR PERSONAL TRAINER</span>
+                  <span style={{ fontSize: '0.72rem', color: '#172C83', fontWeight: 700 }}>Junior Coach</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                  <span>• Alternate Days: <strong>₹4,500/-</strong></span>
+                  <span>• Daily Training: <strong>₹8,000/-</strong></span>
+                </div>
+              </div>
+
+              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1.5px solid #172C83' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>SENIOR PERSONAL TRAINER</span>
+                  <span style={{ fontSize: '0.72rem', color: '#172C83', fontWeight: 800, backgroundColor: '#EEF2FF', padding: '2px 6px', borderRadius: '4px' }}>Senior Coach</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                  <span>• Alternate Days: <strong>₹5,500/-</strong></span>
+                  <span>• Daily Training: <strong>₹10,000/-</strong></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
