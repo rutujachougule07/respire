@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Award, ShieldCheck, HeartHandshake, CheckCircle2, MapPin, Landmark } from 'lucide-react';
+import { Building2, Award, ShieldCheck, HeartHandshake, CheckCircle2, Landmark } from 'lucide-react';
 
 export default function About() {
   const companyPillars = [
@@ -50,15 +50,17 @@ export default function About() {
       />
 
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+        {/* TOP ROW: Image on Left + Company Information on Right */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '52px',
+            gap: '48px',
             alignItems: 'center',
+            marginBottom: '48px',
           }}
         >
-          {/* Left Column: Authentic Mahabal Group Presentation */}
+          {/* Left Column: Authentic Mahabal Group Visual Presentation */}
           <div style={{ position: 'relative' }}>
             <div
               style={{
@@ -67,7 +69,7 @@ export default function About() {
                 border: '1.5px solid rgba(0, 184, 74, 0.22)',
                 boxShadow: '0 24px 50px rgba(15, 23, 42, 0.12)',
                 position: 'relative',
-                height: '490px',
+                height: '460px',
               }}
             >
               <img
@@ -105,7 +107,15 @@ export default function About() {
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '0.74rem', color: '#008A38', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <div
+                    style={{
+                      fontSize: '0.74rem',
+                      color: '#008A38',
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
                     Institutional Stewardship
                   </div>
                   <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>
@@ -156,7 +166,7 @@ export default function About() {
             </div>
           </div>
 
-          {/* Right Column: Strictly Company Background & Values */}
+          {/* Right Column: Company Background & Information */}
           <div>
             <div className="section-eyebrow">
               <Building2 size={14} />
@@ -167,72 +177,39 @@ export default function About() {
               ABOUT <span className="text-green">MAHABAL GROUP & RESPIRE</span>
             </h2>
 
-            <p style={{ fontSize: '1.06rem', color: '#1E293B', marginBottom: '16px', lineHeight: 1.7, fontWeight: 500 }}>
-              <strong>Respire Fitness</strong> is proudly founded and steered under the esteemed banner of the <strong>Mahabal Group</strong>—a distinguished corporate enterprise that has earned high standing and widespread public trust across Sangli and Maharashtra.
+            <p
+              style={{
+                fontSize: '1.05rem',
+                color: '#1E293B',
+                marginBottom: '16px',
+                lineHeight: 1.7,
+                fontWeight: 500,
+              }}
+            >
+              <strong>Respire Fitness</strong> is proudly founded and steered under the esteemed banner of the{' '}
+              <strong>Mahabal Group</strong>—a distinguished corporate enterprise that has earned high standing and
+              widespread public trust across Sangli and Western Maharashtra.
             </p>
 
-            <p style={{ fontSize: '0.94rem', color: '#475569', marginBottom: '26px', lineHeight: 1.68 }}>
-              Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand, Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern sports science with transparent, professional management, the Mahabal Group ensures that every member benefits from corporate reliability, safety, and long-term commitment.
+            <p style={{ fontSize: '0.94rem', color: '#475569', marginBottom: '24px', lineHeight: 1.68 }}>
+              Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand,
+              Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern
+              sports science with transparent, professional management, the Mahabal Group ensures that every member benefits
+              from corporate reliability, safety, and long-term commitment.
             </p>
 
-            {/* Strictly Company Information Pillars */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', marginBottom: '32px' }}>
-              {companyPillars.map((p, idx) => {
-                const Icon = p.icon;
-                return (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '14px',
-                      padding: '14px 18px',
-                      background: 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
-                      borderRadius: '14px',
-                      border: '1px solid rgba(0, 184, 74, 0.18)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
-                        backgroundColor: 'rgba(0, 184, 74, 0.12)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#008A38',
-                        flexShrink: 0,
-                        marginTop: '2px',
-                      }}
-                    >
-                      <Icon size={19} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                        {p.title}
-                      </div>
-                      <div style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
-                        {p.desc}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Company Credentials Strip (No Marketing Fluff) */}
+            {/* Company Credentials Strip */}
             <div
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '12px 24px',
-                padding: '14px 20px',
+                gap: '10px 20px',
+                padding: '14px 18px',
                 borderRadius: '14px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                fontSize: '0.82rem',
-                color: '#334155',
+                backgroundColor: '#F8FCFA',
+                border: '1px solid rgba(0, 184, 74, 0.22)',
+                fontSize: '0.84rem',
+                color: '#0F172A',
                 fontWeight: 700,
               }}
             >
@@ -251,7 +228,90 @@ export default function About() {
             </div>
           </div>
         </div>
+
+        {/* BOTTOM SECTION: 4 Pillar Boxes Placed Side-by-Side Under Image & Information */}
+        <div className="about-pillars-grid">
+          {companyPillars.map((p, idx) => {
+            const Icon = p.icon;
+            return (
+              <div
+                key={idx}
+                className="about-pillar-card"
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '16px',
+                  padding: '22px 20px',
+                  background: 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
+                  borderRadius: '18px',
+                  border: '1.5px solid rgba(0, 184, 74, 0.2)',
+                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <div
+                  style={{
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(0, 184, 74, 0.12)',
+                    border: '1px solid rgba(0, 184, 74, 0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#008A38',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                  }}
+                >
+                  <Icon size={22} />
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: '0.98rem',
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      marginBottom: '6px',
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {p.title}
+                  </div>
+                  <div style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.55 }}>
+                    {p.desc}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      <style>{`
+        .about-pillars-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
+        }
+        @media (min-width: 1024px) {
+          .about-pillars-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 22px !important;
+          }
+        }
+        @media (min-width: 1280px) {
+          .about-pillars-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 18px !important;
+          }
+        }
+        .about-pillar-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 14px 32px rgba(0, 184, 74, 0.15) !important;
+          border-color: rgba(0, 184, 74, 0.45) !important;
+        }
+      `}</style>
     </section>
   );
 }
