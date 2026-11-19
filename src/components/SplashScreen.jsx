@@ -5,15 +5,16 @@ export default function SplashScreen({ onFinish }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Total animation: 3 seconds (starts fading out at 2.5s, unmounts at 3.0s)
+    // Exactly 10 seconds total duration
+    // Start smooth fade-out at 9.4s, completely unmount at 10.0s
     const fadeTimer = setTimeout(() => {
       setIsFadingOut(true);
-    }, 2500);
+    }, 9400);
 
     const removeTimer = setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 3000);
+    }, 10000);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -26,7 +27,7 @@ export default function SplashScreen({ onFinish }) {
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 300);
+    }, 350);
   };
 
   if (!isVisible) return null;
@@ -34,219 +35,153 @@ export default function SplashScreen({ onFinish }) {
   return (
     <div
       onClick={handleSkip}
-      className={`respire-circle-splash ${isFadingOut ? 'fade-out' : ''}`}
+      className={`respire-splash-screen ${isFadingOut ? 'fade-out' : ''}`}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 999999,
-        background: 'radial-gradient(circle at center, #0B1910 0%, #050906 45%, #000000 100%)',
+        background: 'radial-gradient(ellipse at center, #0A1910 0%, #040805 45%, #000000 100%)',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         overflow: 'hidden',
         userSelect: 'none',
-        transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         opacity: isFadingOut ? 0 : 1,
-        transform: isFadingOut ? 'scale(1.06)' : 'scale(1)',
+        transform: isFadingOut ? 'scale(1.08)' : 'scale(1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
       }}
     >
-      {/* Deep Gradient Black Ambient Glows */}
+      {/* Deep Attractive Gradient Black Ambient Light Glow */}
       <div
         style={{
           position: 'absolute',
-          width: '650px',
-          height: '650px',
+          width: 'min(90vw, 850px)',
+          height: 'min(90vw, 850px)',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.28) 0%, rgba(0, 184, 74, 0.1) 40%, transparent 70%)',
-          filter: 'blur(50px)',
-          animation: 'ambientBreath 3s infinite alternate ease-in-out',
+          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.25) 0%, rgba(0, 184, 74, 0.08) 50%, transparent 72%)',
+          filter: 'blur(60px)',
+          animation: 'bgGlowPulse 4s ease-in-out infinite alternate',
           pointerEvents: 'none',
         }}
       />
 
-      {/* Circular Rotating Stage */}
+      {/* 
+        MAIN CENTER ELEMENT: 
+        ONLY THE NAME "RESPIRE" IN VIBRANT GREEN - MASSIVE, PIN-SHARP, 
+        AND ROTATING IN A COMPLETE CIRCLE (NO SIDE CIRCLES, NO RINGS)
+      */}
       <div
         style={{
           position: 'relative',
-          width: 'min(85vw, 420px)',
-          height: 'min(85vw, 420px)',
+          zIndex: 10,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          width: '100%',
+          maxWidth: '920px',
+          padding: '0 24px',
+          perspective: '1400px',
         }}
       >
-        {/* Outer Glowing Neon Ring 1 - Fast Clockwise Spin */}
         <div
+          className="respire-giant-rotating-text"
           style={{
-            position: 'absolute',
-            inset: '10px',
-            borderRadius: '50%',
-            border: '2px dashed rgba(0, 255, 102, 0.45)',
-            boxShadow: '0 0 25px rgba(0, 201, 82, 0.35), inset 0 0 25px rgba(0, 201, 82, 0.2)',
-            animation: 'fullCircleRotate 2.6s linear infinite',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Outer Neon Ring 2 - Counter Clockwise Thin Orbit */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: '30px',
-            borderRadius: '50%',
-            border: '1.5px solid rgba(0, 201, 82, 0.25)',
-            borderTopColor: '#00FF66',
-            borderRightColor: '#00C952',
-            boxShadow: '0 0 35px rgba(0, 255, 102, 0.4)',
-            animation: 'counterCircleRotate 2.2s linear infinite',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Orbiting Electric Neon Dot 1 */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            animation: 'fullCircleRotate 2.4s linear infinite',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
-            style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              backgroundColor: '#00FF66',
-              boxShadow: '0 0 18px #00FF66, 0 0 32px #00C952',
-              position: 'absolute',
-              top: '4px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          />
-        </div>
-
-        {/* Orbiting Electric Neon Dot 2 (Opposite) */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            animation: 'fullCircleRotate 2.4s linear infinite',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
-            style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              backgroundColor: '#00C952',
-              boxShadow: '0 0 15px #00C952, 0 0 25px #00FF66',
-              position: 'absolute',
-              bottom: '4px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          />
-        </div>
-
-        {/* 
-          CENTRAL ELEMENT: ONLY THE NAME "RESPIRE" IN VIBRANT GREEN 
-          SPINNING IN A COMPLETE 360-DEGREE CIRCLE 
-        */}
-        <div
-          className="respire-name-orbit-container"
-          style={{
-            position: 'relative',
-            zIndex: 10,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            animation: 'respireCircleSpin 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards',
+            width: '100%',
+            animation: 'respireCircleMotion 10s ease-in-out infinite',
+            transformStyle: 'preserve-3d',
           }}
         >
+          {/* Ultra-HD Pin-Sharp 2.3K Vectorized Brand Wordmark */}
           <img
-            src="/respire_text_transparent.png"
+            src="/respire_text_ultra_hd.png"
             alt="RESPIRE"
             style={{
-              width: 'min(72vw, 320px)',
+              width: '100%',
+              maxWidth: '850px',
               height: 'auto',
-              maxHeight: '75px',
+              maxHeight: '160px',
               objectFit: 'contain',
+              // Crisp, solid emerald green shadow with zero blur-fog
               filter:
-                'drop-shadow(0 0 15px #00FF66) drop-shadow(0 0 35px #00C952) drop-shadow(0 0 55px rgba(0, 201, 82, 0.7))',
-              animation: 'respirePulse 1.2s ease-in-out infinite alternate',
+                'drop-shadow(0 0 20px rgba(0, 255, 102, 0.85)) drop-shadow(0 15px 35px rgba(0, 201, 82, 0.6))',
+              display: 'block',
             }}
           />
         </div>
       </div>
 
+      {/* Subtle Skip Indicator at Top Right */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '28px',
+          right: '32px',
+          zIndex: 20,
+          fontSize: '0.78rem',
+          fontWeight: 800,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: 'rgba(255, 255, 255, 0.55)',
+          padding: '6px 14px',
+          borderRadius: '999px',
+          backgroundColor: 'rgba(255, 255, 255, 0.06)',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          transition: 'all 0.2s ease',
+        }}
+      >
+        Click to Skip ✕
+      </div>
+
       {/* Embedded Animations */}
       <style>{`
-        /* Full 360-degree circular spin of the RESPIRE name */
-        @keyframes respireCircleSpin {
+        /* 
+          10-Second Continuous Circular Animation:
+          1. 0s - 2s: Zooms in from 360-degree circular spin into sharp focus
+          2. 2s - 8s: Smooth continuous 3D circular rotation (rotateY 360 degrees)
+          3. 8s - 10s: Majestic forward glow pulse before revealing the landing page
+        */
+        @keyframes respireCircleMotion {
           0% {
             opacity: 0;
-            transform: scale(0.3) rotate(-360deg);
-            filter: blur(8px);
+            transform: scale(0.35) rotate(-360deg);
           }
-          30% {
+          15% {
             opacity: 1;
-            filter: blur(0px);
+            transform: scale(1.08) rotate(0deg);
           }
-          75% {
-            transform: scale(1.12) rotate(0deg);
+          22% {
+            transform: scale(1) rotate(0deg) rotateY(0deg);
           }
-          100% {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
+          45% {
+            transform: scale(1.04) rotateY(180deg);
           }
-        }
-
-        /* Continuous 360-degree circle rotation */
-        @keyframes fullCircleRotate {
-          0% {
-            transform: rotate(0deg);
+          70% {
+            transform: scale(1) rotateY(360deg);
           }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-
-        /* Counter 360-degree circle rotation */
-        @keyframes counterCircleRotate {
-          0% {
-            transform: rotate(360deg);
-          }
-          100% {
-            transform: rotate(0deg);
-          }
-        }
-
-        /* Glowing green pulse */
-        @keyframes respirePulse {
-          0% {
-            transform: scale(0.98);
-            filter: drop-shadow(0 0 12px #00FF66) drop-shadow(0 0 28px #00C952);
-          }
-          100% {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 22px #00FF66) drop-shadow(0 0 45px #00FF66) drop-shadow(0 0 70px rgba(0, 201, 82, 0.85));
-          }
-        }
-
-        /* Ambient background breathing */
-        @keyframes ambientBreath {
-          0% {
-            opacity: 0.6;
-            transform: scale(0.9);
+          85% {
+            transform: scale(1.06) rotateY(360deg);
           }
           100% {
             opacity: 1;
-            transform: scale(1.15);
+            transform: scale(1.02) rotateY(360deg);
+          }
+        }
+
+        /* Ambient deep emerald-black background pulse */
+        @keyframes bgGlowPulse {
+          0% {
+            transform: scale(0.85);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1.2);
+            opacity: 1;
           }
         }
       `}</style>
