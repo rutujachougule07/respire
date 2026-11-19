@@ -973,376 +973,387 @@ export default function Membership({ plans = [] }) {
           );
         })()}
 
-        {/* Official Fee Structure Terms, Timings & AC Rules Box */}
+        {/* Modern Split Editorial Guidelines & Timings Section (No boxes inside boxes!) */}
         <div
           style={{
             backgroundColor: '#FFFFFF',
+            borderRadius: '24px',
             border:
               selectedBranch === 'branch2'
-                ? '2px solid rgba(23, 44, 131, 0.22)'
-                : '2px solid rgba(0, 184, 74, 0.24)',
-            borderRadius: '24px',
-            padding: '34px 32px',
+                ? '1.5px solid rgba(23, 44, 131, 0.18)'
+                : '1.5px solid rgba(0, 184, 74, 0.22)',
+            boxShadow: '0 20px 48px rgba(15, 23, 42, 0.07)',
             marginBottom: '44px',
-            boxShadow: '0 16px 45px rgba(15, 23, 42, 0.06)',
+            overflow: 'hidden',
           }}
         >
-          {/* Header Bar */}
           <div
+            className="membership-guidelines-split"
             style={{
               display: 'flex',
               flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              marginBottom: '24px',
-              paddingBottom: '18px',
-              borderBottom:
-                selectedBranch === 'branch2'
-                  ? '1.5px solid rgba(23, 44, 131, 0.12)'
-                  : '1.5px solid rgba(0, 184, 74, 0.16)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            {/* Left Panel: Luxury Branded Timings & Action Plaque */}
+            <div
+              style={{
+                flex: '1 1 360px',
+                background:
+                  selectedBranch === 'branch2'
+                    ? 'linear-gradient(145deg, #090E21 0%, #172C83 60%, #1E3A8A 100%)'
+                    : 'linear-gradient(145deg, #051F10 0%, #006E2C 55%, #008A38 100%)',
+                color: '#FFFFFF',
+                padding: '36px 32px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '28px',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Subtle ambient light circle */}
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '13px',
-                  background:
-                    selectedBranch === 'branch2'
-                      ? 'linear-gradient(135deg, #1E3AA8 0%, #172C83 100%)'
-                      : 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow:
-                    selectedBranch === 'branch2'
-                      ? '0 6px 18px rgba(23, 44, 131, 0.28)'
-                      : '0 6px 18px rgba(0, 184, 74, 0.28)',
-                  flexShrink: 0,
+                  position: 'absolute',
+                  top: '-40px',
+                  right: '-40px',
+                  width: '180px',
+                  height: '180px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  pointerEvents: 'none',
                 }}
-              >
-                <Info size={22} color="#FFFFFF" />
-              </div>
-              <div>
+              />
+
+              {/* Top Branch Identity */}
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 900,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    padding: '4px 10px',
+                    borderRadius: '999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF',
+                    marginBottom: '10px',
+                  }}
+                >
+                  <MapPin size={12} color="#00FF66" />
+                  <span>{currentBranch.shortName}</span>
+                </div>
+
                 <h3
                   style={{
-                    fontSize: '1.35rem',
+                    fontSize: '1.42rem',
                     fontWeight: 900,
-                    color: '#0F172A',
-                    margin: '0 0 3px',
+                    color: '#FFFFFF',
+                    margin: '0 0 6px',
+                    lineHeight: 1.25,
                     letterSpacing: '-0.01em',
                   }}
                 >
-                  Important Membership Terms & Timings
+                  Facility Timings & Access
                 </h3>
-                <div
+
+                <p
                   style={{
                     fontSize: '0.84rem',
-                    color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
-                    fontWeight: 800,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    margin: 0,
+                    lineHeight: 1.45,
                   }}
                 >
-                  {currentBranch.name} • Official Operating Guidelines
-                </div>
+                  {currentBranch.floor}
+                </p>
               </div>
-            </div>
 
-            <a
-              href={`tel:+91${currentBranch.phone}`}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 22px',
-                borderRadius: '999px',
-                backgroundColor:
-                  selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
-                border:
-                  selectedBranch === 'branch2'
-                    ? '1.5px solid rgba(23, 44, 131, 0.35)'
-                    : '1.5px solid rgba(0, 184, 74, 0.35)',
-                color: selectedBranch === 'branch2' ? '#172C83' : '#007A31',
-                fontSize: '0.9rem',
-                fontWeight: 800,
-                textDecoration: 'none',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-              }}
-            >
-              <Phone size={15} />
-              <span>Contact: {currentBranch.phone}</span>
-            </a>
-          </div>
-
-          {/* Quick Highlight Cards: Gym Timing & AC Timings */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '16px',
-              marginBottom: '24px',
-            }}
-          >
-            {/* Gym Timing */}
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
-                border: '1.5px solid #86EFAC',
-                borderRadius: '16px',
-                padding: '20px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                boxShadow: '0 4px 14px rgba(0, 184, 74, 0.08)',
-              }}
-            >
+              {/* Timings Showcase (Fluid & Clean - NOT separate box tiles!) */}
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '13px',
-                  backgroundColor: '#FFFFFF',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#008A38',
-                  boxShadow: '0 4px 12px rgba(0, 184, 74, 0.15)',
-                  flexShrink: 0,
+                  flexDirection: 'column',
+                  gap: '20px',
+                  position: 'relative',
+                  zIndex: 1,
+                  padding: '22px 0',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.16)',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.16)',
                 }}
               >
-                <Clock size={22} />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: '0.74rem',
-                    fontWeight: 900,
-                    color: '#008A38',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '2px',
-                  }}
-                >
-                  GYM TIMING
-                </div>
-                <div
-                  style={{
-                    fontSize: '1.24rem',
-                    fontWeight: 900,
-                    color: '#0F172A',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {currentBranch.gymTiming}
-                </div>
-              </div>
-            </div>
-
-            {/* AC Timings */}
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
-                border: '1.5px solid #7DD3FC',
-                borderRadius: '16px',
-                padding: '20px 24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
-              }}
-            >
-              <div
-                style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '13px',
-                  backgroundColor: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#0284C7',
-                  boxShadow: '0 4px 12px rgba(2, 132, 199, 0.15)',
-                  flexShrink: 0,
-                }}
-              >
-                <Wind size={22} />
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontSize: '0.74rem',
-                    fontWeight: 900,
-                    color: '#0284C7',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '2px',
-                  }}
-                >
-                  AC TIMINGS
-                </div>
-                <div
-                  style={{
-                    fontSize: '1.12rem',
-                    fontWeight: 900,
-                    color: '#0F172A',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {currentBranch.acTiming}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Balanced 2-Column Rules Grid (Spacious, Clean, No Awkward Wrap) */}
-          <div
-            className="terms-rules-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-              gap: '14px',
-              marginBottom: currentBranch.motto ? '24px' : '0',
-            }}
-          >
-            {currentBranch.rules.map((rule, idx) => {
-              const isLastOdd =
-                idx === currentBranch.rules.length - 1 &&
-                currentBranch.rules.length % 2 !== 0;
-
-              return (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    padding: '16px 20px',
-                    borderRadius: '14px',
-                    backgroundColor: isLastOdd
-                      ? selectedBranch === 'branch2'
-                        ? '#EEF2FF'
-                        : '#ECFDF3'
-                      : '#F8FAFC',
-                    border: isLastOdd
-                      ? selectedBranch === 'branch2'
-                        ? '1.5px solid rgba(23, 44, 131, 0.28)'
-                        : '1.5px solid rgba(0, 184, 74, 0.32)'
-                      : '1.5px solid #E2E8F0',
-                    gridColumn: isLastOdd ? '1 / -1' : 'auto',
-                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
+                {/* Gym Timing */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
                   <div
                     style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '8px',
-                      backgroundColor:
-                        selectedBranch === 'branch2'
-                          ? 'rgba(23, 44, 131, 0.12)'
-                          : 'rgba(0, 184, 74, 0.14)',
-                      color:
-                        selectedBranch === 'branch2' ? '#172C83' : '#008A38',
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.14)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      color: '#00FF66',
                       flexShrink: 0,
                     }}
                   >
-                    <CheckCircle2 size={16} />
+                    <Clock size={22} />
                   </div>
-                  <span
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 900,
+                        color: 'rgba(255, 255, 255, 0.75)',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        marginBottom: '3px',
+                      }}
+                    >
+                      Gym Timing
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '1.34rem',
+                        fontWeight: 900,
+                        color: '#FFFFFF',
+                        lineHeight: 1.15,
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      {currentBranch.gymTiming}
+                    </div>
+                  </div>
+                </div>
+
+                {/* AC Timings */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                  <div
                     style={{
-                      fontSize: '0.94rem',
-                      color: '#0F172A',
-                      fontWeight: 700,
-                      lineHeight: 1.45,
+                      width: '42px',
+                      height: '42px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.14)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#67E8F9',
+                      flexShrink: 0,
                     }}
                   >
-                    {rule}
-                  </span>
+                    <Wind size={22} />
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 900,
+                        color: '#67E8F9',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        marginBottom: '3px',
+                      }}
+                    >
+                      AC Timings
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '1.14rem',
+                        fontWeight: 900,
+                        color: '#FFFFFF',
+                        lineHeight: 1.25,
+                      }}
+                    >
+                      {currentBranch.acTiming}
+                    </div>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
 
-          {/* Authentic Motivational Board from Branch Standee */}
-          {currentBranch.motto && (
-            <div
-              style={{
-                marginTop: '22px',
-                padding: '22px 26px',
-                borderRadius: '18px',
-                background:
-                  'linear-gradient(135deg, #0A1128 0%, #172C83 60%, #1E3A8A 100%)',
-                color: '#FFFFFF',
-                boxShadow: '0 10px 28px rgba(23, 44, 131, 0.22)',
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '18px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div
+              {/* Vijaynagar Motivational Quote (when present) or Quick Helpline */}
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                {currentBranch.motto ? (
+                  <div
+                    style={{
+                      marginBottom: '18px',
+                      padding: '14px 16px',
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '0.92rem',
+                        fontWeight: 900,
+                        color: '#FFFFFF',
+                        marginBottom: '3px',
+                      }}
+                    >
+                      ❖ {currentBranch.motto.quote1}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.86rem',
+                        fontWeight: 800,
+                        color: '#00FF66',
+                        marginBottom: '8px',
+                      }}
+                    >
+                      ❖ {currentBranch.motto.quote2}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 900,
+                        letterSpacing: '0.1em',
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      — {currentBranch.motto.signature} • {currentBranch.motto.since}
+                    </div>
+                  </div>
+                ) : null}
+
+                <a
+                  href={`tel:+91${currentBranch.phone}`}
                   style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flexShrink: 0,
+                    gap: '10px',
+                    width: '100%',
+                    padding: '12px 20px',
+                    borderRadius: '12px',
+                    backgroundColor: '#FFFFFF',
+                    color: selectedBranch === 'branch2' ? '#172C83' : '#007A31',
+                    fontSize: '0.92rem',
+                    fontWeight: 900,
+                    textDecoration: 'none',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
+                    transition: 'transform 0.2s',
                   }}
                 >
-                  <Quote size={24} color="#00FF66" />
-                </div>
-                <div>
-                  <div
-                    style={{
-                      fontSize: '1.04rem',
-                      fontWeight: 900,
-                      color: '#FFFFFF',
-                      marginBottom: '4px',
-                      letterSpacing: '0.01em',
-                    }}
-                  >
-                    ❖ {currentBranch.motto.quote1}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.96rem',
-                      fontWeight: 800,
-                      color: '#00FF66',
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    ❖ {currentBranch.motto.quote2}
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  textAlign: 'right',
-                  fontSize: '0.8rem',
-                  fontWeight: 900,
-                  letterSpacing: '0.12em',
-                  color: '#FFFFFF',
-                  textTransform: 'uppercase',
-                }}
-              >
-                <div>— {currentBranch.motto.signature}</div>
-                <div style={{ color: '#00FF66', fontSize: '0.74rem' }}>
-                  {currentBranch.motto.since}
-                </div>
+                  <Phone size={16} />
+                  <span>Call Desk: {currentBranch.phone}</span>
+                </a>
               </div>
             </div>
-          )}
+
+            {/* Right Panel: Official Operating Guidelines (Clean Editorial Checklist - NO BOXES!) */}
+            <div
+              style={{
+                flex: '1 1 480px',
+                padding: '36px 36px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                backgroundColor: '#FFFFFF',
+              }}
+            >
+              {/* Right Panel Header */}
+              <div style={{ marginBottom: '22px' }}>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '0.74rem',
+                    fontWeight: 800,
+                    color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '4px',
+                  }}
+                >
+                  <Info size={14} />
+                  <span>Official Operating Guidelines</span>
+                </div>
+                <h3
+                  style={{
+                    fontSize: '1.45rem',
+                    fontWeight: 900,
+                    color: '#0F172A',
+                    margin: 0,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  Important Membership Terms
+                </h3>
+              </div>
+
+              {/* Clean Flowing Checklist (Zero clunky box tiles!) */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0px',
+                }}
+              >
+                {currentBranch.rules.map((rule, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+                      padding: '15px 12px',
+                      borderBottom:
+                        idx === currentBranch.rules.length - 1
+                          ? 'none'
+                          : '1px solid rgba(15, 23, 42, 0.08)',
+                      transition: 'background 0.2s ease, transform 0.2s ease',
+                      borderRadius: '8px',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        selectedBranch === 'branch2'
+                          ? 'rgba(23, 44, 131, 0.04)'
+                          : 'rgba(0, 184, 74, 0.05)';
+                      e.currentTarget.style.transform = 'translateX(4px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        backgroundColor:
+                          selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
+                        color:
+                          selectedBranch === 'branch2' ? '#172C83' : '#008A38',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <CheckCircle2 size={15} />
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '0.96rem',
+                        fontWeight: 700,
+                        color: '#1E293B',
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {rule}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
