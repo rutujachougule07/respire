@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Clock, Send, MessageCircle, CheckCircle2, Building2, ExternalLink, Phone } from 'lucide-react';
+import { MapPin, Clock, Send, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { submitInquiryToFirestore } from '../services/firestoreService';
 
 export default function Contact() {
@@ -15,31 +15,6 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitNotice, setSubmitNotice] = useState('');
-
-  const branches = [
-    {
-      id: 'vishrambag',
-      badge: 'Branch 1 • Vishrambag',
-      name: 'Respire Vishrambag Branch',
-      address: '7th Floor, R City Mall, Opp. Safa Bakery, Vishrambag, Sangli.',
-      phoneDisplay: '7798001777',
-      phoneFull: '+91 7798001777',
-      waNumber: '917798001777',
-      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=R+City+Mall+Opp+Safa+Bakery+Vishrambag+Sangli',
-      gradient: 'linear-gradient(150deg, #00C952 0%, #008F39 58%, #056129 100%)',
-    },
-    {
-      id: 'vijaynagar',
-      badge: 'Branch 2 • Vijaynagar',
-      name: 'Respire Vijaynagar Branch',
-      address: '3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road, Vijaynagar, Sangli.',
-      phoneDisplay: '9172848777',
-      phoneFull: '+91 9172848777',
-      waNumber: '919172848777',
-      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Krishna+Heights+Opp+KFC+Sangli+Miraj+Road+Vijaynagar+Sangli',
-      gradient: 'linear-gradient(150deg, #172C83 0%, #1E3AA8 55%, #0D1B54 100%)',
-    },
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,13 +32,6 @@ export default function Contact() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const openBranchWhatsApp = (branch) => {
-    const text = encodeURIComponent(
-      `Hello ${branch.name} (Mahabal Group Venture),\nI would like to inquire about membership details and services at ${branch.address}\n\nName: ${formData.name || 'Member'}\nService: ${formData.service}\nProgram: ${formData.program}`
-    );
-    window.open(`https://wa.me/${branch.waNumber}?text=${text}`, '_blank');
   };
 
   return (
@@ -89,142 +57,6 @@ export default function Contact() {
           <p className="section-subtitle">
             Visit either of our premium Sangli branches — <strong>Vishrambag</strong> or <strong>Vijaynagar</strong> — or submit an inquiry below.
           </p>
-        </div>
-
-        {/* 2 Official Branch Cards Side-by-Side */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-            gap: '24px',
-            marginBottom: '34px',
-          }}
-        >
-          {branches.map((branch) => (
-            <div
-              key={branch.id}
-              style={{
-                background: branch.gradient,
-                borderRadius: '24px',
-                padding: '30px',
-                color: '#FFFFFF',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                boxShadow:
-                  branch.id === 'vishrambag'
-                    ? '0 20px 42px rgba(0, 148, 59, 0.24)'
-                    : '0 20px 42px rgba(23, 44, 131, 0.24)',
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '5px 12px',
-                    borderRadius: '999px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.18)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    fontSize: '0.74rem',
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    marginBottom: '14px',
-                  }}
-                >
-                  <Building2 size={14} />
-                  <span>{branch.badge}</span>
-                </div>
-
-                <h3 style={{ fontSize: '1.48rem', fontWeight: 900, color: '#FFFFFF', marginBottom: '10px' }}>
-                  {branch.name}
-                </h3>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '10px',
-                    fontSize: '1rem',
-                    color: 'rgba(255, 255, 255, 0.95)',
-                    lineHeight: 1.55,
-                    fontWeight: 600,
-                    marginBottom: '18px',
-                  }}
-                >
-                  <MapPin size={19} style={{ flexShrink: 0, marginTop: '3px' }} />
-                  <span>{branch.address}</span>
-                </div>
-
-                {/* Clickable Phone Pill */}
-                <a
-                  href={`tel:+91${branch.phoneDisplay}`}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '9px',
-                    padding: '10px 18px',
-                    borderRadius: '11px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.18)',
-                    border: '1px solid rgba(255, 255, 255, 0.35)',
-                    color: '#FFFFFF',
-                    fontSize: '1.02rem',
-                    fontWeight: 900,
-                    letterSpacing: '0.04em',
-                    marginBottom: '22px',
-                  }}
-                >
-                  <Phone size={17} />
-                  <span>{branch.phoneFull}</span>
-                </a>
-              </div>
-
-              {/* Action Buttons Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <a
-                  href={branch.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-white btn-sm"
-                  style={{
-                    padding: '11px 14px',
-                    fontSize: '0.8rem',
-                    textTransform: 'none',
-                    fontWeight: 800,
-                    color: branch.id === 'vishrambag' ? '#007A31' : '#172C83',
-                  }}
-                >
-                  <MapPin size={15} />
-                  <span>Directions</span>
-                  <ExternalLink size={13} />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={() => openBranchWhatsApp(branch)}
-                  style={{
-                    padding: '11px 14px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
-                    border: '1px solid rgba(255, 255, 255, 0.35)',
-                    color: '#FFFFFF',
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '7px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <MessageCircle size={15} />
-                  <span>WhatsApp</span>
-                </button>
-              </div>
-            </div>
-          ))}
         </div>
 
         {/* Bottom 2-Column Grid: Timings & Policy + Direct Membership Inquiry Form */}
