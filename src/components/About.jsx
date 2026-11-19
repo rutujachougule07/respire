@@ -5,23 +5,23 @@ export default function About() {
   const companyPillars = [
     {
       icon: Award,
-      title: 'Decades of Trusted Corporate Heritage',
-      desc: 'Backed by the prestigious Mahabal Group—one of Sangli and Western Maharashtra’s most respected business houses, built on uncompromising ethics and community trust.',
+      title: 'Decades of Trusted Heritage',
+      desc: 'Backed by Mahabal Group—built on decades of trust, ethics, and corporate leadership in Sangli.',
     },
     {
       icon: Landmark,
-      title: 'Vision for Sangli’s Wellness Evolution',
-      desc: 'Founded with the visionary objective of elevating Sangli’s fitness landscape, bringing metro-standard sports science and luxury wellness to local athletes and families.',
+      title: 'Vision for Sangli’s Wellness',
+      desc: 'Elevating Sangli’s fitness with metro-grade sports science and luxury wellness standards.',
     },
     {
       icon: ShieldCheck,
-      title: 'Uncompromising Quality & Institutional Standards',
-      desc: 'Operated under strict corporate governance: world-class biomechanical equipment, certified staff, certified hygiene protocols, and 100% transparent fee policies.',
+      title: 'Uncompromising Standards',
+      desc: 'World-class biomechanical equipment, certified trainers, and 100% transparent fee policies.',
     },
     {
       icon: HeartHandshake,
-      title: 'Deep Regional Roots Across 2 Strategic Hubs',
-      desc: 'A permanent civic commitment to Sangli with two flagship premises: Vishrambag (7th Floor, R City Mall) and Vijaynagar (3rd Floor, Krishna Heights).',
+      title: '2 Strategic Sangli Hubs',
+      desc: 'Serving members across two premier branches: Vishrambag (R City Mall) & Vijaynagar (Krishna Heights).',
     },
   ];
 
@@ -49,7 +49,14 @@ export default function About() {
         }}
       />
 
-      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+      <div
+        className="container"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          maxWidth: '1440px',
+        }}
+      >
         {/* TOP ROW: Image on Left + Company Information on Right */}
         <div
           style={{
@@ -57,7 +64,7 @@ export default function About() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '48px',
             alignItems: 'center',
-            marginBottom: '48px',
+            marginBottom: '40px',
           }}
         >
           {/* Left Column: Authentic Mahabal Group Visual Presentation */}
@@ -69,7 +76,7 @@ export default function About() {
                 border: '1.5px solid rgba(0, 184, 74, 0.22)',
                 boxShadow: '0 24px 50px rgba(15, 23, 42, 0.12)',
                 position: 'relative',
-                height: '460px',
+                height: '440px',
               }}
             >
               <img
@@ -173,16 +180,16 @@ export default function About() {
               <span>• A PART OF MAHABAL GROUP •</span>
             </div>
 
-            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '18px' }}>
+            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>
               ABOUT <span className="text-green">MAHABAL GROUP & RESPIRE</span>
             </h2>
 
             <p
               style={{
-                fontSize: '1.05rem',
+                fontSize: '1.04rem',
                 color: '#1E293B',
-                marginBottom: '16px',
-                lineHeight: 1.7,
+                marginBottom: '14px',
+                lineHeight: 1.68,
                 fontWeight: 500,
               }}
             >
@@ -191,7 +198,7 @@ export default function About() {
               widespread public trust across Sangli and Western Maharashtra.
             </p>
 
-            <p style={{ fontSize: '0.94rem', color: '#475569', marginBottom: '24px', lineHeight: 1.68 }}>
+            <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '22px', lineHeight: 1.65 }}>
               Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand,
               Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern
               sports science with transparent, professional management, the Mahabal Group ensures that every member benefits
@@ -203,7 +210,7 @@ export default function About() {
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '10px 20px',
+                gap: '10px 18px',
                 padding: '14px 18px',
                 borderRadius: '14px',
                 backgroundColor: '#F8FCFA',
@@ -229,7 +236,7 @@ export default function About() {
           </div>
         </div>
 
-        {/* BOTTOM SECTION: 4 Pillar Boxes Placed Side-by-Side Under Image & Information */}
+        {/* BOTTOM SECTION: ALL 4 PILLAR BOXES IN EXACTLY 1 LINE ON DESKTOP */}
         <div className="about-pillars-grid">
           {companyPillars.map((p, idx) => {
             const Icon = p.icon;
@@ -240,20 +247,20 @@ export default function About() {
                 style={{
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '16px',
-                  padding: '22px 20px',
+                  gap: '14px',
+                  padding: '20px 16px',
                   background: 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
-                  borderRadius: '18px',
+                  borderRadius: '16px',
                   border: '1.5px solid rgba(0, 184, 74, 0.2)',
-                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)',
+                  boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)',
                   transition: 'all 0.3s ease',
                 }}
               >
                 <div
                   style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
                     backgroundColor: 'rgba(0, 184, 74, 0.12)',
                     border: '1px solid rgba(0, 184, 74, 0.25)',
                     display: 'flex',
@@ -264,21 +271,21 @@ export default function About() {
                     marginTop: '2px',
                   }}
                 >
-                  <Icon size={22} />
+                  <Icon size={20} />
                 </div>
                 <div>
                   <div
                     style={{
-                      fontSize: '0.98rem',
+                      fontSize: '0.92rem',
                       fontWeight: 800,
                       color: '#0F172A',
-                      marginBottom: '6px',
-                      lineHeight: 1.3,
+                      marginBottom: '4px',
+                      lineHeight: 1.25,
                     }}
                   >
                     {p.title}
                   </div>
-                  <div style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.55 }}>
+                  <div style={{ fontSize: '0.81rem', color: '#475569', lineHeight: 1.48 }}>
                     {p.desc}
                   </div>
                 </div>
@@ -291,24 +298,30 @@ export default function About() {
       <style>{`
         .about-pillars-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 20px;
+          width: 100%;
+          gap: 14px;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 900px) {
           .about-pillars-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 22px !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 14px !important;
           }
         }
-        @media (min-width: 1280px) {
+        @media (min-width: 580px) and (max-width: 899px) {
           .about-pillars-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 18px !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+          }
+        }
+        @media (max-width: 579px) {
+          .about-pillars-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
         }
         .about-pillar-card:hover {
           transform: translateY(-4px);
-          box-shadow: 0 14px 32px rgba(0, 184, 74, 0.15) !important;
+          box-shadow: 0 12px 28px rgba(0, 184, 74, 0.16) !important;
           border-color: rgba(0, 184, 74, 0.45) !important;
         }
       `}</style>
