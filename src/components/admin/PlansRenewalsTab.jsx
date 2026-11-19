@@ -30,11 +30,13 @@ function addMonths(dateStr, months) {
 
 export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast }) {
   const [renewalFilter, setRenewalFilter] = useState('Expiring');
+  const [planBranchFilter, setPlanBranchFilter] = useState('all');
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [isSavingPlan, setIsSavingPlan] = useState(false);
 
   const [planForm, setPlanForm] = useState({
+    branchId: 'vishrambag',
     durationLabel: '1 Month',
     name: '',
     durationMonths: 1,
@@ -49,6 +51,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   const openAddPlan = () => {
     setEditingPlan(null);
     setPlanForm({
+      branchId: planBranchFilter !== 'all' ? planBranchFilter : 'vishrambag',
       durationLabel: '2 Months',
       name: '2 Months Membership',
       durationMonths: 2,
@@ -65,6 +68,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   const openEditPlan = (plan) => {
     setEditingPlan(plan);
     setPlanForm({
+      branchId: plan.branchId || 'vishrambag',
       durationLabel:
         plan.durationLabel ||
         (plan.durationMonths === 12
@@ -96,6 +100,8 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
       if (editingPlan) {
         const updatedPlan = {
           ...editingPlan,
+          branchId: planForm.branchId || 'vishrambag',
+          branchName: planForm.branchId === 'branch2' ? 'Vijaynagar Branch' : 'Vishrambag Branch',
           durationLabel: planForm.durationLabel,
           name: planForm.name || `${planForm.durationLabel} Membership`,
           durationMonths: Number(planForm.durationMonths),
@@ -116,6 +122,8 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
       } else {
         const newPlan = {
           id: `plan-${Date.now()}`,
+          branchId: planForm.branchId || 'vishrambag',
+          branchName: planForm.branchId === 'branch2' ? 'Vijaynagar Branch' : 'Vishrambag Branch',
           durationLabel: planForm.durationLabel,
           name: planForm.name || `${planForm.durationLabel} Membership`,
           durationMonths: Number(planForm.durationMonths),
@@ -279,10 +287,73 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
             </button>
           </div>
 
+          {/* Branch Filter Tabs for Plans */}
+          <div
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#F8FAFC',
+              borderBottom: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginRight: '6px' }}>
+              Filter By Branch:
+            </span>
+            <button
+              onClick={() => setPlanBranchFilter('all')}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                backgroundColor: planBranchFilter === 'all' ? '#0F172A' : '#E2E8F0',
+                color: planBranchFilter === 'all' ? '#FFFFFF' : '#475569',
+              }}
+            >
+              All Branches ({plans.length})
+            </button>
+            <button
+              onClick={() => setPlanBranchFilter('vishrambag')}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                backgroundColor: planBranchFilter === 'vishrambag' ? '#008A38' : '#E2E8F0',
+                color: planBranchFilter === 'vishrambag' ? '#FFFFFF' : '#475569',
+              }}
+            >
+              Vishrambag ({plans.filter((p) => p.branchId === 'vishrambag' || !p.branchId).length})
+            </button>
+            <button
+              onClick={() => setPlanBranchFilter('branch2')}
+              style={{
+                padding: '5px 12px',
+                borderRadius: '999px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                backgroundColor: planBranchFilter === 'branch2' ? '#172C83' : '#E2E8F0',
+                color: planBranchFilter === 'branch2' ? '#FFFFFF' : '#475569',
+              }}
+            >
+              Vijaynagar ({plans.filter((p) => p.branchId === 'branch2' || p.branchId === 'vijaynagar').length})
+            </button>
+          </div>
+
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
               <thead>
                 <tr style={{ backgroundColor: '#F4FBF7', borderBottom: '1px solid #E2E8F0', textAlign: 'left' }}>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Branch</th>
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Duration</th>
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Plan Title</th>
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Charges (₹)</th>
@@ -293,21 +364,47 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               <tbody>
                 {plans.length === 0 ? (
                   <tr>
-                    <td colSpan={5} style={{ padding: '28px', textAlign: 'center', color: '#64748B' }}>
+                    <td colSpan={6} style={{ padding: '28px', textAlign: 'center', color: '#64748B' }}>
                       No plans added yet. Click "Add New Plan" to create one.
                     </td>
                   </tr>
                 ) : (
-                  plans.map((plan) => {
+                  plans
+                    .filter((plan) => {
+                      if (planBranchFilter === 'all') return true;
+                      if (planBranchFilter === 'branch2') {
+                        return plan.branchId === 'branch2' || plan.branchId === 'vijaynagar';
+                      }
+                      return plan.branchId === 'vishrambag' || !plan.branchId;
+                    })
+                    .map((plan) => {
+                    const isVijaynagar = plan.branchId === 'branch2' || plan.branchId === 'vijaynagar';
                     const durationText =
                       plan.durationLabel ||
                       (plan.durationMonths === 12
                         ? '1 Year'
+                        : plan.durationMonths < 1
+                        ? '1 Day'
                         : `${plan.durationMonths} ${plan.durationMonths === 1 ? 'Month' : 'Months'}`);
                     const memberCount = members.filter((m) => m.planId === plan.id && m.status === 'Active').length;
 
                     return (
                       <tr key={plan.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '14px 20px' }}>
+                          <span
+                            style={{
+                              padding: '3px 9px',
+                              borderRadius: '999px',
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              backgroundColor: isVijaynagar ? '#EEF2FF' : '#ECFDF3',
+                              color: isVijaynagar ? '#172C83' : '#008A38',
+                              border: isVijaynagar ? '1px solid #C7D2FE' : '1px solid #A7F3D0',
+                            }}
+                          >
+                            {isVijaynagar ? 'Vijaynagar' : 'Vishrambag'}
+                          </span>
+                        </td>
                         <td style={{ padding: '14px 20px', fontWeight: 900, fontSize: '0.96rem', color: '#0F172A' }}>
                           {durationText}
                           {plan.isPopular && (
@@ -612,6 +709,20 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               onSubmit={handleSavePlan}
               style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1, overflowY: 'auto' }}
             >
+              <div>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                  BRANCH *
+                </label>
+                <select
+                  value={planForm.branchId}
+                  onChange={(e) => setPlanForm({ ...planForm, branchId: e.target.value })}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem', backgroundColor: '#FFFFFF' }}
+                >
+                  <option value="vishrambag">Respire Vishrambag Branch (7th Floor, R City Mall)</option>
+                  <option value="branch2">Respire Vijaynagar Branch (3rd Floor, Krishna Heights - Since 2012)</option>
+                </select>
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
@@ -621,7 +732,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                     required
                     value={planForm.durationLabel}
                     onChange={(e) => setPlanForm({ ...planForm, durationLabel: e.target.value })}
-                    placeholder="e.g. 1 Month, 3 Months, 1 Year"
+                    placeholder="e.g. 1 Day, 1 Month, 3 Months, 1 Year"
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem' }}
                   />
                 </div>
@@ -631,11 +742,11 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                   </label>
                   <input
                     type="number"
-                    min="500"
+                    min="100"
                     required
                     value={planForm.price}
                     onChange={(e) => setPlanForm({ ...planForm, price: e.target.value })}
-                    placeholder="5500"
+                    placeholder="2000"
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem' }}
                   />
                 </div>

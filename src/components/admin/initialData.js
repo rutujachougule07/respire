@@ -47,8 +47,11 @@ export const LOGIN_ACCOUNTS = [
 ];
 
 export const INITIAL_PLANS = [
+  // --- Vishrambag Branch Plans (7th Floor, R City Mall) ---
   {
     id: 'plan-1',
+    branchId: 'vishrambag',
+    branchName: 'Vishrambag Branch',
     name: '1 Month Membership',
     durationLabel: '1 Month',
     durationMonths: 1,
@@ -62,6 +65,8 @@ export const INITIAL_PLANS = [
   },
   {
     id: 'plan-2',
+    branchId: 'vishrambag',
+    branchName: 'Vishrambag Branch',
     name: '3 Months Membership',
     durationLabel: '3 Months',
     durationMonths: 3,
@@ -75,6 +80,8 @@ export const INITIAL_PLANS = [
   },
   {
     id: 'plan-3',
+    branchId: 'vishrambag',
+    branchName: 'Vishrambag Branch',
     name: '6 Months Membership',
     durationLabel: '6 Months',
     durationMonths: 6,
@@ -88,6 +95,8 @@ export const INITIAL_PLANS = [
   },
   {
     id: 'plan-4',
+    branchId: 'vishrambag',
+    branchName: 'Vishrambag Branch',
     name: '1 Year Membership',
     durationLabel: '1 Year',
     durationMonths: 12,
@@ -99,9 +108,86 @@ export const INITIAL_PLANS = [
     status: 'Active',
     isPopular: false,
   },
+
+  // --- Vijaynagar Branch Plans (Since 2012 • 3rd Floor, Krishna Heights) ---
+  {
+    id: 'plan-vjn-day',
+    branchId: 'branch2',
+    branchName: 'Vijaynagar Branch',
+    name: '1 Day Pass',
+    durationLabel: '1 Day',
+    durationMonths: 0.03,
+    price: 200,
+    freezeDays: 0,
+    badge: 'Daily Pass',
+    ideal: 'Single-day complete gym floor access for guest or trial workout',
+    features: ['Full Gym Floor Access', 'Cardio & Strength Machines', 'Locker Access', 'Valid for 1 Day'],
+    status: 'Active',
+    isPopular: false,
+  },
+  {
+    id: 'plan-vjn-1',
+    branchId: 'branch2',
+    branchName: 'Vijaynagar Branch',
+    name: '1 Month Membership',
+    durationLabel: '1 Month',
+    durationMonths: 1,
+    price: 2000,
+    freezeDays: 0,
+    badge: 'Starter Tier',
+    ideal: 'Full fitness floor access with flexible monthly renewal',
+    features: ['Full Gym Floor Access', 'Cardio & Free Weight Zone', 'Locker Facility', 'AC Hours Workout Access'],
+    status: 'Active',
+    isPopular: false,
+  },
+  {
+    id: 'plan-vjn-2',
+    branchId: 'branch2',
+    branchName: 'Vijaynagar Branch',
+    name: '3 Months Membership',
+    durationLabel: '3 Months',
+    durationMonths: 3,
+    price: 5000,
+    freezeDays: 7,
+    badge: 'Consistency Tier',
+    ideal: 'Build a solid fitness routine over 90 focused days',
+    features: ['Full Gym Floor Access', 'Cardio & Strength Training', 'Trainer Guidance & Form Checks', 'AC Hours Workout Access'],
+    status: 'Active',
+    isPopular: false,
+  },
+  {
+    id: 'plan-vjn-3',
+    branchId: 'branch2',
+    branchName: 'Vijaynagar Branch',
+    name: '6 Months Membership',
+    durationLabel: '6 Months',
+    durationMonths: 6,
+    price: 8500,
+    freezeDays: 15,
+    badge: 'Most Popular',
+    ideal: 'Our most popular Vijaynagar package for serious transformation',
+    features: ['Complete Gym Facility Access', 'Advanced Strength & Cardio Floor', 'Locker & Shower Facility', 'Continuous Trainer Guidance'],
+    status: 'Active',
+    isPopular: true,
+  },
+  {
+    id: 'plan-vjn-4',
+    branchId: 'branch2',
+    branchName: 'Vijaynagar Branch',
+    name: '1 Year Membership',
+    durationLabel: '1 Year',
+    durationMonths: 12,
+    price: 13000,
+    freezeDays: 30,
+    badge: 'Best Value',
+    ideal: 'Year-round 365 days fitness at lowest rate (Only ₹1,083/month)',
+    features: ['365 Days Unrestricted Access', 'Complete Equipment & Floor Access', 'Priority Guidance & Tips', 'Maximum Annual Savings'],
+    status: 'Active',
+    isPopular: false,
+  },
 ];
 
-export const OFFICIAL_FEE_RULES = [
+export const VISHRAMBAG_RULES = [
   'Limited Time Offer.',
   'The One Day charge for a Trial is Rs. 500/-. There is No Free Trial.',
   'Gym Timings :- 05.30 AM to 10.00 PM.',
@@ -110,6 +196,24 @@ export const OFFICIAL_FEE_RULES = [
   'AC Will Be Shut Down Daily From 12PM To 4PM.',
   'For more details contact 7798001777.',
 ];
+
+export const VIJAYNAGAR_RULES = [
+  'Gym Timing :- 05:30AM to 10:00PM.',
+  'All fees will be received strictly in advance.',
+  'Membership fees are Non-refundable & Non-transferable.',
+  'Ac Timing :- 06AM to 09:30AM & 05PM to 09:00PM.',
+  'Daily 1 Day Membership / Workout Pass :- ₹200/-.',
+  'For more details contact 9172848777.',
+];
+
+export const VIJAYNAGAR_MANAGEMENT = {
+  since: 'Since 2012',
+  quote1: 'You Get Fit With Us.....',
+  quote2: 'I Will Start "One Day" ..... or ..... "Day 1".....?',
+  signature: 'MANAGEMENT',
+};
+
+export const OFFICIAL_FEE_RULES = VISHRAMBAG_RULES;
 
 export const INITIAL_TRAINERS = [
   {

@@ -31,7 +31,7 @@ function PublicLayout({ children }) {
 export default function App() {
   const [plans, setPlans] = useState(() => {
     try {
-      const raw = localStorage.getItem('rf_official_plans_v2');
+      const raw = localStorage.getItem('rf_official_plans_v3');
       return raw ? JSON.parse(raw) : INITIAL_PLANS;
     } catch {
       return INITIAL_PLANS;
@@ -59,7 +59,7 @@ export default function App() {
   // Cache to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('rf_official_plans_v2', JSON.stringify(plans));
+      localStorage.setItem('rf_official_plans_v3', JSON.stringify(plans));
     } catch {
       // ignore storage errors
     }

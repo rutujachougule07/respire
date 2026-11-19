@@ -66,7 +66,11 @@ export default function MembershipPage({ plans }) {
             </Link>
             <a href="tel:+917798001777" className="btn btn-secondary">
               <Phone size={16} />
-              <span>Call 7798001777</span>
+              <span>Vishrambag: 7798001777</span>
+            </a>
+            <a href="tel:+919172848777" className="btn btn-secondary">
+              <Phone size={16} />
+              <span>Vijaynagar: 9172848777</span>
             </a>
           </div>
         </div>

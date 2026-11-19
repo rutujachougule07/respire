@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowRight, MapPin, Phone, ShieldCheck, Lock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Menu, X, ArrowRight, MapPin, Phone } from 'lucide-react';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
 
-  const { isAuthenticated, adminSession } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -67,6 +65,7 @@ export default function Navbar() {
     { label: 'Services', path: '/services', id: 'services' },
     { label: 'Membership', path: '/membership', id: 'membership' },
     { label: 'Programs', path: '/programs', id: 'programs' },
+    { label: 'Features', path: '/#features', id: 'features' },
     { label: 'Contact', path: '/contact', id: 'contact' },
   ];
 
@@ -252,31 +251,8 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Action CTA & Admin Link */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {/* Quick Admin Portal Button */}
-            <Link
-              to={isAuthenticated ? '/admin' : '/login'}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '7px 12px',
-                borderRadius: '8px',
-                backgroundColor: isAuthenticated ? 'rgba(0, 184, 74, 0.12)' : '#F1F5F9',
-                border: isAuthenticated ? '1px solid rgba(0, 184, 74, 0.35)' : '1px solid #E2E8F0',
-                color: isAuthenticated ? '#008A38' : '#475569',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                textDecoration: 'none',
-                transition: 'all 0.2s',
-              }}
-              title="Respire Admin Portal"
-            >
-              {isAuthenticated ? <ShieldCheck size={14} color="#008A38" /> : <Lock size={13} />}
-              <span>{isAuthenticated ? 'Admin' : 'Staff'}</span>
-            </Link>
-
+          {/* Action CTA & Mobile Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Link
               to="/contact"
               className="btn btn-primary btn-sm"
@@ -353,30 +329,6 @@ export default function Navbar() {
               );
             })}
 
-            {/* Admin Portal in Mobile Menu */}
-            <Link
-              to={isAuthenticated ? '/admin' : '/login'}
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                padding: '12px 16px',
-                fontSize: '0.96rem',
-                fontWeight: 700,
-                color: '#008A38',
-                borderRadius: '10px',
-                backgroundColor: 'rgba(0, 184, 74, 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                textDecoration: 'none',
-                marginTop: '4px',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShieldCheck size={16} color="#008A38" />
-                <span>{isAuthenticated ? 'Admin Dashboard' : 'Staff / Admin Portal'}</span>
-              </span>
-              <ArrowRight size={16} color="#00B84A" />
-            </Link>
 
             <div style={{ marginTop: '12px', paddingTop: '14px', borderTop: '1px solid rgba(15, 23, 42, 0.08)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: '#475569', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 600 }}>

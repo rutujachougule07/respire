@@ -444,6 +444,7 @@ export default function Contact() {
                     Preferred Branch *
                   </label>
                   <select
+                    name="branch"
                     value={formData.branch}
                     onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                     style={{

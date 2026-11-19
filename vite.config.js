@@ -5,6 +5,21 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    host: true
-  }
+    host: true,
+  },
+  build: {
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/firebase/')) {
+            return 'firebase';
+          }
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'react-vendor';
+          }
+        },
+      },
+    },
+  },
 });
