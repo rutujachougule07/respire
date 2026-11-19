@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
+import SplashScreen from './components/SplashScreen';
 import AdminDashboard from './components/admin/AdminDashboard';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
@@ -67,6 +68,7 @@ export default function App() {
 
   return (
     <>
+      <SplashScreen />
       <ScrollToTop />
       <Routes>
         {/* Public Website Routes */}
