@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   ShieldCheck,
   Clock,
@@ -975,36 +975,18 @@ export default function Membership({ plans = [] }) {
 
         {/* Official Fee Structure Terms, Timings & AC Rules Box */}
         <div
-          className="membership-terms-panel"
           style={{
             backgroundColor: '#FFFFFF',
             border:
               selectedBranch === 'branch2'
-                ? '1.5px solid rgba(23, 44, 131, 0.22)'
-                : '1.5px solid rgba(0, 184, 74, 0.22)',
+                ? '2px solid rgba(23, 44, 131, 0.22)'
+                : '2px solid rgba(0, 184, 74, 0.24)',
             borderRadius: '24px',
-            padding: '30px 32px',
+            padding: '34px 32px',
             marginBottom: '44px',
-            boxShadow: '0 16px 40px rgba(15, 23, 42, 0.06)',
-            position: 'relative',
-            overflow: 'hidden',
+            boxShadow: '0 16px 45px rgba(15, 23, 42, 0.06)',
           }}
         >
-          {/* Top subtle decorative gradient border */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '4px',
-              background:
-                selectedBranch === 'branch2'
-                  ? 'linear-gradient(90deg, #172C83 0%, #2563EB 100%)'
-                  : 'linear-gradient(90deg, #007A31 0%, #00D256 100%)',
-            }}
-          />
-
           {/* Header Bar */}
           <div
             style={{
@@ -1017,16 +999,16 @@ export default function Membership({ plans = [] }) {
               paddingBottom: '18px',
               borderBottom:
                 selectedBranch === 'branch2'
-                  ? '1px solid rgba(23, 44, 131, 0.14)'
-                  : '1px solid rgba(0, 184, 74, 0.16)',
+                  ? '1.5px solid rgba(23, 44, 131, 0.12)'
+                  : '1.5px solid rgba(0, 184, 74, 0.16)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <div
                 style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '12px',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '13px',
                   background:
                     selectedBranch === 'branch2'
                       ? 'linear-gradient(135deg, #1E3AA8 0%, #172C83 100%)'
@@ -1036,8 +1018,8 @@ export default function Membership({ plans = [] }) {
                   justifyContent: 'center',
                   boxShadow:
                     selectedBranch === 'branch2'
-                      ? '0 6px 16px rgba(23, 44, 131, 0.25)'
-                      : '0 6px 16px rgba(0, 184, 74, 0.25)',
+                      ? '0 6px 18px rgba(23, 44, 131, 0.28)'
+                      : '0 6px 18px rgba(0, 184, 74, 0.28)',
                   flexShrink: 0,
                 }}
               >
@@ -1046,7 +1028,7 @@ export default function Membership({ plans = [] }) {
               <div>
                 <h3
                   style={{
-                    fontSize: '1.3rem',
+                    fontSize: '1.35rem',
                     fontWeight: 900,
                     color: '#0F172A',
                     margin: '0 0 3px',
@@ -1057,7 +1039,7 @@ export default function Membership({ plans = [] }) {
                 </h3>
                 <div
                   style={{
-                    fontSize: '0.82rem',
+                    fontSize: '0.84rem',
                     color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
                     fontWeight: 800,
                   }}
@@ -1073,16 +1055,16 @@ export default function Membership({ plans = [] }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '10px 20px',
-                borderRadius: '12px',
+                padding: '10px 22px',
+                borderRadius: '999px',
                 backgroundColor:
                   selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
                 border:
                   selectedBranch === 'branch2'
-                    ? '1.5px solid rgba(23, 44, 131, 0.3)'
-                    : '1.5px solid rgba(0, 184, 74, 0.3)',
+                    ? '1.5px solid rgba(23, 44, 131, 0.35)'
+                    : '1.5px solid rgba(0, 184, 74, 0.35)',
                 color: selectedBranch === 'branch2' ? '#172C83' : '#007A31',
-                fontSize: '0.88rem',
+                fontSize: '0.9rem',
                 fontWeight: 800,
                 textDecoration: 'none',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
@@ -1097,51 +1079,36 @@ export default function Membership({ plans = [] }) {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '16px',
-              marginBottom: '22px',
+              marginBottom: '24px',
             }}
           >
             {/* Gym Timing */}
             <div
               style={{
-                background:
-                  selectedBranch === 'branch2'
-                    ? 'linear-gradient(135deg, #F0F4FF 0%, #E0E7FF 100%)'
-                    : 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
-                border:
-                  selectedBranch === 'branch2'
-                    ? '1.5px solid rgba(23, 44, 131, 0.3)'
-                    : '1.5px solid rgba(0, 184, 74, 0.35)',
+                background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                border: '1.5px solid #86EFAC',
                 borderRadius: '16px',
-                padding: '18px 22px',
+                padding: '20px 24px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '16px',
-                boxShadow:
-                  selectedBranch === 'branch2'
-                    ? '0 6px 18px rgba(23, 44, 131, 0.08)'
-                    : '0 6px 18px rgba(0, 184, 74, 0.08)',
+                boxShadow: '0 4px 14px rgba(0, 184, 74, 0.08)',
               }}
             >
               <div
                 style={{
                   width: '46px',
                   height: '46px',
-                  borderRadius: '12px',
-                  background:
-                    selectedBranch === 'branch2'
-                      ? 'linear-gradient(135deg, #2563EB 0%, #172C83 100%)'
-                      : 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
+                  borderRadius: '13px',
+                  backgroundColor: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
+                  color: '#008A38',
+                  boxShadow: '0 4px 12px rgba(0, 184, 74, 0.15)',
                   flexShrink: 0,
-                  boxShadow:
-                    selectedBranch === 'branch2'
-                      ? '0 4px 12px rgba(23, 44, 131, 0.25)'
-                      : '0 4px 12px rgba(0, 184, 74, 0.25)',
                 }}
               >
                 <Clock size={22} />
@@ -1150,21 +1117,21 @@ export default function Membership({ plans = [] }) {
                 <div
                   style={{
                     fontSize: '0.74rem',
-                    fontWeight: 800,
-                    color: selectedBranch === 'branch2' ? '#1E3A8A' : '#047857',
+                    fontWeight: 900,
+                    color: '#008A38',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    marginBottom: '3px',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
                   }}
                 >
                   GYM TIMING
                 </div>
                 <div
                   style={{
-                    fontSize: '1.18rem',
+                    fontSize: '1.24rem',
                     fontWeight: 900,
                     color: '#0F172A',
-                    lineHeight: 1.2,
+                    letterSpacing: '-0.01em',
                   }}
                 >
                   {currentBranch.gymTiming}
@@ -1176,27 +1143,27 @@ export default function Membership({ plans = [] }) {
             <div
               style={{
                 background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
-                border: '1.5px solid rgba(14, 165, 233, 0.35)',
+                border: '1.5px solid #7DD3FC',
                 borderRadius: '16px',
-                padding: '18px 22px',
+                padding: '20px 24px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '16px',
-                boxShadow: '0 6px 18px rgba(14, 165, 233, 0.08)',
+                boxShadow: '0 4px 14px rgba(2, 132, 199, 0.08)',
               }}
             >
               <div
                 style={{
                   width: '46px',
                   height: '46px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
+                  borderRadius: '13px',
+                  backgroundColor: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
+                  color: '#0284C7',
+                  boxShadow: '0 4px 12px rgba(2, 132, 199, 0.15)',
                   flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)',
                 }}
               >
                 <Wind size={22} />
@@ -1205,11 +1172,11 @@ export default function Membership({ plans = [] }) {
                 <div
                   style={{
                     fontSize: '0.74rem',
-                    fontWeight: 800,
-                    color: '#0369A1',
+                    fontWeight: 900,
+                    color: '#0284C7',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.07em',
-                    marginBottom: '3px',
+                    letterSpacing: '0.08em',
+                    marginBottom: '2px',
                   }}
                 >
                   AC TIMINGS
@@ -1219,7 +1186,7 @@ export default function Membership({ plans = [] }) {
                     fontSize: '1.12rem',
                     fontWeight: 900,
                     color: '#0F172A',
-                    lineHeight: 1.25,
+                    letterSpacing: '-0.01em',
                   }}
                 >
                   {currentBranch.acTiming}
@@ -1228,66 +1195,67 @@ export default function Membership({ plans = [] }) {
             </div>
           </div>
 
-          {/* Balanced 2-Column Rules Grid */}
+          {/* Balanced 2-Column Rules Grid (Spacious, Clean, No Awkward Wrap) */}
           <div
-            className="membership-rules-grid"
+            className="terms-rules-grid"
             style={{
               display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
               gap: '14px',
               marginBottom: currentBranch.motto ? '24px' : '0',
             }}
           >
             {currentBranch.rules.map((rule, idx) => {
               const isLastOdd =
-                currentBranch.rules.length % 2 !== 0 &&
-                idx === currentBranch.rules.length - 1;
+                idx === currentBranch.rules.length - 1 &&
+                currentBranch.rules.length % 2 !== 0;
 
               return (
                 <div
                   key={idx}
                   style={{
-                    gridColumn: isLastOdd ? '1 / -1' : 'auto',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '14px',
-                    padding: '15px 18px',
-                    borderRadius: '12px',
-                    backgroundColor: '#FFFFFF',
-                    border:
-                      selectedBranch === 'branch2'
-                        ? '1.5px solid rgba(23, 44, 131, 0.16)'
-                        : '1.5px solid rgba(0, 184, 74, 0.18)',
-                    borderLeft:
-                      selectedBranch === 'branch2'
-                        ? '5px solid #172C83'
-                        : '5px solid #00B84A',
-                    boxShadow: '0 3px 12px rgba(15, 23, 42, 0.04)',
+                    padding: '16px 20px',
+                    borderRadius: '14px',
+                    backgroundColor: isLastOdd
+                      ? selectedBranch === 'branch2'
+                        ? '#EEF2FF'
+                        : '#ECFDF3'
+                      : '#F8FAFC',
+                    border: isLastOdd
+                      ? selectedBranch === 'branch2'
+                        ? '1.5px solid rgba(23, 44, 131, 0.28)'
+                        : '1.5px solid rgba(0, 184, 74, 0.32)'
+                      : '1.5px solid #E2E8F0',
+                    gridColumn: isLastOdd ? '1 / -1' : 'auto',
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
                     transition: 'all 0.2s ease',
                   }}
                 >
                   <div
                     style={{
-                      width: '26px',
-                      height: '26px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '8px',
                       backgroundColor:
                         selectedBranch === 'branch2'
-                          ? '#EEF2FF'
-                          : '#ECFDF3',
+                          ? 'rgba(23, 44, 131, 0.12)'
+                          : 'rgba(0, 184, 74, 0.14)',
+                      color:
+                        selectedBranch === 'branch2' ? '#172C83' : '#008A38',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <CheckCircle2
-                      size={16}
-                      color={selectedBranch === 'branch2' ? '#172C83' : '#008A38'}
-                    />
+                    <CheckCircle2 size={16} />
                   </div>
                   <span
                     style={{
-                      fontSize: '0.92rem',
+                      fontSize: '0.94rem',
                       color: '#0F172A',
                       fontWeight: 700,
                       lineHeight: 1.45,
@@ -1306,33 +1274,32 @@ export default function Membership({ plans = [] }) {
               style={{
                 marginTop: '22px',
                 padding: '22px 26px',
-                borderRadius: '16px',
+                borderRadius: '18px',
                 background:
-                  'linear-gradient(135deg, #090E21 0%, #172C83 60%, #1E3AA8 100%)',
+                  'linear-gradient(135deg, #0A1128 0%, #172C83 60%, #1E3A8A 100%)',
                 color: '#FFFFFF',
-                boxShadow: '0 10px 28px rgba(23, 44, 131, 0.25)',
+                boxShadow: '0 10px 28px rgba(23, 44, 131, 0.22)',
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '16px',
+                gap: '18px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div
                   style={{
-                    width: '44px',
-                    height: '44px',
+                    width: '46px',
+                    height: '46px',
                     borderRadius: '12px',
                     backgroundColor: 'rgba(255, 255, 255, 0.12)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                   }}
                 >
-                  <Quote size={22} color="#00FF66" />
+                  <Quote size={24} color="#00FF66" />
                 </div>
                 <div>
                   <div
@@ -1364,13 +1331,13 @@ export default function Membership({ plans = [] }) {
                   textAlign: 'right',
                   fontSize: '0.8rem',
                   fontWeight: 900,
-                  letterSpacing: '0.1em',
+                  letterSpacing: '0.12em',
                   color: '#FFFFFF',
                   textTransform: 'uppercase',
                 }}
               >
                 <div>— {currentBranch.motto.signature}</div>
-                <div style={{ color: '#00FF66', fontSize: '0.74rem', marginTop: '2px' }}>
+                <div style={{ color: '#00FF66', fontSize: '0.74rem' }}>
                   {currentBranch.motto.since}
                 </div>
               </div>
@@ -1395,7 +1362,7 @@ export default function Membership({ plans = [] }) {
             gap: 20px !important;
           }
         }
-        @media (min-width: 641px) {
+        @media (min-width: 641px) and (max-width: 1023px) {
           .membership-cards-grid.cols-5 {
             grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
             gap: 14px !important;
@@ -1404,20 +1371,11 @@ export default function Membership({ plans = [] }) {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 16px !important;
           }
-          .membership-rules-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
         }
         @media (max-width: 640px) {
           .membership-cards-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
-          }
-          .membership-terms-panel {
-            padding: 22px 18px !important;
-          }
-          .membership-rules-grid {
-            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
