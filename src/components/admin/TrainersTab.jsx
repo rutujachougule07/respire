@@ -13,12 +13,14 @@ import {
   CheckCircle2,
   Dumbbell,
 } from 'lucide-react';
+import { saveTrainerToFirestore } from '../../services/firestoreService';
 
 export default function TrainersTab({ trainers, setTrainers, members, setMembers, activeBranchId = 'vishrambag', isSuperAdmin = false, showToast }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTrainer, setEditingTrainer] = useState(null);
   const [assignModalTrainer, setAssignModalTrainer] = useState(null);
   const [scheduleModalTrainer, setScheduleModalTrainer] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const defaultBranch = activeBranchId === 'all' ? 'vishrambag' : activeBranchId;
 
@@ -70,31 +72,44 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
     setIsFormOpen(true);
   };
 
-  const handleSaveTrainer = (e) => {
+  const handleSaveTrainer = async (e) => {
     e.preventDefault();
-    if (editingTrainer) {
-      setTrainers((prev) =>
-        prev.map((t) =>
-          t.id === editingTrainer.id
-            ? { ...t, ...form, rating: Number(form.rating) }
-            : t
-        )
-      );
-      showToast(`Updated profile for Trainer ${form.name}`);
-    } else {
-      const newTrainer = {
-        id: `tr-${Date.now()}`,
-        ...form,
-        branchId: form.branchId || defaultBranch,
-        rating: Number(form.rating),
-        schedule: [
-          { day: 'Mon – Sat', shift: 'Morning', time: '06:00 AM – 11:00 AM', slots: '5 Open Slots' },
-        ],
-      };
-      setTrainers((prev) => [...prev, newTrainer]);
-      showToast(`Added new trainer ${form.name}`);
+    if (isSaving) return; // Prevent double submission
+    setIsSaving(true);
+
+    try {
+      if (editingTrainer) {
+        const updatedTrainer = { ...editingTrainer, ...form, rating: Number(form.rating) };
+        await saveTrainerToFirestore(updatedTrainer).catch((err) =>
+          console.warn('Firestore trainer update notice:', err.message)
+        );
+
+        setTrainers((prev) =>
+          prev.map((t) => (t.id === editingTrainer.id ? updatedTrainer : t))
+        );
+        showToast(`Updated profile for Trainer ${form.name}`);
+      } else {
+        const newTrainer = {
+          id: `tr-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+          ...form,
+          branchId: form.branchId || defaultBranch,
+          rating: Number(form.rating),
+          schedule: [
+            { day: 'Mon – Sat', shift: 'Morning', time: '06:00 AM – 11:00 AM', slots: '5 Open Slots' },
+          ],
+        };
+
+        await saveTrainerToFirestore(newTrainer).catch((err) =>
+          console.warn('Firestore trainer insert notice:', err.message)
+        );
+
+        setTrainers((prev) => [...prev.filter((t) => t.id !== newTrainer.id), newTrainer]);
+        showToast(`Added new trainer ${form.name}`);
+      }
+      setIsFormOpen(false);
+    } finally {
+      setIsSaving(false);
     }
-    setIsFormOpen(false);
   };
 
   const toggleAssignMember = (memberId, trainerId) => {
@@ -397,7 +412,9 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                 <button type="button" onClick={() => setIsFormOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
-                <button type="submit" className="btn btn-primary btn-sm">{editingTrainer ? 'Save Profile' : 'Add Trainer'}</button>
+                <button type="submit" disabled={isSaving} className="btn btn-primary btn-sm" style={{ opacity: isSaving ? 0.7 : 1 }}>
+                  {isSaving ? 'Saving...' : (editingTrainer ? 'Save Profile' : 'Add Trainer')}
+                </button>
               </div>
             </form>
           </div>

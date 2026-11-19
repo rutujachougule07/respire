@@ -15,6 +15,7 @@ import {
   Award,
   CheckCircle2,
 } from 'lucide-react';
+import { saveMemberToFirestore, updateMemberStatusInFirestore } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');
@@ -34,6 +35,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [viewingMember, setViewingMember] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const defaultBranch = activeBranchId === 'all' ? 'vishrambag' : activeBranchId;
 
@@ -111,63 +113,92 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     });
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    const selectedPlan = plans.find((p) => p.id === form.planId);
-    if (editingMember) {
-      setMembers((prev) =>
-        prev.map((m) =>
-          m.id === editingMember.id
-            ? {
-                ...m,
-                branchId: form.branchId || m.branchId,
-                name: form.name,
-                phone: form.phone,
-                email: form.email,
-                gender: form.gender,
-                age: Number(form.age),
-                planId: form.planId,
-                planName: selectedPlan ? selectedPlan.name : m.planName,
-                trainerId: form.trainerId,
-                joinDate: form.joinDate,
-                expiryDate: form.expiryDate,
-                program: form.program,
-                addOns: form.addOns,
-                bodyMetrics: { weight: form.weight, bodyFat: form.bodyFat, bmi: form.bmi },
-              }
-            : m
-        )
+    if (isSaving) return; // Prevent double click / duplicate creation
+
+    // Duplicate check on phone number
+    if (form.phone) {
+      const cleanPhone = form.phone.replace(/\D/g, '');
+      const duplicate = members.find(
+        (m) => (!editingMember || m.id !== editingMember.id) && m.phone && m.phone.replace(/\D/g, '') === cleanPhone
       );
-      showToast(`Updated profile for ${form.name}`);
-    } else {
-      const prefix = form.branchId === 'branch2' ? 'RF-2' : 'RF-1';
-      const newMember = {
-        id: `${prefix}${String(Date.now()).slice(-3)}`,
-        branchId: form.branchId || defaultBranch,
-        name: form.name,
-        phone: form.phone,
-        email: form.email,
-        gender: form.gender,
-        age: Number(form.age),
-        planId: form.planId,
-        planName: selectedPlan ? selectedPlan.name : '1 Month Membership',
-        trainerId: form.trainerId,
-        joinDate: form.joinDate,
-        expiryDate: form.expiryDate,
-        status: 'Active',
-        program: form.program,
-        addOns: form.addOns,
-        bodyMetrics: { weight: form.weight, bodyFat: form.bodyFat, bmi: form.bmi },
-        reminderSentAt: null,
-      };
-      setMembers((prev) => [newMember, ...prev]);
-      showToast(`Registered new member ${form.name} (${newMember.id})`);
+      if (duplicate) {
+        showToast(`⚠️ Member already exists with this phone: ${duplicate.name} (${duplicate.id})`);
+        return;
+      }
     }
-    setIsFormOpen(false);
+
+    setIsSaving(true);
+    const selectedPlan = plans.find((p) => p.id === form.planId);
+
+    try {
+      if (editingMember) {
+        const updatedMember = {
+          ...editingMember,
+          branchId: form.branchId || editingMember.branchId,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          gender: form.gender,
+          age: Number(form.age),
+          planId: form.planId,
+          planName: selectedPlan ? selectedPlan.name : editingMember.planName,
+          trainerId: form.trainerId,
+          joinDate: form.joinDate,
+          expiryDate: form.expiryDate,
+          program: form.program,
+          addOns: form.addOns,
+          bodyMetrics: { weight: form.weight, bodyFat: form.bodyFat, bmi: form.bmi },
+        };
+
+        await saveMemberToFirestore(updatedMember, members).catch((err) =>
+          console.warn('Firestore member update notice:', err.message)
+        );
+
+        setMembers((prev) => prev.map((m) => (m.id === editingMember.id ? updatedMember : m)));
+        showToast(`Updated profile for ${form.name}`);
+      } else {
+        const prefix = form.branchId === 'branch2' ? 'RF-2' : 'RF-1';
+        const uniqueId = `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 5).toUpperCase()}`;
+        const newMember = {
+          id: uniqueId,
+          branchId: form.branchId || defaultBranch,
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          gender: form.gender,
+          age: Number(form.age),
+          planId: form.planId,
+          planName: selectedPlan ? selectedPlan.name : '1 Month Membership',
+          trainerId: form.trainerId,
+          joinDate: form.joinDate,
+          expiryDate: form.expiryDate,
+          status: 'Active',
+          program: form.program,
+          addOns: form.addOns,
+          bodyMetrics: { weight: form.weight, bodyFat: form.bodyFat, bmi: form.bmi },
+          reminderSentAt: null,
+        };
+
+        await saveMemberToFirestore(newMember, members).catch((err) =>
+          console.warn('Firestore member insert notice:', err.message)
+        );
+
+        setMembers((prev) => [newMember, ...prev]);
+        showToast(`Registered new member ${form.name} (${newMember.id})`);
+      }
+      setIsFormOpen(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const toggleMemberStatus = (member) => {
+  const toggleMemberStatus = async (member) => {
     const nextStatus = member.status === 'Active' ? 'Deactivated' : 'Active';
+    await updateMemberStatusInFirestore(member.id, nextStatus).catch((err) =>
+      console.warn('Firestore member status notice:', err.message)
+    );
     setMembers((prev) => prev.map((m) => (m.id === member.id ? { ...m, status: nextStatus } : m)));
     showToast(`${member.name} account ${nextStatus === 'Active' ? 'reactivated' : 'deactivated'}`);
   };
@@ -706,9 +737,14 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 <button type="button" onClick={() => setIsFormOpen(false)} className="btn btn-secondary btn-sm">
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary btn-sm">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="btn btn-primary btn-sm"
+                  style={{ opacity: isSaving ? 0.7 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}
+                >
                   <CheckCircle2 size={15} />
-                  <span>{editingMember ? 'Save Changes' : 'Register Member'}</span>
+                  <span>{isSaving ? 'Saving to Cloud...' : editingMember ? 'Save Changes' : 'Register Member'}</span>
                 </button>
               </div>
             </form>

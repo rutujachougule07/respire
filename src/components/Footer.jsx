@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowUp, MapPin, Building2, ArrowRight, Lock, X, Eye, EyeOff, ShieldCheck, Mail, KeyRound, Phone, AlertCircle } from 'lucide-react';
 import { LOGIN_ACCOUNTS } from './admin/initialData';
+import { useAuth } from '../context/AuthContext';
 
 export default function Footer({ onAdminLogin }) {
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -10,6 +12,10 @@ export default function Footer({ onAdminLogin }) {
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [focusedField, setFocusedField] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);
@@ -31,25 +37,25 @@ export default function Footer({ onAdminLogin }) {
     });
   };
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
-    const matched = LOGIN_ACCOUNTS.find(
-      (acc) =>
-        acc.email.toLowerCase() === adminUser.trim().toLowerCase() &&
-        acc.password === adminPass
-    );
-
-    if (!matched) {
-      setLoginError('Invalid email or password. Please check your credentials and try again.');
-      return;
-    }
-
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     setLoginError('');
-    setShowAdminModal(false);
-    setAdminUser('');
-    setAdminPass('');
-    if (onAdminLogin) {
-      onAdminLogin(matched);
+
+    try {
+      const res = await login(adminUser, adminPass);
+      setShowAdminModal(false);
+      setAdminUser('');
+      setAdminPass('');
+      if (onAdminLogin) {
+        onAdminLogin(res.session);
+      }
+      navigate('/admin');
+    } catch (err) {
+      setLoginError(err.message || 'Invalid email or password.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -168,22 +174,16 @@ export default function Footer({ onAdminLogin }) {
               </h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {[
-                  { label: 'Home', id: 'hero' },
-                  { label: 'About Us', id: 'about' },
-                  { label: 'Our Services', id: 'services' },
-                  { label: 'Membership Plans', id: 'membership' },
-                  { label: 'Workout Programs', id: 'programs' },
-                  { label: 'Smart Fitness Tracking', id: 'features' },
-                  { label: 'Why Choose Us', id: 'why-us' },
-                  { label: 'Contact Us', id: 'contact' },
+                  { label: 'Home', path: '/' },
+                  { label: 'About Us', path: '/about' },
+                  { label: 'Our Services', path: '/services' },
+                  { label: 'Membership Plans', path: '/membership' },
+                  { label: 'Workout Programs', path: '/programs' },
+                  { label: 'Contact Us', path: '/contact' },
                 ].map((item, idx) => (
                   <li key={idx}>
-                    <a
-                      href={`#${item.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        scrollTo(item.id);
-                      }}
+                    <Link
+                      to={item.path}
                       style={{
                         fontSize: '0.88rem',
                         color: '#9CA3AF',
@@ -191,6 +191,7 @@ export default function Footer({ onAdminLogin }) {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
+                        textDecoration: 'none',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.color = '#00D256';
@@ -202,35 +203,31 @@ export default function Footer({ onAdminLogin }) {
                       }}
                     >
                       <span>›</span> {item.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
                 <li>
-                  <a
-                    href="#admin-login"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowAdminModal(true);
-                    }}
+                  <Link
+                    to="/login"
                     style={{
                       fontSize: '0.88rem',
-                      color: '#9CA3AF',
+                      color: '#00D256',
+                      fontWeight: 700,
                       transition: 'all 0.2s ease',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
+                      textDecoration: 'none',
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = '#00D256';
                       e.currentTarget.style.transform = 'translateX(4px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = '#9CA3AF';
                       e.currentTarget.style.transform = 'translateX(0)';
                     }}
                   >
-                    <span>›</span> Admin Login
-                  </a>
+                    <span>›</span> Staff & Admin Portal
+                  </Link>
                 </li>
               </ul>
             </div>

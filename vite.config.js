@@ -6,14 +6,5 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          firebase: ['firebase/app', 'firebase/analytics', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
-        }
-      }
-    }
   }
 });

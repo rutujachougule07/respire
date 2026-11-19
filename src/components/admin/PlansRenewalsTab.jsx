@@ -12,6 +12,7 @@ import {
   Info,
 } from 'lucide-react';
 import { OFFICIAL_FEE_RULES } from './initialData';
+import { savePlanToFirestore, deletePlanFromFirestore, saveMemberToFirestore } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');
@@ -31,6 +32,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   const [renewalFilter, setRenewalFilter] = useState('Expiring');
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
+  const [isSavingPlan, setIsSavingPlan] = useState(false);
 
   const [planForm, setPlanForm] = useState({
     durationLabel: '1 Month',
@@ -80,60 +82,79 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
     setIsPlanModalOpen(true);
   };
 
-  const handleSavePlan = (e) => {
+  const handleSavePlan = async (e) => {
     e.preventDefault();
-    const featuresArr = planForm.featuresText
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    if (isSavingPlan) return; // Prevent double submission
+    setIsSavingPlan(true);
 
-    if (editingPlan) {
-      setPlans((prev) =>
-        prev.map((p) =>
-          p.id === editingPlan.id
-            ? {
-                ...p,
-                durationLabel: planForm.durationLabel,
-                name: planForm.name || `${planForm.durationLabel} Membership`,
-                durationMonths: Number(planForm.durationMonths),
-                price: Number(planForm.price),
-                freezeDays: Number(planForm.freezeDays),
-                badge: planForm.badge,
-                features: featuresArr,
-                status: planForm.status,
-                isPopular: planForm.isPopular,
-              }
-            : p
-        )
-      );
-      showToast(`Updated "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
-    } else {
-      const newPlan = {
-        id: `plan-${Date.now()}`,
-        durationLabel: planForm.durationLabel,
-        name: planForm.name || `${planForm.durationLabel} Membership`,
-        durationMonths: Number(planForm.durationMonths),
-        price: Number(planForm.price),
-        freezeDays: Number(planForm.freezeDays),
-        badge: planForm.badge,
-        features: featuresArr,
-        status: planForm.status,
-        isPopular: planForm.isPopular,
-      };
-      setPlans((prev) => [...prev, newPlan]);
-      showToast(`Added "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
+    try {
+      const featuresArr = planForm.featuresText
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      if (editingPlan) {
+        const updatedPlan = {
+          ...editingPlan,
+          durationLabel: planForm.durationLabel,
+          name: planForm.name || `${planForm.durationLabel} Membership`,
+          durationMonths: Number(planForm.durationMonths),
+          price: Number(planForm.price),
+          freezeDays: Number(planForm.freezeDays),
+          badge: planForm.badge,
+          features: featuresArr,
+          status: planForm.status,
+          isPopular: planForm.isPopular,
+        };
+
+        await savePlanToFirestore(updatedPlan).catch((err) =>
+          console.warn('Firestore plan update notice:', err.message)
+        );
+
+        setPlans((prev) => prev.map((p) => (p.id === editingPlan.id ? updatedPlan : p)));
+        showToast(`Updated "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
+      } else {
+        const newPlan = {
+          id: `plan-${Date.now()}`,
+          durationLabel: planForm.durationLabel,
+          name: planForm.name || `${planForm.durationLabel} Membership`,
+          durationMonths: Number(planForm.durationMonths),
+          price: Number(planForm.price),
+          freezeDays: Number(planForm.freezeDays),
+          badge: planForm.badge,
+          features: featuresArr,
+          status: planForm.status,
+          isPopular: planForm.isPopular,
+        };
+
+        await savePlanToFirestore(newPlan).catch((err) =>
+          console.warn('Firestore plan insert notice:', err.message)
+        );
+
+        setPlans((prev) => [...prev, newPlan]);
+        showToast(`Added "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
+      }
+      setIsPlanModalOpen(false);
+    } finally {
+      setIsSavingPlan(false);
     }
-    setIsPlanModalOpen(false);
   };
 
-  const handleDeletePlan = (plan) => {
+  const handleDeletePlan = async (plan) => {
+    await deletePlanFromFirestore(plan.id).catch((err) =>
+      console.warn('Firestore plan delete notice:', err.message)
+    );
     setPlans((prev) => prev.filter((p) => p.id !== plan.id));
     showToast(`Deleted "${plan.durationLabel || plan.name}" from Fee Structure`);
   };
 
-  const togglePlanStatus = (plan) => {
+  const togglePlanStatus = async (plan) => {
     const next = plan.status === 'Active' ? 'Paused' : 'Active';
-    setPlans((prev) => prev.map((p) => (p.id === plan.id ? { ...p, status: next } : p)));
+    const updated = { ...plan, status: next };
+    await savePlanToFirestore(updated).catch((err) =>
+      console.warn('Firestore plan status notice:', err.message)
+    );
+    setPlans((prev) => prev.map((p) => (p.id === plan.id ? updated : p)));
     showToast(`"${plan.durationLabel || plan.name}" marked as ${next}`);
   };
 
@@ -145,16 +166,23 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
     showToast(`WhatsApp renewal reminder sent to ${member.name} (${member.phone})`);
   };
 
-  const handleQuickRenew = (member) => {
+  const handleQuickRenew = async (member) => {
     const matchedPlan = plans.find((p) => p.id === member.planId);
     const months = matchedPlan ? matchedPlan.durationMonths : 1;
     const newExpiry = addMonths(member.expiryDate, months);
+    const updatedMember = {
+      ...member,
+      expiryDate: newExpiry,
+      status: 'Active',
+      reminderSentAt: null,
+    };
+
+    await saveMemberToFirestore(updatedMember).catch((err) =>
+      console.warn('Firestore renewal sync notice:', err.message)
+    );
+
     setMembers((prev) =>
-      prev.map((m) =>
-        m.id === member.id
-          ? { ...m, expiryDate: newExpiry, status: 'Active', reminderSentAt: null }
-          : m
-      )
+      prev.map((m) => (m.id === member.id ? updatedMember : m))
     );
     showToast(`Renewed ${member.name}'s ${member.planName} until ${newExpiry}`);
   };
@@ -687,9 +715,14 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                 <button type="button" onClick={() => setIsPlanModalOpen(false)} className="btn btn-secondary btn-sm">
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary btn-sm">
+                <button
+                  type="submit"
+                  disabled={isSavingPlan}
+                  className="btn btn-primary btn-sm"
+                  style={{ opacity: isSavingPlan ? 0.75 : 1 }}
+                >
                   <CheckCircle2 size={15} />
-                  <span>{editingPlan ? 'Save Changes' : 'Add Plan'}</span>
+                  <span>{isSavingPlan ? 'Saving Plan...' : (editingPlan ? 'Save Changes' : 'Add Plan')}</span>
                 </button>
               </div>
             </form>

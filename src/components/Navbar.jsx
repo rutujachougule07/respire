@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight, MapPin, Phone } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, ArrowRight, MapPin, Phone, ShieldCheck, Lock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
 
+  const { isAuthenticated, adminSession } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isHomePage = location.pathname === '/';
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 30);
 
-      const sections = ['hero', 'about', 'services', 'membership', 'programs', 'features', 'why-us', 'contact'];
-      const scrollPosition = window.scrollY + 180;
+      if (isHomePage) {
+        const sections = ['hero', 'about', 'services', 'membership', 'programs', 'features', 'why-us', 'contact'];
+        const scrollPosition = window.scrollY + 180;
 
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section);
-            break;
+        for (const section of sections) {
+          const el = document.getElementById(section);
+          if (el) {
+            const top = el.offsetTop;
+            const height = el.offsetHeight;
+            if (scrollPosition >= top && scrollPosition < top + height) {
+              setActiveSection(section);
+              break;
+            }
           }
         }
       }
@@ -28,30 +38,36 @@ export default function Navbar() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHomePage]);
 
-  const scrollToSection = (e, id) => {
-    e.preventDefault();
+  const handleNavClick = (e, link) => {
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      const navHeight = 104;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
+
+    if (isHomePage && link.id) {
+      e.preventDefault();
+      const element = document.getElementById(link.id);
+      if (element) {
+        const navHeight = 104;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        });
+      }
+    } else {
+      // If on another page, navigate directly to route
+      navigate(link.path);
     }
   };
 
   const navLinks = [
-    { label: 'Home', id: 'hero' },
-    { label: 'About', id: 'about' },
-    { label: 'Services', id: 'services' },
-    { label: 'Programs', id: 'programs' },
-    { label: 'Features', id: 'features' },
-    { label: 'Contact', id: 'contact' },
+    { label: 'Home', path: '/', id: 'hero' },
+    { label: 'About', path: '/about', id: 'about' },
+    { label: 'Services', path: '/services', id: 'services' },
+    { label: 'Membership', path: '/membership', id: 'membership' },
+    { label: 'Programs', path: '/programs', id: 'programs' },
+    { label: 'Contact', path: '/contact', id: 'contact' },
   ];
 
   return (
@@ -64,10 +80,10 @@ export default function Navbar() {
           right: 0,
           zIndex: 1000,
           transition: 'all 0.3s ease',
-          backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.96)' : 'rgba(255, 255, 255, 0.92)',
+          backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.98)' : 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: isScrolled ? '1px solid rgba(0, 184, 74, 0.2)' : '1px solid rgba(15, 23, 42, 0.06)',
+          borderBottom: isScrolled ? '1px solid rgba(0, 184, 74, 0.25)' : '1px solid rgba(15, 23, 42, 0.08)',
           boxShadow: isScrolled ? '0 10px 30px rgba(15, 23, 42, 0.08)' : '0 2px 10px rgba(15, 23, 42, 0.03)',
         }}
       >
@@ -141,10 +157,14 @@ export default function Navbar() {
             height: '76px',
           }}
         >
-          {/* Official Full-Color Logo on Crisp White */}
-          <a
-            href="#hero"
-            onClick={(e) => scrollToSection(e, 'hero')}
+          {/* Official Full-Color Logo */}
+          <Link
+            to="/"
+            onClick={() => {
+              if (isHomePage) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -166,57 +186,61 @@ export default function Navbar() {
                 e.target.src = '/respire_logo_transparent.png';
               }}
             />
-          </a>
+          </Link>
 
           {/* Desktop Navigation Links */}
           <nav
             style={{
               display: 'none',
               alignItems: 'center',
-              gap: '6px',
+              gap: '4px',
             }}
             className="desktop-nav"
           >
             {navLinks.map((link) => {
-              const isActive = activeSection === link.id;
+              const isCurrentRoute =
+                location.pathname === link.path ||
+                (isHomePage && link.path === '/' && activeSection === link.id);
+
               return (
                 <a
-                  key={link.id}
-                  href={`#${link.id}`}
-                  onClick={(e) => scrollToSection(e, link.id)}
+                  key={link.path}
+                  href={link.path}
+                  onClick={(e) => handleNavClick(e, link)}
                   style={{
-                    padding: '8px 16px',
-                    fontSize: '0.88rem',
+                    padding: '8px 14px',
+                    fontSize: '0.86rem',
                     fontWeight: 700,
-                    color: isActive ? '#008F39' : '#334155',
+                    color: isCurrentRoute ? '#008F39' : '#334155',
                     borderRadius: '8px',
                     transition: 'all 0.2s ease',
                     position: 'relative',
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    backgroundColor: isActive ? 'rgba(0, 184, 74, 0.08)' : 'transparent',
+                    backgroundColor: isCurrentRoute ? 'rgba(0, 184, 74, 0.08)' : 'transparent',
+                    textDecoration: 'none',
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.target.style.color = '#00B84A';
-                      e.target.style.backgroundColor = 'rgba(0, 184, 74, 0.05)';
+                    if (!isCurrentRoute) {
+                      e.currentTarget.style.color = '#00B84A';
+                      e.currentTarget.style.backgroundColor = 'rgba(0, 184, 74, 0.05)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.target.style.color = '#334155';
-                      e.target.style.backgroundColor = 'transparent';
+                    if (!isCurrentRoute) {
+                      e.currentTarget.style.color = '#334155';
+                      e.currentTarget.style.backgroundColor = 'transparent';
                     }
                   }}
                 >
                   {link.label}
-                  {isActive && (
+                  {isCurrentRoute && (
                     <span
                       style={{
                         position: 'absolute',
                         bottom: '2px',
-                        left: '16px',
-                        right: '16px',
+                        left: '14px',
+                        right: '14px',
                         height: '2.5px',
                         background: 'linear-gradient(90deg, #00D256, #007A31)',
                         borderRadius: '2px',
@@ -228,17 +252,39 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Action CTA & Mobile Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <a
-              href="#contact"
-              onClick={(e) => scrollToSection(e, 'contact')}
+          {/* Action CTA & Admin Link */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Quick Admin Portal Button */}
+            <Link
+              to={isAuthenticated ? '/admin' : '/login'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 12px',
+                borderRadius: '8px',
+                backgroundColor: isAuthenticated ? 'rgba(0, 184, 74, 0.12)' : '#F1F5F9',
+                border: isAuthenticated ? '1px solid rgba(0, 184, 74, 0.35)' : '1px solid #E2E8F0',
+                color: isAuthenticated ? '#008A38' : '#475569',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+              }}
+              title="Respire Admin Portal"
+            >
+              {isAuthenticated ? <ShieldCheck size={14} color="#008A38" /> : <Lock size={13} />}
+              <span>{isAuthenticated ? 'Admin' : 'Staff'}</span>
+            </Link>
+
+            <Link
+              to="/contact"
               className="btn btn-primary btn-sm"
               style={{ fontWeight: 800 }}
             >
               <span>Join Now</span>
               <ArrowRight size={15} />
-            </a>
+            </Link>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -252,6 +298,7 @@ export default function Navbar() {
                 backgroundColor: '#F1F5F9',
                 border: '1px solid rgba(15, 23, 42, 0.1)',
                 color: '#0F172A',
+                cursor: 'pointer',
               }}
               className="mobile-nav-toggle"
               aria-label="Toggle Navigation Menu"
@@ -275,47 +322,79 @@ export default function Navbar() {
               boxShadow: '0 20px 35px rgba(15, 23, 42, 0.1)',
             }}
           >
-            {navLinks.map((link) => (
-              <a
-                key={link.id}
-                href={`#${link.id}`}
-                onClick={(e) => scrollToSection(e, link.id)}
-                style={{
-                  padding: '12px 16px',
-                  fontSize: '0.96rem',
-                  fontWeight: 700,
-                  color: activeSection === link.id ? '#008A38' : '#1E293B',
-                  borderRadius: '10px',
-                  backgroundColor: activeSection === link.id ? '#ECFDF3' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                <span>{link.label}</span>
-                <ArrowRight size={16} color={activeSection === link.id ? '#00B84A' : '#94A3B8'} />
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isCurrentRoute =
+                location.pathname === link.path ||
+                (isHomePage && link.path === '/' && activeSection === link.id);
+
+              return (
+                <a
+                  key={link.path}
+                  href={link.path}
+                  onClick={(e) => handleNavClick(e, link)}
+                  style={{
+                    padding: '12px 16px',
+                    fontSize: '0.96rem',
+                    fontWeight: 700,
+                    color: isCurrentRoute ? '#008A38' : '#1E293B',
+                    borderRadius: '10px',
+                    backgroundColor: isCurrentRoute ? '#ECFDF3' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <span>{link.label}</span>
+                  <ArrowRight size={16} color={isCurrentRoute ? '#00B84A' : '#94A3B8'} />
+                </a>
+              );
+            })}
+
+            {/* Admin Portal in Mobile Menu */}
+            <Link
+              to={isAuthenticated ? '/admin' : '/login'}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                padding: '12px 16px',
+                fontSize: '0.96rem',
+                fontWeight: 700,
+                color: '#008A38',
+                borderRadius: '10px',
+                backgroundColor: 'rgba(0, 184, 74, 0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                textDecoration: 'none',
+                marginTop: '4px',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={16} color="#008A38" />
+                <span>{isAuthenticated ? 'Admin Dashboard' : 'Staff / Admin Portal'}</span>
+              </span>
+              <ArrowRight size={16} color="#00B84A" />
+            </Link>
 
             <div style={{ marginTop: '12px', paddingTop: '14px', borderTop: '1px solid rgba(15, 23, 42, 0.08)' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: '#475569', fontSize: '0.8rem', marginBottom: '8px', fontWeight: 600 }}>
                 <MapPin size={14} color="#00B84A" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span><strong>Vishrambag:</strong> 7th Floor, R City Mall, Opp. Safa Bakery • <a href="tel:+917798001777" style={{ color: '#008A38', fontWeight: 800 }}>7798001777</a></span>
+                <span><strong>Vishrambag:</strong> 7th Floor, R City Mall • <a href="tel:+917798001777" style={{ color: '#008A38', fontWeight: 800 }}>7798001777</a></span>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: '#475569', fontSize: '0.8rem', marginBottom: '12px', fontWeight: 600 }}>
                 <MapPin size={14} color="#172C83" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span><strong>Vijaynagar:</strong> 3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Rd • <a href="tel:+919172848777" style={{ color: '#008A38', fontWeight: 800 }}>9172848777</a></span>
+                <span><strong>Vijaynagar:</strong> 3rd Floor, Krishna Heights • <a href="tel:+919172848777" style={{ color: '#008A38', fontWeight: 800 }}>9172848777</a></span>
               </div>
-              <a
-                href="#contact"
-                onClick={(e) => scrollToSection(e, 'contact')}
+              <Link
+                to="/contact"
+                onClick={() => setMobileMenuOpen(false)}
                 className="btn btn-primary"
-                style={{ width: '100%' }}
+                style={{ width: '100%', textAlign: 'center' }}
               >
                 Join Now
-              </a>
+              </Link>
             </div>
           </div>
         )}
@@ -328,9 +407,6 @@ export default function Navbar() {
           }
           .mobile-nav-toggle {
             display: none !important;
-          }
-          .topbar-address {
-            display: flex !important;
           }
         }
       `}</style>

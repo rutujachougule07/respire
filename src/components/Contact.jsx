@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Clock, Send, MessageCircle, CheckCircle2, Building2, ExternalLink, Phone } from 'lucide-react';
+import { submitInquiryToFirestore } from '../services/firestoreService';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ export default function Contact() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitNotice, setSubmitNotice] = useState('');
 
   const branches = [
     {
@@ -38,9 +41,22 @@ export default function Contact() {
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (submitting) return; // Prevent double submission!
+    setSubmitting(true);
+    setSubmitNotice('');
+
+    try {
+      await submitInquiryToFirestore(formData);
+      setSubmitted(true);
+    } catch (err) {
+      console.warn('Inquiry notice:', err.message);
+      // If duplicate or network notice, still acknowledge user cleanly
+      setSubmitted(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const openBranchWhatsApp = (branch) => {
@@ -525,10 +541,18 @@ export default function Contact() {
 
                 <button
                   type="submit"
+                  disabled={submitting}
                   className="btn btn-primary"
-                  style={{ width: '100%', padding: '14px', fontWeight: 800, fontSize: '0.92rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    fontWeight: 800,
+                    fontSize: '0.92rem',
+                    opacity: submitting ? 0.7 : 1,
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                  }}
                 >
-                  <span>Submit Membership Inquiry</span>
+                  <span>{submitting ? 'Submitting to Cloud...' : 'Submit Membership Inquiry'}</span>
                   <Send size={16} />
                 </button>
               </form>
