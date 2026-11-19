@@ -973,388 +973,300 @@ export default function Membership({ plans = [] }) {
           );
         })()}
 
-        {/* Modern Split Editorial Guidelines & Timings Section (No boxes inside boxes!) */}
-        <div
-          style={{
-            backgroundColor: '#FFFFFF',
-            borderRadius: '24px',
-            border:
-              selectedBranch === 'branch2'
-                ? '1.5px solid rgba(23, 44, 131, 0.18)'
-                : '1.5px solid rgba(0, 184, 74, 0.22)',
-            boxShadow: '0 20px 48px rgba(15, 23, 42, 0.07)',
-            marginBottom: '44px',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            className="membership-guidelines-split"
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-            }}
-          >
-            {/* Left Panel: Luxury Branded Timings & Action Plaque */}
-            <div
-              style={{
-                flex: '1 1 360px',
-                background:
-                  selectedBranch === 'branch2'
-                    ? 'linear-gradient(145deg, #090E21 0%, #172C83 60%, #1E3A8A 100%)'
-                    : 'linear-gradient(145deg, #051F10 0%, #006E2C 55%, #008A38 100%)',
-                color: '#FFFFFF',
-                padding: '36px 32px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '28px',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Subtle ambient light circle */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  right: '-40px',
-                  width: '180px',
-                  height: '180px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  pointerEvents: 'none',
-                }}
-              />
+        {/* Important Membership Terms & Timings - Cards Section (Modeled after About Pillars) */}
+        {(() => {
+          const isVijaynagar = selectedBranch === 'branch2' || selectedBranch === 'vijaynagar';
 
-              {/* Top Branch Identity */}
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.72rem',
-                    fontWeight: 900,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    padding: '4px 10px',
-                    borderRadius: '999px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.14)',
-                    color: '#FFFFFF',
-                    marginBottom: '10px',
-                  }}
-                >
-                  <MapPin size={12} color="#00FF66" />
-                  <span>{currentBranch.shortName}</span>
-                </div>
+          // Explicit mapping for each branch strictly using official rules & details
+          const termsCards = isVijaynagar
+            ? [
+                {
+                  icon: Clock,
+                  title: 'Gym Timings',
+                  desc: 'Gym Timing :- 05:30AM to 10:00PM.',
+                },
+                {
+                  icon: Wind,
+                  title: 'AC Timings',
+                  desc: 'Ac Timing :- 06AM to 09:30AM & 05PM to 09:00PM.',
+                },
+                {
+                  icon: Ticket,
+                  title: 'Daily Workout Pass',
+                  desc: 'Daily 1 Day Membership / Workout Pass :- ₹200/-.',
+                },
+                {
+                  icon: CreditCard,
+                  title: 'Advance Payment',
+                  desc: 'All fees will be received strictly in advance.',
+                },
+                {
+                  icon: ShieldAlert,
+                  title: 'Refund & Transfer Policy',
+                  desc: 'Membership fees are Non-refundable & Non-transferable.',
+                },
+                {
+                  icon: PhoneCall,
+                  title: 'Desk Helpline',
+                  desc: 'For more details contact 9172848777.',
+                  phone: '9172848777',
+                },
+              ]
+            : [
+                {
+                  icon: Clock,
+                  title: 'Gym Timings',
+                  desc: 'Gym Timings :- 05.30 AM to 10.00 PM.',
+                },
+                {
+                  icon: Wind,
+                  title: 'AC Timings',
+                  desc: 'AC Will Be Shut Down Daily From 12PM To 4PM.',
+                },
+                {
+                  icon: Ticket,
+                  title: 'Trial Workout Charge',
+                  desc: 'The One Day charge for a Trial is Rs. 500/-. There is No Free Trial.',
+                },
+                {
+                  icon: CreditCard,
+                  title: 'Advance Payment',
+                  desc: 'All fees will be received strictly in advance.',
+                },
+                {
+                  icon: ShieldAlert,
+                  title: 'Refund Policy',
+                  desc: 'Membership fees are Non-refundable.',
+                },
+                {
+                  icon: Sparkles,
+                  title: 'Special Pricing',
+                  desc: 'Limited Time Offer.',
+                },
+                {
+                  icon: PhoneCall,
+                  title: 'Desk Helpline',
+                  desc: 'For more details contact 7798001777.',
+                  phone: '7798001777',
+                },
+              ];
 
-                <h3
-                  style={{
-                    fontSize: '1.42rem',
-                    fontWeight: 900,
-                    color: '#FFFFFF',
-                    margin: '0 0 6px',
-                    lineHeight: 1.25,
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  Facility Timings & Access
-                </h3>
+          const brandGreen = '#008A38';
+          const brandBlue = '#172C83';
+          const accentColor = isVijaynagar ? brandBlue : brandGreen;
 
-                <p
-                  style={{
-                    fontSize: '0.84rem',
-                    color: 'rgba(255, 255, 255, 0.85)',
-                    margin: 0,
-                    lineHeight: 1.45,
-                  }}
-                >
-                  {currentBranch.floor}
-                </p>
-              </div>
-
-              {/* Timings Showcase (Fluid & Clean - NOT separate box tiles!) */}
+          return (
+            <div style={{ marginBottom: '44px' }}>
+              {/* Section Header */}
               <div
                 style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '20px',
-                  position: 'relative',
-                  zIndex: 1,
-                  padding: '22px 0',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.16)',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.16)',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  marginBottom: '20px',
+                  paddingBottom: '14px',
+                  borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
                 }}
               >
-                {/* Gym Timing */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+                <div>
                   <div
                     style={{
-                      width: '42px',
-                      height: '42px',
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.14)',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#00FF66',
-                      flexShrink: 0,
+                      gap: '6px',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      color: accentColor,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      marginBottom: '4px',
                     }}
                   >
-                    <Clock size={22} />
+                    <Info size={14} />
+                    <span>{currentBranch.shortName} • Official Operating Guidelines</span>
                   </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: 900,
-                        color: 'rgba(255, 255, 255, 0.75)',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        marginBottom: '3px',
-                      }}
-                    >
-                      Gym Timing
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '1.34rem',
-                        fontWeight: 900,
-                        color: '#FFFFFF',
-                        lineHeight: 1.15,
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      {currentBranch.gymTiming}
-                    </div>
-                  </div>
-                </div>
-
-                {/* AC Timings */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-                  <div
+                  <h3
                     style={{
-                      width: '42px',
-                      height: '42px',
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.14)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#67E8F9',
-                      flexShrink: 0,
+                      fontSize: '1.42rem',
+                      fontWeight: 900,
+                      color: '#0F172A',
+                      margin: 0,
+                      letterSpacing: '-0.01em',
                     }}
                   >
-                    <Wind size={22} />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: 900,
-                        color: '#67E8F9',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        marginBottom: '3px',
-                      }}
-                    >
-                      AC Timings
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '1.14rem',
-                        fontWeight: 900,
-                        color: '#FFFFFF',
-                        lineHeight: 1.25,
-                      }}
-                    >
-                      {currentBranch.acTiming}
-                    </div>
-                  </div>
+                    Important Membership Terms & Timings
+                  </h3>
                 </div>
-              </div>
-
-              {/* Vijaynagar Motivational Quote (when present) or Quick Helpline */}
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                {currentBranch.motto ? (
-                  <div
-                    style={{
-                      marginBottom: '18px',
-                      padding: '14px 16px',
-                      borderRadius: '12px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: '0.92rem',
-                        fontWeight: 900,
-                        color: '#FFFFFF',
-                        marginBottom: '3px',
-                      }}
-                    >
-                      ❖ {currentBranch.motto.quote1}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.86rem',
-                        fontWeight: 800,
-                        color: '#00FF66',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      ❖ {currentBranch.motto.quote2}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '0.72rem',
-                        fontWeight: 900,
-                        letterSpacing: '0.1em',
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      — {currentBranch.motto.signature} • {currentBranch.motto.since}
-                    </div>
-                  </div>
-                ) : null}
 
                 <a
                   href={`tel:+91${currentBranch.phone}`}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    width: '100%',
-                    padding: '12px 20px',
-                    borderRadius: '12px',
-                    backgroundColor: '#FFFFFF',
-                    color: selectedBranch === 'branch2' ? '#172C83' : '#007A31',
-                    fontSize: '0.92rem',
-                    fontWeight: 900,
-                    textDecoration: 'none',
-                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
-                    transition: 'transform 0.2s',
-                  }}
-                >
-                  <Phone size={16} />
-                  <span>Call Desk: {currentBranch.phone}</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Right Panel: Official Operating Guidelines (Clean Editorial Checklist - NO BOXES!) */}
-            <div
-              style={{
-                flex: '1 1 480px',
-                padding: '36px 36px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                backgroundColor: '#FFFFFF',
-              }}
-            >
-              {/* Right Panel Header */}
-              <div style={{ marginBottom: '22px' }}>
-                <div
-                  style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    fontSize: '0.74rem',
+                    gap: '8px',
+                    padding: '8px 18px',
+                    borderRadius: '999px',
+                    backgroundColor: isVijaynagar
+                      ? 'rgba(23, 44, 131, 0.07)'
+                      : 'rgba(0, 184, 74, 0.08)',
+                    border: isVijaynagar
+                      ? '1px solid rgba(23, 44, 131, 0.22)'
+                      : '1px solid rgba(0, 184, 74, 0.22)',
+                    color: accentColor,
+                    fontSize: '0.86rem',
                     fontWeight: 800,
-                    color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    marginBottom: '4px',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <Info size={14} />
-                  <span>Official Operating Guidelines</span>
-                </div>
-                <h3
-                  style={{
-                    fontSize: '1.45rem',
-                    fontWeight: 900,
-                    color: '#0F172A',
-                    margin: 0,
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  Important Membership Terms
-                </h3>
+                  <Phone size={14} />
+                  <span>Contact: {currentBranch.phone}</span>
+                </a>
               </div>
 
-              {/* Clean Flowing Checklist (Zero clunky box tiles!) */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0px',
-                }}
-              >
-                {currentBranch.rules.map((rule, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '14px',
-                      padding: '15px 12px',
-                      borderBottom:
-                        idx === currentBranch.rules.length - 1
-                          ? 'none'
-                          : '1px solid rgba(15, 23, 42, 0.08)',
-                      transition: 'background 0.2s ease, transform 0.2s ease',
-                      borderRadius: '8px',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor =
-                        selectedBranch === 'branch2'
-                          ? 'rgba(23, 44, 131, 0.04)'
-                          : 'rgba(0, 184, 74, 0.05)';
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
-                  >
+              {/* Cards Grid: Matching Image 2 (About Pillars Card Style) */}
+              <div className="terms-pillars-grid">
+                {termsCards.map((item, idx) => {
+                  const Icon = item.icon;
+                  const CardWrapper = item.phone ? 'a' : 'div';
+                  const wrapperProps = item.phone
+                    ? {
+                        href: `tel:+91${item.phone}`,
+                        style: { textDecoration: 'none' },
+                      }
+                    : {};
+
+                  return (
+                    <CardWrapper
+                      key={idx}
+                      {...wrapperProps}
+                      className={`terms-pillar-card ${isVijaynagar ? 'vijaynagar' : ''}`}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '14px',
+                        padding: '20px 18px',
+                        background: isVijaynagar
+                          ? 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)'
+                          : 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
+                        borderRadius: '16px',
+                        border: isVijaynagar
+                          ? '1.5px solid rgba(23, 44, 131, 0.2)'
+                          : '1.5px solid rgba(0, 184, 74, 0.2)',
+                        boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)',
+                        cursor: item.phone ? 'pointer' : 'default',
+                        ...wrapperProps.style,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '38px',
+                          height: '38px',
+                          borderRadius: '10px',
+                          backgroundColor: isVijaynagar
+                            ? 'rgba(23, 44, 131, 0.12)'
+                            : 'rgba(0, 184, 74, 0.12)',
+                          border: isVijaynagar
+                            ? '1px solid rgba(23, 44, 131, 0.25)'
+                            : '1px solid rgba(0, 184, 74, 0.25)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: accentColor,
+                          flexShrink: 0,
+                          marginTop: '2px',
+                        }}
+                      >
+                        <Icon size={20} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div
+                          style={{
+                            fontSize: '0.94rem',
+                            fontWeight: 800,
+                            color: '#0F172A',
+                            marginBottom: '4px',
+                            lineHeight: 1.25,
+                          }}
+                        >
+                          {item.title}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.84rem',
+                            color: '#475569',
+                            lineHeight: 1.48,
+                            fontWeight: 500,
+                          }}
+                        >
+                          {item.desc}
+                        </div>
+                      </div>
+                    </CardWrapper>
+                  );
+                })}
+              </div>
+
+              {/* Management Motto Banner for Vijaynagar */}
+              {isVijaynagar && currentBranch.motto && (
+                <div
+                  style={{
+                    marginTop: '16px',
+                    padding: '16px 22px',
+                    background: 'linear-gradient(135deg, #090E21 0%, #172C83 100%)',
+                    borderRadius: '16px',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '14px',
+                    boxShadow: '0 8px 24px rgba(23, 44, 131, 0.16)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div
                       style={{
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '50%',
-                        backgroundColor:
-                          selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
-                        color:
-                          selectedBranch === 'branch2' ? '#172C83' : '#008A38',
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.14)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        color: '#67E8F9',
                         flexShrink: 0,
                       }}
                     >
-                      <CheckCircle2 size={15} />
+                      <Quote size={20} />
                     </div>
-                    <span
-                      style={{
-                        fontSize: '0.96rem',
-                        fontWeight: 700,
-                        color: '#1E293B',
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {rule}
-                    </span>
+                    <div>
+                      <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#FFFFFF' }}>
+                        ❖ {currentBranch.motto.quote1}
+                      </div>
+                      <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#38BDF8' }}>
+                        ❖ {currentBranch.motto.quote2}
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <div
+                    style={{
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      letterSpacing: '0.08em',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    — {currentBranch.motto.signature} • {currentBranch.motto.since}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
+          );
+        })()}
       </div>
 
       <style>{`
@@ -1388,6 +1300,42 @@ export default function Membership({ plans = [] }) {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
           }
+        }
+
+        .terms-pillars-grid {
+          display: grid;
+          width: 100%;
+          gap: 14px;
+        }
+        @media (min-width: 1024px) {
+          .terms-pillars-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+          }
+        }
+        @media (min-width: 600px) and (max-width: 1023px) {
+          .terms-pillars-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+          }
+        }
+        @media (max-width: 599px) {
+          .terms-pillars-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+        }
+        .terms-pillar-card {
+          transition: all 0.25s ease;
+        }
+        .terms-pillar-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 24px rgba(0, 184, 74, 0.14) !important;
+          border-color: rgba(0, 184, 74, 0.45) !important;
+        }
+        .terms-pillar-card.vijaynagar:hover {
+          box-shadow: 0 10px 24px rgba(23, 44, 131, 0.16) !important;
+          border-color: rgba(23, 44, 131, 0.45) !important;
         }
       `}</style>
     </section>
