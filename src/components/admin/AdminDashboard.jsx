@@ -203,57 +203,163 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        justifyContent: 'space-between',
-        padding: '24px 18px',
+        backgroundColor: '#0B1120',
+        color: '#FFFFFF',
+        userSelect: 'none',
       }}
     >
-      <div>
-        {/* Logo & Role Badge */}
-        <div
-          style={{
-            paddingBottom: '20px',
-            marginBottom: '20px',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
+      {/* 1. FIXED BRAND HEADER — Never clipped, never scrolled away */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '22px 18px 16px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(11, 17, 32, 0.98) 100%)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <img
-            src="/logo_white_text_header.png"
+            src="/respire_logo_transparent.png"
             alt="Respire Fitness"
-            style={{ height: '44px', width: 'auto', objectFit: 'contain', marginBottom: '10px' }}
+            style={{
+              height: '42px',
+              width: 'auto',
+              maxWidth: '185px',
+              objectFit: 'contain',
+              display: 'block',
+              filter: 'drop-shadow(0 2px 10px rgba(0, 210, 86, 0.25))',
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/respire_logo_web.png';
+            }}
           />
+          {/* Mobile drawer close button */}
+          <button
+            onClick={() => setMobileSidebarOpen(false)}
+            className="admin-mobile-toggle"
+            aria-label="Close sidebar"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#94A3B8',
+              cursor: 'pointer',
+              padding: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Role Pill & Live Status Badge */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
           <div
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
               padding: '4px 10px',
-              borderRadius: '6px',
+              borderRadius: '999px',
               backgroundColor: isSuperAdmin
-                ? 'rgba(23, 44, 131, 0.45)'
-                : 'rgba(0, 184, 74, 0.18)',
+                ? 'rgba(99, 102, 241, 0.14)'
+                : 'rgba(0, 210, 86, 0.14)',
               border: isSuperAdmin
-                ? '1px solid rgba(99, 132, 255, 0.5)'
-                : '1px solid rgba(0, 184, 74, 0.4)',
+                ? '1px solid rgba(129, 140, 248, 0.35)'
+                : '1px solid rgba(0, 210, 86, 0.35)',
               fontSize: '0.7rem',
               fontWeight: 800,
-              color: isSuperAdmin ? '#93C5FD' : '#00D256',
-              letterSpacing: '0.06em',
+              color: isSuperAdmin ? '#A5B4FC' : '#4ADE80',
+              letterSpacing: '0.04em',
               textTransform: 'uppercase',
             }}
           >
             <ShieldCheck size={12} />
-            <span>{isSuperAdmin ? 'Super Admin Panel' : 'Branch Manager'}</span>
+            <span>{isSuperAdmin ? 'Super Admin' : 'Branch Manager'}</span>
           </div>
-          <div style={{ fontSize: '0.76rem', color: '#CBD5E1', fontWeight: 700, marginTop: '8px' }}>
-            {adminInfo?.branchName || 'Respire Fitness'}
-          </div>
+
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              color: '#34D399',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              padding: '3px 8px',
+              borderRadius: '999px',
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: '#10B981',
+                boxShadow: '0 0 8px #10B981',
+              }}
+            />
+            Live Cloud
+          </span>
         </div>
 
-        {/* Navigation Links */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* Active Branch Display */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '7px 10px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.07)',
+            fontSize: '0.74rem',
+            color: '#CBD5E1',
+            fontWeight: 600,
+          }}
+        >
+          <Building2 size={13} color="#00D256" style={{ flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {isSuperAdmin && selectedBranch === 'all'
+              ? 'All Branches (Vishrambag & Vijaynagar)'
+              : currentBranchMeta?.name || adminInfo?.branchName || 'Respire Fitness'}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. SCROLLABLE NAVIGATION LINKS */}
+      <div
+        className="admin-sidebar-scroll"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '16px 12px',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            color: '#64748B',
+            textTransform: 'uppercase',
+            padding: '0 8px 10px',
+          }}
+        >
+          Navigation
+        </div>
+
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = activeTab === item.id;
+            const isDueBadge = item.id === 'plans' && String(item.badge || '').includes('Due');
+            const isNewBadge = item.id === 'inquiries' && String(item.badge || '').includes('New');
+
             return (
               <button
                 key={item.id}
@@ -266,36 +372,81 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '12px 14px',
-                  borderRadius: '12px',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
                   background: active
-                    ? 'linear-gradient(135deg, #00D256 0%, #008A37 100%)'
+                    ? 'linear-gradient(90deg, rgba(0, 210, 86, 0.16) 0%, rgba(0, 184, 74, 0.06) 100%)'
                     : 'transparent',
-                  color: active ? '#FFFFFF' : '#CBD5E1',
-                  fontWeight: active ? 800 : 600,
-                  fontSize: '0.86rem',
+                  color: active ? '#FFFFFF' : '#94A3B8',
+                  fontWeight: active ? 700 : 500,
+                  fontSize: '0.84rem',
                   textAlign: 'left',
-                  boxShadow: active ? '0 8px 18px rgba(0, 184, 74, 0.28)' : 'none',
-                  transition: 'all 0.2s ease',
-                  border: 'none',
+                  border: active
+                    ? '1px solid rgba(0, 210, 86, 0.35)'
+                    : '1px solid transparent',
+                  boxShadow: active ? '0 4px 14px rgba(0, 210, 86, 0.12)' : 'none',
                   cursor: 'pointer',
+                  transition: 'all 0.18s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    e.currentTarget.style.color = '#FFFFFF';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#94A3B8';
+                  }
                 }}
               >
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-                  <Icon size={17} />
-                  <span>{item.label}</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                  <Icon
+                    size={17}
+                    color={active ? '#00E676' : '#64748B'}
+                    style={{
+                      flexShrink: 0,
+                      filter: active ? 'drop-shadow(0 0 6px rgba(0, 230, 118, 0.4))' : 'none',
+                    }}
+                  />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.label}
+                  </span>
                 </span>
+
                 {item.badge !== null && (
                   <span
                     style={{
                       padding: '2px 8px',
                       borderRadius: '999px',
-                      fontSize: '0.7rem',
-                      fontWeight: 800,
-                      backgroundColor: active
-                        ? 'rgba(255,255,255,0.22)'
-                        : 'rgba(255,255,255,0.08)',
-                      color: active ? '#FFFFFF' : '#00D256',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      flexShrink: 0,
+                      letterSpacing: '0.02em',
+                      ...(isDueBadge
+                        ? {
+                            backgroundColor: 'rgba(245, 158, 11, 0.18)',
+                            border: '1px solid rgba(245, 158, 11, 0.35)',
+                            color: '#FBBF24',
+                          }
+                        : isNewBadge
+                        ? {
+                            backgroundColor: 'rgba(59, 130, 246, 0.18)',
+                            border: '1px solid rgba(59, 130, 246, 0.35)',
+                            color: '#60A5FA',
+                          }
+                        : active
+                        ? {
+                            backgroundColor: 'rgba(0, 210, 86, 0.22)',
+                            border: '1px solid rgba(0, 210, 86, 0.4)',
+                            color: '#00E676',
+                          }
+                        : {
+                            backgroundColor: 'rgba(255, 255, 255, 0.07)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            color: '#CBD5E1',
+                          }),
                     }}
                   >
                     {item.badge}
@@ -307,60 +458,140 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
         </nav>
       </div>
 
-      {/* Logged-in User, View Public Site & Logout */}
-      <div style={{ paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* 3. PINNED BOTTOM FOOTER */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '14px 14px 18px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'linear-gradient(180deg, rgba(11, 17, 32, 0.95) 0%, rgba(8, 13, 24, 1) 100%)',
+        }}
+      >
+        {/* Quick Public Website Switcher */}
         <button
           onClick={() => navigate('/')}
           style={{
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            padding: '10px 12px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-            color: '#94A3B8',
-            border: 'none',
-            fontSize: '0.8rem',
-            fontWeight: 700,
+            justifyContent: 'space-between',
+            padding: '9px 12px',
+            borderRadius: '9px',
+            backgroundColor: 'rgba(255, 255, 255, 0.04)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            color: '#CBD5E1',
+            fontSize: '0.78rem',
+            fontWeight: 600,
             cursor: 'pointer',
-            marginBottom: '14px',
+            marginBottom: '10px',
+            transition: 'all 0.18s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.borderColor = 'rgba(0, 210, 86, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
+            e.currentTarget.style.color = '#CBD5E1';
+            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
           }}
         >
-          <Globe size={15} color="#00D256" />
-          <span>View Public Website</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Globe size={14} color="#00E676" />
+            <span>Public Website</span>
+          </span>
+          <span style={{ fontSize: '0.72rem', color: '#64748B' }}>↗</span>
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-          <div>
-            <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#FFFFFF' }}>
-              {adminInfo?.name || 'Manager'}
-            </div>
-            <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>{adminInfo?.email}</div>
-          </div>
-        </div>
-
-        <button
-          onClick={handleLogout}
+        {/* User Card with Avatar & Sign Out */}
+        <div
           style={{
-            width: '100%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             gap: '8px',
-            padding: '10px',
+            padding: '9px 10px',
             borderRadius: '10px',
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            color: '#F87171',
-            fontSize: '0.82rem',
-            fontWeight: 700,
-            cursor: 'pointer',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
           }}
         >
-          <LogOut size={15} />
-          <span>Sign Out</span>
-        </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #00D256 0%, #172C83 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: '0.78rem',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(0, 210, 86, 0.25)',
+              }}
+            >
+              {(adminInfo?.name || 'M').charAt(0).toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0, overflow: 'hidden' }}>
+              <div
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {adminInfo?.name || 'Mahabal Owner'}
+              </div>
+              <div
+                style={{
+                  fontSize: '0.68rem',
+                  color: '#94A3B8',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {adminInfo?.email || 'admin@gmail.com'}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            title="Sign Out"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              border: '1px solid rgba(239, 68, 68, 0.25)',
+              color: '#F87171',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: 'all 0.18s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.22)';
+              e.currentTarget.style.color = '#FFFFFF';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+              e.currentTarget.style.color = '#F87171';
+            }}
+          >
+            <LogOut size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -370,15 +601,16 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       {/* Desktop Persistent Dark Sidebar */}
       <aside
         style={{
-          width: '270px',
-          backgroundColor: '#0F172A',
+          width: '264px',
+          backgroundColor: '#0B1120',
           color: '#FFFFFF',
           flexShrink: 0,
           position: 'sticky',
           top: 0,
           height: '100vh',
-          overflowY: 'auto',
           display: 'none',
+          borderRight: '1px solid rgba(255, 255, 255, 0.07)',
+          zIndex: 90,
         }}
         className="admin-desktop-sidebar"
       >
@@ -392,7 +624,8 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             position: 'fixed',
             inset: 0,
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            backdropFilter: 'blur(3px)',
             display: 'flex',
           }}
           onClick={() => setMobileSidebarOpen(false)}
@@ -400,9 +633,11 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           <div
             style={{
               width: '280px',
-              backgroundColor: '#0F172A',
+              backgroundColor: '#0B1120',
               height: '100%',
-              boxShadow: '4px 0 24px rgba(0,0,0,0.5)',
+              boxShadow: '6px 0 28px rgba(0,0,0,0.6)',
+              display: 'flex',
+              flexDirection: 'column',
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -657,6 +892,19 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           .admin-mobile-toggle {
             display: none !important;
           }
+        }
+        .admin-sidebar-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .admin-sidebar-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .admin-sidebar-scroll::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.12);
+          border-radius: 4px;
+        }
+        .admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.25);
         }
       `}</style>
     </div>

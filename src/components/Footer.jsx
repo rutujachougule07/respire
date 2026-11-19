@@ -8,7 +8,7 @@ export default function Footer({ onAdminLogin }) {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [focusedField, setFocusedField] = useState('');
@@ -523,7 +523,10 @@ export default function Footer({ onAdminLogin }) {
 
             {/* Unified Single Login Form Body */}
             <div style={{ padding: '14px 24px 22px' }}>
-              <form onSubmit={handleAdminLogin} style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
+              <form onSubmit={handleAdminLogin} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '13px' }}>
+                {/* Decoys */}
+                <input type="text" name="decoy_email" tabIndex="-1" autoComplete="off" style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} />
+                <input type="password" name="decoy_pass" tabIndex="-1" autoComplete="new-password" style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} />
                 {loginError && (
                   <div
                     style={{
@@ -568,6 +571,8 @@ export default function Footer({ onAdminLogin }) {
                     />
                     <input
                       type="email"
+                      name="respire_portal_email_desk"
+                      autoComplete="off"
                       required
                       placeholder="Enter your email address"
                       value={adminUser}
@@ -617,6 +622,8 @@ export default function Footer({ onAdminLogin }) {
                     />
                     <input
                       type={showPass ? 'text' : 'password'}
+                      name="respire_portal_pass_desk"
+                      autoComplete="new-password"
                       required
                       placeholder="Enter your password"
                       value={adminPass}

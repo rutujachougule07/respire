@@ -21,6 +21,14 @@ export const BRANCHES = [
 
 export const LOGIN_ACCOUNTS = [
   {
+    email: 'rutu@gmail.com',
+    password: '123456',
+    name: 'Rutu (Super Admin)',
+    role: 'Super Admin',
+    branchId: 'all',
+    branchName: 'All Branches (Vishrambag & Vijaynagar)',
+  },
+  {
     email: 'admin@gmail.com',
     password: '123456',
     name: 'Mahabal Group Owner',

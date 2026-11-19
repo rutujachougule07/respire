@@ -1,180 +1,153 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function SplashScreen({ onFinish }) {
   const [isVisible, setIsVisible] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const videoRef = useRef(null);
+  const finishedRef = useRef(false);
 
-  useEffect(() => {
-    // 10 seconds total duration
-    // Start smooth fade-out at 9.4s, completely unmount at 10.0s
-    const fadeTimer = setTimeout(() => {
-      setIsFadingOut(true);
-    }, 9400);
-
-    const removeTimer = setTimeout(() => {
-      setIsVisible(false);
-      if (onFinish) onFinish();
-    }, 10000);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
-  }, [onFinish]);
-
-  const handleSkip = () => {
+  const handleFinish = () => {
+    if (finishedRef.current) return;
+    finishedRef.current = true;
     setIsFadingOut(true);
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 300);
+    }, 600);
+  };
+
+  useEffect(() => {
+    // Attempt programmatic autoplay with error catch to satisfy all browser security policies
+    if (videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Video auto-playback deferred or prevented:', err);
+        });
+      }
+    }
+
+    // Safety fallback timer (video is 10.0s)
+    const fallbackTimer = setTimeout(() => {
+      handleFinish();
+    }, 10500);
+
+    return () => {
+      clearTimeout(fallbackTimer);
+    };
+  }, []);
+
+  const handleTimeUpdate = () => {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime || 0;
+    const duration = videoRef.current.duration || 10;
+    if (duration > 0 && duration - current <= 0.6 && !isFadingOut) {
+      setIsFadingOut(true);
+    }
   };
 
   if (!isVisible) return null;
 
   return (
     <div
-      onClick={handleSkip}
+      onClick={handleFinish}
       className={`respire-splash-screen ${isFadingOut ? 'fade-out' : ''}`}
       style={{
         position: 'fixed',
         inset: 0,
+        width: '100vw',
+        height: '100vh',
         zIndex: 999999,
-        background: 'radial-gradient(ellipse at center, #08160D 0%, #030604 50%, #000000 100%)',
+        backgroundColor: '#050806',
+        backgroundImage: `radial-gradient(ellipse at center, rgba(0, 201, 82, 0.15) 0%, rgba(4, 9, 6, 0.75) 50%, #020403 100%), url('/clean_ref_bg.jpg')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        cursor: 'pointer',
+        cursor: 'default',
         overflow: 'hidden',
         userSelect: 'none',
         transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         opacity: isFadingOut ? 0 : 1,
-        transform: isFadingOut ? 'scale(1.06)' : 'scale(1)',
+        transform: isFadingOut ? 'scale(1.03)' : 'scale(1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
       }}
     >
-      {/* Attractive Luxury Gradient Black Ambient Nebula */}
+      {/* Luxury Ambient Emerald Green Breathing Nebula */}
       <div
         style={{
           position: 'absolute',
-          width: 'min(95vw, 950px)',
-          height: 'min(95vw, 950px)',
+          width: 'min(95vw, 680px)',
+          height: 'min(95vw, 680px)',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.18) 0%, rgba(0, 184, 74, 0.05) 50%, transparent 75%)',
-          filter: 'blur(70px)',
-          animation: 'ambientNebula 5s ease-in-out infinite alternate',
+          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.24) 0%, rgba(0, 184, 74, 0.08) 45%, transparent 72%)',
+          filter: 'blur(50px)',
+          animation: 'respireNebulaPulse 4s ease-in-out infinite alternate',
           pointerEvents: 'none',
+          zIndex: 1,
         }}
       />
 
-      {/* 
-        CIRCULAR ORBIT MOTION STAGE:
-        Moves smoothly in a complete 360-degree circular orbit,
-        while ALWAYS keeping the text perfectly upright, legible, and forward-facing!
-        ZERO side circles, ZERO rings, ZERO dotted lines.
-      */}
-      <div
-        className="respire-orbital-wrapper"
-        style={{
-          position: 'relative',
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-          maxWidth: '960px',
-          padding: '0 20px',
-          animation: 'respireCircularOrbit 4.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite',
+      {/* 10-Second 3D RESPIRE Branding Video */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        disablePictureInPicture
+        controls={false}
+        controlsList="nodownload nofullscreen noremoteplayback"
+        preload="auto"
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={handleFinish}
+        onError={() => {
+          console.warn('Video playback encountered an issue, transitioning in website.');
+          handleFinish();
         }}
+        className="respire-branding-video"
       >
-        {/* Entrance Zoom + Breath Scale */}
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            animation: 'respireEntranceZoom 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-          }}
-        >
-          {/* Ultra-HD Pin-Sharp 2.3K Vectorized Wordmark (100% Clear & Sharp, Never Inverted) */}
-          <img
-            src="/respire_text_ultra_hd.png"
-            alt="RESPIRE"
-            style={{
-              width: '100%',
-              maxWidth: '920px',
-              height: 'auto',
-              maxHeight: '190px',
-              objectFit: 'contain',
-              // Razor-sharp drop shadow that accentuates letters without clouding gaps
-              filter:
-                'drop-shadow(0 0 12px rgba(0, 255, 102, 0.75)) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.95))',
-              display: 'block',
-              animation: 'textSheenPulse 2.4s ease-in-out infinite alternate',
-            }}
-          />
-        </div>
-      </div>
+        <source src="/video.webm" type="video/webm" />
+        <source src="/video.mp4" type="video/mp4" />
+        Your browser does not support HTML5 video playback.
+      </video>
 
-      {/* Embedded Animations */}
+      {/* Responsive Styles: Perfect Full-Screen Desktop & Flawless Mobile View */}
       <style>{`
-        /* 
-          Full 360-Degree Circular Orbit Motion:
-          The text travels around a complete circle of radius 36px,
-          while continuously rotating its counter-angle so it remains
-          100% horizontally upright, clear, and razor-sharp!
-        */
-        @keyframes respireCircularOrbit {
-          0% {
-            transform: rotate(0deg) translateY(-32px) rotate(0deg) scale(0.97);
-          }
-          25% {
-            transform: rotate(90deg) translateY(-32px) rotate(-90deg) scale(1.03);
-          }
-          50% {
-            transform: rotate(180deg) translateY(-32px) rotate(-180deg) scale(1.06);
-          }
-          75% {
-            transform: rotate(270deg) translateY(-32px) rotate(-270deg) scale(1.03);
-          }
-          100% {
-            transform: rotate(360deg) translateY(-32px) rotate(-360deg) scale(0.97);
+        /* Landscape / Desktop: Full screen edge-to-edge cover */
+        @media (min-width: 769px) and (min-aspect-ratio: 1.25) {
+          .respire-branding-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            display: block;
+            z-index: 2;
           }
         }
 
-        /* Initial 1.2s cinematic zoom entrance */
-        @keyframes respireEntranceZoom {
-          0% {
-            opacity: 0;
-            transform: scale(0.4);
-            filter: blur(10px);
-          }
-          60% {
-            transform: scale(1.05);
-            filter: blur(0px);
-          }
-          100% {
-            opacity: 1;
-            transform: scale(1);
-            filter: blur(0px);
+        /* Mobile / Portrait / Tablet: 100% full width, perfectly centered, never cropped, seamless feathering */
+        @media (max-width: 768px), (max-aspect-ratio: 1.25) {
+          .respire-branding-video {
+            position: relative;
+            width: 100vw;
+            max-width: 100vw;
+            height: auto;
+            max-height: 100vh;
+            object-fit: contain;
+            display: block;
+            z-index: 2;
+            -webkit-mask-image: radial-gradient(ellipse 98% 90% at center, black 75%, transparent 100%);
+            mask-image: radial-gradient(ellipse 98% 90% at center, black 75%, transparent 100%);
           }
         }
 
-        /* Subtle glowing energy pulse on the text */
-        @keyframes textSheenPulse {
+        @keyframes respireNebulaPulse {
           0% {
-            filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.65)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9));
-          }
-          100% {
-            filter: drop-shadow(0 0 22px rgba(0, 255, 102, 0.95)) drop-shadow(0 0 45px rgba(0, 201, 82, 0.55)) drop-shadow(0 18px 36px rgba(0, 0, 0, 0.95));
-          }
-        }
-
-        /* Ambient background glow breathing */
-        @keyframes ambientNebula {
-          0% {
-            transform: scale(0.85);
+            transform: scale(0.9);
             opacity: 0.6;
           }
           100% {
