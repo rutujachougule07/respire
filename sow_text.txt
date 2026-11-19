@@ -1,0 +1,722 @@
+=== PAGE 1 ===
+ 
+ 
+ 
+ 
+INFOYASHONAND 
+TECHNOLOGY PVT LTD 
+VishramBag, Sangli, Maharashtra, India 
+ 
+Q U O T A T I O N 
+Complete Gym Management System, 
+Website & Mobile App 
+Prepared for  Respire Fitness, Sangli, Maharashtra, India 
+Quotation No. 
+IT/RF/2026/003 
+Date 
+30 September 2026 
+Valid for 
+30 days from the date above 
+Price basis 
+Fixed price in INR; GST extra 
+ 
+PROJECT PRICE 
+₹2,60,000 
++ GST ₹46,800 (18%) 
+ 
+DELIVERY TIME 
+60 Days 
+from advance and content 
+ 
+BUG-FREE SUPPORT 
+1 Year 
+included in the price 
+ 
+CONFIDENTIAL – prepared exclusively for Respire Fitness 
+
+
+=== PAGE 2 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 2 
+Contents 
+1. Executive Summary 
+2. Who Uses the System 
+3. What Is Included – Component by Component 
+3.6 Biometric machine integration – ₹25,000 
+4. How Attendance and WhatsApp Work Together 
+5. Confidentiality and Data Security 
+6. Deployment Plan (Going Live) 
+7. Timeline and Milestones 
+8. Price Breakup 
+9. Payment Schedule 
+10. AMC, Running Charges and App-Store Charges 
+11. What Is NOT Provided 
+12. Client Responsibilities and Assumptions 
+13. Deliverables 
+14. Warranty and Support 
+15. Ownership and Commercial Terms 
+16. Acceptance 
+ 
+How to read this quotation. Section 3 lists exactly what is included. Section 8 shows the price. Section 11 lists what is not 
+provided. Anything not written in this quotation is not included. 
+ 
+
+
+=== PAGE 3 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 3 
+1. Executive Summary 
+Respire Fitness needs one connected system to run the gym: a website that brings in new members, a control 
+dashboard for the owner, panels for gym managers and trainers, and a mobile app for members. Members' entries 
+on the existing biometric attendance machine will be captured automatically, and the official WhatsApp Business 
+API will send absence and renewal reminders without any manual work. Members can also watch recorded 
+lectures, and compare trainers by rating, reviews and open time slots before booking a session. 
+This is a single, complete quotation. Everything included is listed in Section 3 and priced in Section 8. Anything not 
+written in this quotation is not included (see Section 11). 
+Component 
+Price (INR) 
+Dynamic website (10–15 pages) 
+30,000 
+Super Admin dashboard 
+32,000 
+Gym Manager panel 
+32,000 
+Trainer panel (mobile app – Android + iOS) 
+20,000 
+Client (member) mobile app – Android + iOS 
+60,000 
+Core system behind all panels 
+30,000 
+Biometric machine integration 
+15,000 
+WhatsApp Business API integration 
+18,500 
+Design, testing, deployment, training 
+22,500 
+Total (excl. GST) 
+2,60,000 
+GST @ 18% (subject to verification) 
+46,800 
+Total payable 
+3,06,800 
+ 
+Timeline: 60 days from advance payment, content handover and machine access.  Bug-free service and support: 1 year after 
+go-live, included in the price. 
+2. Who Uses the System 
+The system works in four levels. Each level sees only what it needs. 
+Level 
+Who 
+Uses 
+Main purpose 
+1 
+Super Admin (owner) 
+Web dashboard 
+Controls everything: managers, plans, website, 
+WhatsApp, biometric, reports 
+2 
+Gym Managers 
+Web panel 
+Daily operations: members, renewals, attendance, 
+trainer assignment 
+3 
+Trainers 
+Web panel (works on mobile 
+browser) 
+Work with assigned members: workouts, notes, 
+progress; own profile, open slots, recorded lectures 
+4 
+Clients (members) 
+Mobile app (Android + iOS) 
+Own plan, workouts, progress, attendance, recorded 
+lectures, trainer ratings and slot booking, notifications 
+– 
+Public visitors 
+Website 
+See the gym, plans and trainers; send enquiries 
+ 
+
+
+=== PAGE 4 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 4 
+ 
+ 
+3. What Is Included – Component by Component 
+3.1 Dynamic website (10–15 pages) – ₹30,000 
+"Dynamic" means all website content is managed by you from the Super Admin dashboard. No developer is needed to change 
+text, photos, plans, offers or trainers. 
+Item 
+Details 
+Pages (up to 15) 
+Home, About Us, Membership Plans, Trainers, Classes and Timetable, Gallery, 
+Transformations/Success Stories, Offers, Testimonials, Blog/News, FAQ, Contact, Privacy Policy, 
+Terms and Conditions, Free Trial/Enquiry 
+Managed from admin 
+Text, images, plans and prices, trainer profiles, gallery, offers, blog posts, testimonials, timetable, 
+FAQs 
+Lead capture 
+Enquiry and free-trial forms; leads saved in the dashboard and shown to managers 
+Other 
+Mobile-friendly design, fast loading, SEO fields on every page, Google Map, WhatsApp chat 
+button, social links 
+ 
+3.2 Super Admin dashboard – ₹32,000 
+Feature 
+Details 
+Access control 
+Secure login; create and remove manager accounts; set what each manager can see and do 
+Gym overview 
+Total, active, expired and new members; renewals due; revenue summary; today's attendance 
+Plans and pricing 
+Create membership plans (monthly to yearly), price, validity, freeze rules 
+Reports 
+Member growth, inactive members, churn, subscription and renewal revenue, attendance 
+reports; export to Excel/PDF 
+Website control 
+Edit every website page and view enquiries 
+WhatsApp control 
+Message templates, automation rules, pause/resume, message logs, delivery reports 
+Biometric control 
+Device status, last sync time, member-to-device ID mapping, sync errors 
+Trainer ratings and 
+videos 
+Trainer ranking and rating report; review moderation; overview of recorded lectures and who 
+can watch 
+Settings and audit 
+Gym timings, holidays, rest days; log of important actions by every user 
+ 
+
+
+=== PAGE 5 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 5 
+3.3 Gym Manager panel – ₹32,000 
+Feature 
+Details 
+Members 
+Register, edit, deactivate; profile, plan and history; one-time import of existing member list 
+Renewals 
+Renew or upgrade plan; expiry list (7/15/30 days); renewal history; freeze membership 
+Trainers 
+Trainer records; assign members to trainers; trainer schedule 
+Schedule 
+Workout and class schedule management 
+Attendance 
+Live attendance from biometric machine; present and absent lists; daily, weekly, monthly 
+reports; manual correction (with audit log) 
+Trainer profiles and 
+reviews 
+Approve trainer profiles; set slot rules; view all slot bookings; hide abusive reviews 
+Recorded lectures 
+Upload and manage videos; choose who can watch 
+Follow-up 
+Follow-up list of absent and expiring members; announcements to members 
+ 
+3.4 Trainer panel – ₹20,000 
+Feature 
+Details 
+My members 
+List and profiles of assigned members only 
+Daily schedule 
+Day's sessions and classes 
+Workouts 
+Assign workouts, update progress, add session notes 
+Progress 
+View member measurement and transformation history and attendance of assigned members 
+My profile and slots 
+Edit own profile; set weekly open slots; accept or decline booking requests 
+Reviews 
+See own rating and member reviews 
+Recorded lectures 
+Upload and manage own videos; see how many times each video is watched 
+Reports 
+Completed sessions and member follow-up history 
+ 
+3.5 Client (member) mobile app – Android + iOS – ₹60,000 
+Feature 
+Details 
+Account 
+Secure login, registration, profile 
+Membership 
+Plan, start and expiry date, days left, renewal status and history 
+Training 
+Assigned trainer, personal workout schedule, workout progress 
+Body progress 
+Weight and measurements with charts; body-composition values entered manually from report; 
+before-and-after photos 
+Attendance 
+Biometric attendance history and monthly summary 
+Find a trainer 
+Trainers ranked by rating with profiles, reviews and open slots; book a slot 
+Recorded lectures 
+Browse by category, search and watch videos in the app 
+Alerts 
+Push notifications: renewal reminders, class updates, announcements 
+Gym info 
+Timings, contact, location, rules 
+ 
+
+
+=== PAGE 6 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 6 
+3.6 Biometric machine integration – ₹15,000 
+The gym's existing biometric machine will be connected so that check-ins reach the system automatically. The machine's brand, 
+model and connection method are not yet known, so this work starts with a feasibility check. 
+Step / feature 
+Details 
+Step 1: Feasibility (₹10,000) 
+We inspect the machine (on-site visit in Sangli included) and confirm whether it can 
+connect through its official software kit, network link or supported data feed 
+Step 2: Integration (₹15,000) 
+Built only if Step 1 confirms a workable route 
+Attendance sync 
+Secure real-time or scheduled transfer of check-in records from the machine 
+Member mapping 
+Machine user ID linked with the member ID in the system 
+Automatic attendance 
+Attendance marked automatically; several check-ins in one day create one attendance 
+record 
+Reliability 
+Duplicate entry handling; recovery of missed records after a connection failure; device 
+online/offline status 
+Rules 
+Gym timings, holidays, member rest days and membership freeze periods respected 
+Corrections 
+Manual attendance correction with a log of who changed what and when 
+Privacy 
+We do not store fingerprints or face data. Only the machine's user ID and check-in time are 
+stored 
+ 
+Conditions: covers one machine. If the machine needs a paid software licence, extra connecting hardware or a computer kept 
+on at the gym, those costs are extra and shown to you in writing first. If Step 1 shows integration is not possible, the ₹15,000 
+integration fee is not charged (refunded if already paid), the ₹10,000 feasibility fee stays payable, and attendance will be 
+entered manually. 
+3.7 WhatsApp Business API integration – ₹18,500 
+Messages go through the official WhatsApp Business API, not unofficial tools, so your number is not at risk of being blocked for 
+automation. 
+Feature 
+Details 
+Account setup 
+Help with WhatsApp Business account, phone number registration and connection to the system 
+Templates 
+Up to 5 message templates set up and submitted for WhatsApp approval: absence reminder, 
+renewal/expiry reminder, welcome, class reminder, announcement 
+Consent 
+Member mobile numbers and permission (opt-in) recorded; opt-out respected; no message to 
+members without consent 
+Absence reminder 
+Sent automatically after 1, 2 or 3 consecutive days of absence (configurable) 
+Other automation 
+Membership expiry and renewal reminders; class reminders and schedule updates 
+Safety 
+No duplicate reminder for the same absence; retry on failure; pause or stop all automation with 
+one switch 
+Tracking 
+Sent, delivered, read and failed status; message history; admin reports; automation run log 
+ 
+Sample message: "Hi Rahul! We missed you at Respire Fitness today. Your fitness goals are waiting for you. See you tomorrow!" 
+Not included in this price: API and WhatsApp per-message charges (Section 10), extra templates beyond 5 (quoted separately), 
+and WhatsApp's approval decisions, which we cannot control. 
+3.8 Recorded lectures library – included in the Trainer panel and Client app prices 
+Trainers and managers can upload recorded lectures and workout videos. Members watch them inside the app. 
+
+
+=== PAGE 7 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 7 
+Feature 
+Details 
+Upload and manage 
+Trainers and managers upload videos with title, description and category; edit, hide or delete 
+them 
+Categories 
+Beginner, Intermediate, Advanced, plus your own categories such as Yoga, Zumba, Weight Loss, 
+Diet Tips 
+Who can watch 
+Chosen per video: all members, members of a chosen plan, or only the uploading trainer's 
+members 
+Playback in app 
+Members browse, search and play videos on Android and iPhone; playback resumes where they 
+stopped 
+Security 
+Videos play only for logged-in members through secure, expiring links, with no download button. 
+Screen recording on a phone cannot be fully prevented 
+Storage 
+Videos are stored on secure cloud storage in your name; storage and streaming charges are 
+billed by the provider (Section 10) 
+ 
+Limits: up to 100 videos, each up to 30 minutes and 500 MB. Live streaming, video calls, video shooting and video editing are 
+not included. 
+3.9 Trainer ranking, reviews and slot booking – included in the Trainer panel and Client app prices 
+Members can compare trainers, read reviews and book an open slot from the app. 
+Feature 
+Details 
+Trainer list 
+Trainers are shown ranked by rating, highest first. Equal ratings are ordered by number of 
+reviews. New trainers with few reviews are marked "New" 
+Filters 
+Filter by specialty (for example yoga, weight loss, Zumba, strength) and by "open slot today" 
+Trainer profile 
+Photo, about, years of experience, certifications, specialties, languages, average rating, number 
+of reviews and next open slots 
+Reviews 
+Members give 1 to 5 stars and a written review for a trainer they have trained with. One review 
+per member per trainer, which they can edit. Managers can hide abusive or fake reviews, and 
+hidden reviews do not count in the rating 
+Open slots 
+Trainers set their weekly available times. Members see open slots for the next 7 days; booked 
+slots are not shown as open 
+Booking 
+Member books a slot, which is confirmed automatically or after trainer approval as you choose. 
+Cancel or reschedule is allowed until a cut-off time you set. Trainer and member get 
+notifications, and a reminder goes through the approved WhatsApp class-reminder template 
+Control 
+Managers approve trainer profiles, set slot rules and see all bookings. The owner sees trainer 
+ranking and rating reports 
+Not included 
+Online payment for slots (booking has no payment step) and video-call sessions 
+ 
+
+
+=== PAGE 8 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 8 
+4. How Attendance and WhatsApp Work Together 
+Step 
+What happens 
+1 
+Member checks in on the biometric machine 
+2 
+The system receives the check-in and marks attendance automatically 
+3 
+At a time you set, the system lists active members expected that day 
+4 
+Members on rest day, holiday or freeze are removed from the list 
+5 
+Members with no check-in are identified as absent 
+6 
+An approved WhatsApp reminder is sent to absent members who gave consent 
+7 
+Each absence gets one reminder only; results are logged and visible to the owner and managers 
+ 
+If the biometric machine cannot be connected, managers can enter attendance manually and the WhatsApp reminders will run 
+on that data. 
+5. Confidentiality and Data Security 
+Member details, phone numbers, body measurements and photos are personal information. We protect them as 
+follows. 
+5.1 Our commitments 
+• NDA: a mutual Non-Disclosure Agreement is signed before work starts, covering business information, member 
+data, pricing and access details. 
+• Limited team access: only team members working on your project can see project material, and each is bound by 
+confidentiality. 
+• Your data is yours: we never sell, share or reuse it for other clients or marketing. On request we export it, and at 
+the end we delete our copies and confirm in writing. 
+5.2 Protection built into the system 
+Area 
+Protection 
+Passwords 
+Stored in scrambled (hashed) form; nobody, including us, can read them 
+Data transfer 
+Everything travels over secure (HTTPS) connections 
+Stored data 
+Database and backups are kept on encrypted storage on a server in India 
+Access levels 
+Owner, manager, trainer and member each see only what their level allows; members see only 
+their own data 
+Login safety 
+Automatic logout, protection against repeated wrong-password attempts 
+Activity log 
+Important actions (edits, renewals, deactivations, attendance corrections) are recorded with user 
+and time 
+Backups 
+Automatic daily backups; restore tested before go-live 
+Videos 
+Play only for logged-in members through secure, expiring links; no download button 
+Reviews 
+Only members who trained with a trainer can review; managers can hide abusive reviews 
+Testing 
+Dummy data is used during development, not real member data 
+ 
+5.3 Accounts and access after handover 
+• Server, domain, WhatsApp and app-store accounts are opened in Respire Fitness's name. We keep limited access 
+only for support during the 1-year support period and are removed after it ends. 
+
+
+=== PAGE 9 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 9 
+• Any security incident affecting your data will be reported to you without delay, along with what was done to fix it. 
+5.4 Legal notes (please review with your lawyer) 
+• We follow reasonable security practices under the IT Act 2000 and SPDI Rules 2011, which are currently in force. 
+• The Digital Personal Data Protection Act 2023 and its Rules bring duties on consent, notice and deletion in phases. 
+Exact dates and your duties as the data owner should be confirmed with legal counsel. The system supports consent 
+records and data export/deletion. 
+• Biometric attendance data is sensitive. Only machine user IDs and check-in times are stored; no fingerprints or face 
+data. Members under 18 may need parental consent. 
+6. Deployment Plan (Going Live) 
+Deployment is included in the price. It is done component by component so everything is tested before members use it. 
+Component 
+How it goes live 
+Servers and database 
+Secure server set up in India in your name; test and live versions kept separate; daily 
+backups switched on 
+Website 
+Published on your domain with security certificate; all pages and forms tested 
+Super Admin, Manager and 
+Trainer panels 
+Published on secure web addresses; accounts created for owner, managers and trainers 
+Client mobile app 
+Prepared, submitted and published on Google Play and Apple App Store under your 
+accounts 
+Biometric machine 
+On-site setup and connection at the gym; live check-in test with sample members; 
+mapping of member IDs 
+WhatsApp API 
+Number connected; templates approved; test messages sent; automation switched on 
+after your approval 
+Video library 
+Cloud video storage opened in your name; sample videos uploaded and playback tested on 
+Android and iPhone 
+Data 
+Existing member list imported once and checked with you 
+Go-live check 
+Full checklist signed by you; training for owner, managers and trainers; 1-year bug-fix 
+warranty and support start 
+ 
+7. Timeline and Milestones 
+Days 
+Activity 
+Milestone 
+1–7 
+Requirements confirmed; biometric machine inspected; 
+designs 
+M1: designs and feasibility report approved 
+8–25 
+Core system, Super Admin and Manager panels 
+M2: working panels demo 
+15–35 
+Trainer panel, member app, recorded lectures, trainer ratings 
+and booking, website (in parallel) 
+M3: beta demo of all panels and app (day 35) 
+30–48 
+Biometric and WhatsApp integration, testing with real 
+machine 
+M4: attendance and WhatsApp working end to 
+end 
+45–54 
+Client review, fixes, store submission 
+M5: client sign-off 
+54–60 
+Deployment, training, handover 
+M6: go-live and handover (day 60) 
+ 
+The total timeline is 60 calendar days. It starts after advance payment, and receipt of logo, plan details, website content and 
+access to the biometric machine. Delays in client feedback or content, machine or software problems, WhatsApp template 
+approval and Apple/Google app review are outside our control and extend the timeline by the same number of days. 
+
+
+=== PAGE 10 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 10 
+8. Price Breakup 
+# 
+Item 
+Amount (INR) 
+1 
+Dynamic website (10–15 pages) 
+30,000 
+2 
+Super Admin dashboard 
+32,000 
+3 
+Gym Manager panel 
+32,000 
+4 
+Trainer panel 
+20,000 
+5 
+Client mobile app (Android + iOS) 
+50,000 
+6 
+Core system: secure login, database, roles, reports, notifications, backups 
+30,000 
+7 
+Biometric machine integration (Feasibility ₹10,000 + Integration ₹15,000) 
+25,000 
+8 
+WhatsApp Business API integration and automation 
+18,500 
+9 
+UI/UX design (standard layouts adapted with your logo and colours) 
+7,500 
+10 
+Testing, deployment and store publishing (all components) 
+10,000 
+11 
+Training, documentation and project management 
+5,000 
+ 
+Total (excl. GST) 
+2,60,000 
+ 
+GST @ 18% 
+46,800 
+ 
+Grand total 
+3,06,800 
+ 
+9. Payment Schedule 
+Stage 
+% 
+Amount (excl. GST) 
+Advance on order confirmation 
+40% 
+₹1,04,000 
+After beta demo, milestone M3 (approx. day 35) 
+30% 
+₹78,000 
+Before final handover, after client sign-off 
+30% 
+₹78,000 
+Total 
+100% 
+₹2,60,000 
+ 
+GST is added on each invoice. Payment by bank transfer, UPI or cheque within 7 days of invoice. The ₹10,000 biometric 
+feasibility fee is payable even if integration turns out to be impossible. 
+10. AMC, Running Charges and App-Store Charges 
+10.1 Annual Maintenance Contract (AMC) 
+Item 
+Price 
+Annual AMC – domain renewal only 
+₹15,000 per year (excl. GST) 
+ 
+The AMC covers only the renewal of the website domain. Bug fixes and support during the first year are covered separately by 
+the free 1-year warranty and support (Section 14). The AMC does not include new features, server or hosting charges, app-
+store charges, or any third-party charges. Any such work is quoted separately. 
+
+
+=== PAGE 11 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 11 
+10.2 Charges paid directly by Respire Fitness to providers (not included in the price or the AMC) 
+Item 
+Details 
+Server, database and backups Photo 
+storage 
+₹5,000–9,000 per year (estimate) 
+Video storage and streaming 
+Not included. Billed by the storage provider on actual usage; depends on the 
+number of videos and viewers 
+API charges, including WhatsApp 
+Business API message charges 
+Not included. Billed by the provider on actual usage. Prices are not stated in 
+this quotation 
+SMS charges 
+Not included. Billed by the SMS provider on actual usage. Prices are not stated 
+in this quotation 
+AI services or AI integration 
+Not included. No AI is part of this quotation; any AI feature and its usage 
+charges would be quoted and billed separately 
+ 
+10.3 App-store renewal charges (separate) 
+Item 
+Details 
+Apple Developer Program – yearly 
+renewal 
+About US$99 per year, paid by the client directly to Apple 
+Google Play Developer account 
+US$25 one-time, paid by the client directly to Google 
+ 
+App-store charges are separate from the quotation price and from the AMC. Amounts are indicative and are set by Apple and 
+Google. 
+11. What Is NOT Provided 
+We will not provide anything that is not written in this quotation. Any extra feature, integration, device, content 
+or service needs a separate written quotation and your approval before work starts. Specifically not included: 
+• recorded videos, or videos longer than 30 minutes or larger than 500 MB 
+• Smartwatch or wearable integration, AI camera pose tracking, direct body-composition machine integration 
+• API charges (including WhatsApp Business API message charges), SMS charges, charges of any AI service or 
+integration, server and app-store fees, machine software licences, hardware, computers or internet 
+• Any AI feature or AI integration 
+• Website content writing, photography, logo design or video content; fully custom graphic design (designs use 
+standard layouts adapted with your logo and colours) 
+• Legal advice, data-protection registrations or audits 
+• New features, changes to the agreed scope, and support after the 1-year support period, except under a new 
+written quotation (the AMC covers domain renewal only) 
+• Anything the biometric machine or WhatsApp itself does not technically allow 
+12. Client Responsibilities and Assumptions 
+What we need from you 
+• Access to the biometric machine and its details within the first 3 days; contact of the machine supplier if needed 
+• Logo, plan and price details, trainer profile details, photos and website text within the first 7 days 
+• Recorded lecture videos to upload (recorded by your trainers; we do not shoot or edit videos) 
+• One decision-maker who gives feedback within 48 hours 
+• WhatsApp business number, business documents for verification, and opening of server, domain and app-store 
+accounts 
+
+
+=== PAGE 12 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 12 
+• Existing member list in Excel/CSV 
+• Members' consent for WhatsApp messages, collected through the system 
+Assumptions 
+• One gym location in Sangli; up to about 300 members; up to 3 managers and 5 trainers; up to 100 recorded videos 
+of up to 30 minutes and 500 MB each 
+• English screens (Marathi/Hindi labels on request); 1 revision round on designs 
+• One machine, one WhatsApp number 
+• Changes after sign-off are treated as change requests and priced separately 
+13. Deliverables 
+• Approved designs and requirement document 
+• Dynamic website (10–15 pages), Super Admin dashboard, Gym Manager panel, Trainer panel 
+• Client mobile app on Android and iOS, published on both stores, with recorded lectures, trainer ranking, reviews 
+and slot booking 
+• Biometric attendance connection (if feasible) and WhatsApp automation with approved templates 
+• Attendance, membership and revenue reports 
+• Testing summary, user guide, technical documentation 
+• Training for owner, managers and trainers (on-site or online) 
+• Handover of source code and all accounts and passwords 
+14. Warranty and Support 
+• 1 year of bug-free service and support is included in the price, starting from go-live. Nothing extra is charged for it. 
+• What we do free of charge: fix every defect (anything not working as described in this quotation), fix security issues 
+in the software we delivered, keep the system running as delivered, and help your team with how-to questions. 
+• How to reach us: by phone, WhatsApp and email during working hours. Every issue is acknowledged within 1 
+working day, and serious problems (system not working) are handled first. 
+• Not covered: new features or changes to the agreed scope; extra work caused by changes from WhatsApp, the 
+machine maker, Apple or Google; problems caused by hardware, internet, misuse or changes made by others to the 
+software; third-party charges. 
+• After 1 year: support continues under a separate written quotation. The AMC (₹15,000 per year) covers domain 
+renewal only. 
+15. Ownership and Commercial Terms 
+• Code ownership: on full payment, ownership of the custom software we build passes to Respire Fitness with 
+complete source code and documentation. Third-party and open-source parts stay under their own licences, listed 
+at handover. 
+• Changes: any change to scope is estimated in writing and approved before work. 
+• Termination: either side may end the contract with written notice; completed work is paid pro rata and delivered. 
+• Liability: limited to the fees paid for this project. 
+• Validity: 30 days. All prices exclude GST. 
+• Law: Indian law; court jurisdiction to be confirmed at contract signing. 
+16. Acceptance 
+To accept, sign below and return this quotation with the advance payment. A formal agreement and NDA follow 
+before work starts. 
+ 
+
+
+=== PAGE 13 ===
+INFOYASHONAND TECHNOLOGY PVT LTDQuotation IT/RF/2026/003  |  Respire Fitness 
+VishramBag, Sangli, Maharashtra, India   |   Confidential   |   Valid 30 daysPage 13 
+For the Vendor 
+Infoyashonand Technology Pvt Ltd 
+Vishram Bag, Sangli, Maharashtra 
+ 
+Signature and company stamp 
+Date: ______________ 
+Accepted by the Client 
+Respire Fitness 
+Sangli, Maharashtra 
+ 
+Signature and company stamp 
+Date: ______________ 
+ 
+
+

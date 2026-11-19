@@ -1,0 +1,701 @@
+import React, { useState } from 'react';
+import {
+  Plus,
+  Edit3,
+  Trash2,
+  Bell,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle2,
+  Calendar,
+  X,
+  Info,
+} from 'lucide-react';
+import { OFFICIAL_FEE_RULES } from './initialData';
+
+function getDaysRemaining(expiryDate) {
+  const today = new Date('2026-11-18');
+  const exp = new Date(expiryDate);
+  return Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+}
+
+function addMonths(dateStr, months) {
+  const base = new Date(dateStr);
+  const today = new Date('2026-11-18');
+  const start = base > today ? base : today;
+  start.setMonth(start.getMonth() + Number(months || 1));
+  return start.toISOString().split('T')[0];
+}
+
+export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast }) {
+  const [renewalFilter, setRenewalFilter] = useState('Expiring');
+  const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState(null);
+
+  const [planForm, setPlanForm] = useState({
+    durationLabel: '1 Month',
+    name: '',
+    durationMonths: 1,
+    price: 5500,
+    freezeDays: 0,
+    badge: 'Limited Time Offer',
+    featuresText: 'Full Gym Floor Access, Biometric Check-in, Locker Access',
+    status: 'Active',
+    isPopular: false,
+  });
+
+  const openAddPlan = () => {
+    setEditingPlan(null);
+    setPlanForm({
+      durationLabel: '2 Months',
+      name: '2 Months Membership',
+      durationMonths: 2,
+      price: 9500,
+      freezeDays: 0,
+      badge: 'Limited Time Offer',
+      featuresText: 'Full Gym Floor Access, Biometric Check-in, Locker & Shower Access',
+      status: 'Active',
+      isPopular: false,
+    });
+    setIsPlanModalOpen(true);
+  };
+
+  const openEditPlan = (plan) => {
+    setEditingPlan(plan);
+    setPlanForm({
+      durationLabel:
+        plan.durationLabel ||
+        (plan.durationMonths === 12
+          ? '1 Year'
+          : `${plan.durationMonths} ${plan.durationMonths === 1 ? 'Month' : 'Months'}`),
+      name: plan.name,
+      durationMonths: plan.durationMonths,
+      price: plan.price,
+      freezeDays: plan.freezeDays || 0,
+      badge: plan.badge || 'Limited Time Offer',
+      featuresText: (plan.features || []).join(', '),
+      status: plan.status || 'Active',
+      isPopular: Boolean(plan.isPopular),
+    });
+    setIsPlanModalOpen(true);
+  };
+
+  const handleSavePlan = (e) => {
+    e.preventDefault();
+    const featuresArr = planForm.featuresText
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (editingPlan) {
+      setPlans((prev) =>
+        prev.map((p) =>
+          p.id === editingPlan.id
+            ? {
+                ...p,
+                durationLabel: planForm.durationLabel,
+                name: planForm.name || `${planForm.durationLabel} Membership`,
+                durationMonths: Number(planForm.durationMonths),
+                price: Number(planForm.price),
+                freezeDays: Number(planForm.freezeDays),
+                badge: planForm.badge,
+                features: featuresArr,
+                status: planForm.status,
+                isPopular: planForm.isPopular,
+              }
+            : p
+        )
+      );
+      showToast(`Updated "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
+    } else {
+      const newPlan = {
+        id: `plan-${Date.now()}`,
+        durationLabel: planForm.durationLabel,
+        name: planForm.name || `${planForm.durationLabel} Membership`,
+        durationMonths: Number(planForm.durationMonths),
+        price: Number(planForm.price),
+        freezeDays: Number(planForm.freezeDays),
+        badge: planForm.badge,
+        features: featuresArr,
+        status: planForm.status,
+        isPopular: planForm.isPopular,
+      };
+      setPlans((prev) => [...prev, newPlan]);
+      showToast(`Added "${planForm.durationLabel}" plan (₹${Number(planForm.price).toLocaleString('en-IN')}/-)`);
+    }
+    setIsPlanModalOpen(false);
+  };
+
+  const handleDeletePlan = (plan) => {
+    setPlans((prev) => prev.filter((p) => p.id !== plan.id));
+    showToast(`Deleted "${plan.durationLabel || plan.name}" from Fee Structure`);
+  };
+
+  const togglePlanStatus = (plan) => {
+    const next = plan.status === 'Active' ? 'Paused' : 'Active';
+    setPlans((prev) => prev.map((p) => (p.id === plan.id ? { ...p, status: next } : p)));
+    showToast(`"${plan.durationLabel || plan.name}" marked as ${next}`);
+  };
+
+  const handleSendReminder = (member) => {
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setMembers((prev) =>
+      prev.map((m) => (m.id === member.id ? { ...m, reminderSentAt: `Sent today at ${timestamp}` } : m))
+    );
+    showToast(`WhatsApp renewal reminder sent to ${member.name} (${member.phone})`);
+  };
+
+  const handleQuickRenew = (member) => {
+    const matchedPlan = plans.find((p) => p.id === member.planId);
+    const months = matchedPlan ? matchedPlan.durationMonths : 1;
+    const newExpiry = addMonths(member.expiryDate, months);
+    setMembers((prev) =>
+      prev.map((m) =>
+        m.id === member.id
+          ? { ...m, expiryDate: newExpiry, status: 'Active', reminderSentAt: null }
+          : m
+      )
+    );
+    showToast(`Renewed ${member.name}'s ${member.planName} until ${newExpiry}`);
+  };
+
+  const activeMembers = members.filter((m) => m.status === 'Active');
+  const renewalsList = activeMembers
+    .map((m) => ({ ...m, daysLeft: getDaysRemaining(m.expiryDate) }))
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .filter((m) => {
+      if (renewalFilter === 'Expiring') return m.daysLeft <= 15 && m.daysLeft >= 0;
+      if (renewalFilter === 'Expired') return m.daysLeft < 0;
+      return true;
+    });
+
+  const expiringCount = activeMembers.filter((m) => {
+    const d = getDaysRemaining(m.expiryDate);
+    return d <= 15 && d >= 0;
+  }).length;
+
+  const expiredCount = activeMembers.filter((m) => getDaysRemaining(m.expiryDate) < 0).length;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+      {/* SECTION 1: OFFICIAL MEMBERSHIP FEE STRUCTURE MANAGER (ADD / EDIT / DELETE) */}
+      <div>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '14px',
+            marginBottom: '18px',
+          }}
+        >
+          <div>
+            <h2 style={{ fontSize: '1.55rem', fontWeight: 900, color: '#0F172A', marginBottom: '4px' }}>
+              Membership Fee Structure & Renewals
+            </h2>
+            <p style={{ fontSize: '0.88rem', color: '#64748B' }}>
+              Add, Edit, or Delete official membership plans (changes sync live to the website).
+            </p>
+          </div>
+          <button onClick={openAddPlan} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
+            <Plus size={16} />
+            <span>Add New Plan</span>
+          </button>
+        </div>
+
+        {/* Clean Fee Structure Table (Exact Standee Mirror + Edit/Delete Actions) */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            border: '1.5px solid rgba(0, 184, 74, 0.22)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.05)',
+            marginBottom: '22px',
+          }}
+        >
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #00C952 0%, #008A37 100%)',
+              padding: '16px 22px',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '10px',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '1.08rem', fontWeight: 900 }}>RESPIRE FITNESS — Membership Fee Structure</div>
+              <div style={{ fontSize: '0.76rem', color: '#D1FAE5', fontWeight: 600 }}>
+                Live pricing table synced with your website • Edit, Delete, or Add tiers anytime
+              </div>
+            </div>
+            <button
+              onClick={openAddPlan}
+              style={{
+                padding: '7px 14px',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                color: '#007A31',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <Plus size={14} /> Add Fee Tier
+            </button>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#F4FBF7', borderBottom: '1px solid #E2E8F0', textAlign: 'left' }}>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Duration</th>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Plan Title</th>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Charges (₹)</th>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Status</th>
+                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plans.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ padding: '28px', textAlign: 'center', color: '#64748B' }}>
+                      No plans added yet. Click "Add New Plan" to create one.
+                    </td>
+                  </tr>
+                ) : (
+                  plans.map((plan) => {
+                    const durationText =
+                      plan.durationLabel ||
+                      (plan.durationMonths === 12
+                        ? '1 Year'
+                        : `${plan.durationMonths} ${plan.durationMonths === 1 ? 'Month' : 'Months'}`);
+                    const memberCount = members.filter((m) => m.planId === plan.id && m.status === 'Active').length;
+
+                    return (
+                      <tr key={plan.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                        <td style={{ padding: '14px 20px', fontWeight: 900, fontSize: '0.96rem', color: '#0F172A' }}>
+                          {durationText}
+                          {plan.isPopular && (
+                            <span style={{ marginLeft: '8px', padding: '2px 8px', borderRadius: '999px', backgroundColor: '#EEF2FF', color: '#172C83', fontSize: '0.68rem', fontWeight: 800 }}>
+                              POPULAR
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '14px 20px' }}>
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#334155' }}>{plan.name}</div>
+                          <div style={{ fontSize: '0.74rem', color: '#64748B' }}>{memberCount} active members</div>
+                        </td>
+                        <td style={{ padding: '14px 20px', fontWeight: 900, fontSize: '1.05rem', color: '#008A38' }}>
+                          ₹{Number(plan.price).toLocaleString('en-IN')}/-
+                        </td>
+                        <td style={{ padding: '14px 20px' }}>
+                          <button
+                            onClick={() => togglePlanStatus(plan)}
+                            title="Click to toggle Active/Paused"
+                            style={{
+                              padding: '4px 11px',
+                              borderRadius: '999px',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              backgroundColor: plan.status === 'Active' ? '#DCFCE7' : '#F1F5F9',
+                              color: plan.status === 'Active' ? '#15803D' : '#64748B',
+                            }}
+                          >
+                            {plan.status}
+                          </button>
+                        </td>
+                        <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                          <div style={{ display: 'inline-flex', gap: '8px' }}>
+                            <button
+                              onClick={() => openEditPlan(plan)}
+                              style={{
+                                padding: '7px 12px',
+                                borderRadius: '8px',
+                                backgroundColor: '#ECFDF3',
+                                color: '#008A38',
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                              }}
+                            >
+                              <Edit3 size={14} /> Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeletePlan(plan)}
+                              style={{
+                                padding: '7px 12px',
+                                borderRadius: '8px',
+                                backgroundColor: '#FEF2F2',
+                                color: '#DC2626',
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                              }}
+                            >
+                              <Trash2 size={14} /> Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Official Standee Terms Footer Inside Table Card */}
+          <div style={{ backgroundColor: '#F8FCFA', borderTop: '1px solid #E2E8F0', padding: '16px 22px' }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#008A38', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Info size={14} /> Official Fee Rules & Gym Timings
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '6px 18px', fontSize: '0.8rem', color: '#334155', fontWeight: 600 }}>
+              {OFFICIAL_FEE_RULES.map((r, i) => (
+                <div key={i}>* {r}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 2: RENEWAL DATES TRACKER & EXPIRING MEMBERSHIPS */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '20px',
+          padding: '24px',
+          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '16px',
+            marginBottom: '20px',
+          }}
+        >
+          <div>
+            <h3 style={{ fontSize: '1.22rem', fontWeight: 900, color: '#0F172A', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Calendar size={19} color="#00B84A" />
+              <span>Renewal Dates & Expiring Memberships</span>
+            </h3>
+            <p style={{ fontSize: '0.84rem', color: '#64748B', marginTop: '2px' }}>
+              Track whose membership is ending soon and send instant WhatsApp renewal reminders.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            {[
+              { id: 'Expiring', label: `Expiring Soon (${expiringCount})` },
+              { id: 'Expired', label: `Expired (${expiredCount})` },
+              { id: 'All', label: `All Active (${activeMembers.length})` },
+            ].map((tab) => {
+              const active = renewalFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setRenewalFilter(tab.id)}
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '9px',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    background: active ? 'linear-gradient(135deg, #00D256 0%, #008A37 100%)' : '#F1F5F9',
+                    color: active ? '#FFFFFF' : '#475569',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '760px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', textAlign: 'left' }}>
+                <th style={{ padding: '12px 14px', fontSize: '0.74rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Member</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.74rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Current Plan</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.74rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Renewal Date</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.74rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Urgency</th>
+                <th style={{ padding: '12px 14px', fontSize: '0.74rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {renewalsList.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '30px', textAlign: 'center', color: '#64748B', fontSize: '0.9rem' }}>
+                    No memberships in this category right now.
+                  </td>
+                </tr>
+              ) : (
+                renewalsList.map((m) => {
+                  const isOverdue = m.daysLeft < 0;
+                  const isSoon = m.daysLeft >= 0 && m.daysLeft <= 15;
+
+                  return (
+                    <tr key={m.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                      <td style={{ padding: '14px' }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>{m.name}</div>
+                        <div style={{ fontSize: '0.76rem', color: '#64748B' }}>{m.phone}</div>
+                      </td>
+                      <td style={{ padding: '14px', fontSize: '0.86rem', fontWeight: 700, color: '#334155' }}>
+                        {m.planName}
+                      </td>
+                      <td style={{ padding: '14px', fontSize: '0.86rem', fontWeight: 800, color: '#0F172A' }}>
+                        {m.expiryDate}
+                      </td>
+                      <td style={{ padding: '14px' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            padding: '4px 10px',
+                            borderRadius: '999px',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            backgroundColor: isOverdue ? '#FEE2E2' : isSoon ? '#FEF3C7' : '#DCFCE7',
+                            color: isOverdue ? '#B91C1C' : isSoon ? '#B45309' : '#15803D',
+                          }}
+                        >
+                          {(isOverdue || isSoon) && <AlertTriangle size={12} />}
+                          {isOverdue
+                            ? `Expired ${Math.abs(m.daysLeft)}d ago`
+                            : isSoon
+                            ? `Ends in ${m.daysLeft} days`
+                            : `${m.daysLeft} days remaining`}
+                        </span>
+                      </td>
+                      <td style={{ padding: '14px', textAlign: 'right' }}>
+                        <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
+                          <button
+                            onClick={() => handleSendReminder(m)}
+                            style={{
+                              padding: '7px 12px',
+                              borderRadius: '8px',
+                              backgroundColor: m.reminderSentAt ? '#DCFCE7' : '#EEF2FF',
+                              color: m.reminderSentAt ? '#15803D' : '#172C83',
+                              fontSize: '0.76rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                            }}
+                          >
+                            <Bell size={13} />
+                            <span>{m.reminderSentAt ? 'Reminder Sent ✓' : 'Send Reminder'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleQuickRenew(m)}
+                            style={{
+                              padding: '7px 12px',
+                              borderRadius: '8px',
+                              background: 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
+                              color: '#FFFFFF',
+                              fontSize: '0.76rem',
+                              fontWeight: 800,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                            }}
+                          >
+                            <RefreshCw size={13} />
+                            <span>Renew Now</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add / Edit Plan Modal */}
+      {isPlanModalOpen && (
+        <div
+          onClick={() => setIsPlanModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2500,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.35)',
+            }}
+          >
+            <div
+              style={{
+                padding: '18px 22px',
+                borderBottom: '1px solid #E2E8F0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                backgroundColor: '#F4FBF7',
+                flexShrink: 0,
+              }}
+            >
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#0F172A' }}>
+                {editingPlan ? 'Edit Membership Plan' : 'Add New Membership Plan'}
+              </h3>
+              <button onClick={() => setIsPlanModalOpen(false)} style={{ color: '#64748B' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleSavePlan}
+              style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: '14px', flex: 1, overflowY: 'auto' }}
+            >
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                    DURATION LABEL *
+                  </label>
+                  <input
+                    required
+                    value={planForm.durationLabel}
+                    onChange={(e) => setPlanForm({ ...planForm, durationLabel: e.target.value })}
+                    placeholder="e.g. 1 Month, 3 Months, 1 Year"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                    CHARGES (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    min="500"
+                    required
+                    value={planForm.price}
+                    onChange={(e) => setPlanForm({ ...planForm, price: e.target.value })}
+                    placeholder="5500"
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                  PLAN TITLE
+                </label>
+                <input
+                  required
+                  value={planForm.name}
+                  onChange={(e) => setPlanForm({ ...planForm, name: e.target.value })}
+                  placeholder="e.g. 6 Months Membership"
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>MONTHS</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="36"
+                    required
+                    value={planForm.durationMonths}
+                    onChange={(e) => setPlanForm({ ...planForm, durationMonths: e.target.value })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.86rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>FREEZE DAYS</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="90"
+                    value={planForm.freezeDays}
+                    onChange={(e) => setPlanForm({ ...planForm, freezeDays: e.target.value })}
+                    style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.86rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>BADGE</label>
+                  <input
+                    value={planForm.badge}
+                    onChange={(e) => setPlanForm({ ...planForm, badge: e.target.value })}
+                    placeholder="Limited Time Offer"
+                    style={{ width: '100%', padding: '10px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                  INCLUDED FEATURES (comma-separated)
+                </label>
+                <textarea
+                  rows={3}
+                  value={planForm.featuresText}
+                  onChange={(e) => setPlanForm({ ...planForm, featuresText: e.target.value })}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.86rem' }}
+                />
+              </div>
+
+              <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', fontWeight: 700, color: '#0F172A', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={planForm.isPopular}
+                  onChange={(e) => setPlanForm({ ...planForm, isPopular: e.target.checked })}
+                  style={{ accentColor: '#00B84A', width: '16px', height: '16px' }}
+                />
+                <span>Highlight as "Most Popular" green card on website</span>
+              </label>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '6px' }}>
+                <button type="button" onClick={() => setIsPlanModalOpen(false)} className="btn btn-secondary btn-sm">
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary btn-sm">
+                  <CheckCircle2 size={15} />
+                  <span>{editingPlan ? 'Save Changes' : 'Add Plan'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

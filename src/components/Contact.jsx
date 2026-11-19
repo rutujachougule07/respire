@@ -1,0 +1,541 @@
+import React, { useState } from 'react';
+import { MapPin, Clock, Send, MessageCircle, CheckCircle2, Building2, ExternalLink, Phone } from 'lucide-react';
+
+export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    branch: 'Respire Vishrambag Branch',
+    service: 'Personal Training',
+    program: 'Beginner',
+    notes: '',
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+
+  const branches = [
+    {
+      id: 'vishrambag',
+      badge: 'Branch 1 • Vishrambag',
+      name: 'Respire Vishrambag Branch',
+      address: '7th Floor, R City Mall, Opp. Safa Bakery, Vishrambag, Sangli.',
+      phoneDisplay: '7798001777',
+      phoneFull: '+91 7798001777',
+      waNumber: '917798001777',
+      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=R+City+Mall+Opp+Safa+Bakery+Vishrambag+Sangli',
+      gradient: 'linear-gradient(150deg, #00C952 0%, #008F39 58%, #056129 100%)',
+    },
+    {
+      id: 'vijaynagar',
+      badge: 'Branch 2 • Vijaynagar',
+      name: 'Respire Vijaynagar Branch',
+      address: '3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road, Vijaynagar, Sangli.',
+      phoneDisplay: '9172848777',
+      phoneFull: '+91 9172848777',
+      waNumber: '919172848777',
+      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=Krishna+Heights+Opp+KFC+Sangli+Miraj+Road+Vijaynagar+Sangli',
+      gradient: 'linear-gradient(150deg, #172C83 0%, #1E3AA8 55%, #0D1B54 100%)',
+    },
+  ];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  const openBranchWhatsApp = (branch) => {
+    const text = encodeURIComponent(
+      `Hello ${branch.name} (Mahabal Group Venture),\nI would like to inquire about membership details and services at ${branch.address}\n\nName: ${formData.name || 'Member'}\nService: ${formData.service}\nProgram: ${formData.program}`
+    );
+    window.open(`https://wa.me/${branch.waNumber}?text=${text}`, '_blank');
+  };
+
+  return (
+    <section
+      id="contact"
+      className="section-padding"
+      style={{
+        backgroundColor: '#FFFFFF',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+        {/* Section Header */}
+        <div className="section-header">
+          <div className="section-eyebrow">
+            <MapPin size={14} />
+            <span>Visit Our 2 Branches in Sangli</span>
+          </div>
+          <h2 className="section-title">
+            CONNECT WITH <span className="text-green">RESPIRE FITNESS</span>
+          </h2>
+          <p className="section-subtitle">
+            Visit either of our premium Sangli branches — <strong>Vishrambag</strong> or <strong>Vijaynagar</strong> — or submit an inquiry below.
+          </p>
+        </div>
+
+        {/* 2 Official Branch Cards Side-by-Side */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+            gap: '24px',
+            marginBottom: '34px',
+          }}
+        >
+          {branches.map((branch) => (
+            <div
+              key={branch.id}
+              style={{
+                background: branch.gradient,
+                borderRadius: '24px',
+                padding: '30px',
+                color: '#FFFFFF',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                boxShadow:
+                  branch.id === 'vishrambag'
+                    ? '0 20px 42px rgba(0, 148, 59, 0.24)'
+                    : '0 20px 42px rgba(23, 44, 131, 0.24)',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '5px 12px',
+                    borderRadius: '999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    fontSize: '0.74rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.07em',
+                    marginBottom: '14px',
+                  }}
+                >
+                  <Building2 size={14} />
+                  <span>{branch.badge}</span>
+                </div>
+
+                <h3 style={{ fontSize: '1.48rem', fontWeight: 900, color: '#FFFFFF', marginBottom: '10px' }}>
+                  {branch.name}
+                </h3>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    fontSize: '1rem',
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    lineHeight: 1.55,
+                    fontWeight: 600,
+                    marginBottom: '18px',
+                  }}
+                >
+                  <MapPin size={19} style={{ flexShrink: 0, marginTop: '3px' }} />
+                  <span>{branch.address}</span>
+                </div>
+
+                {/* Clickable Phone Pill */}
+                <a
+                  href={`tel:+91${branch.phoneDisplay}`}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '9px',
+                    padding: '10px 18px',
+                    borderRadius: '11px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    color: '#FFFFFF',
+                    fontSize: '1.02rem',
+                    fontWeight: 900,
+                    letterSpacing: '0.04em',
+                    marginBottom: '22px',
+                  }}
+                >
+                  <Phone size={17} />
+                  <span>{branch.phoneFull}</span>
+                </a>
+              </div>
+
+              {/* Action Buttons Row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <a
+                  href={branch.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-white btn-sm"
+                  style={{
+                    padding: '11px 14px',
+                    fontSize: '0.8rem',
+                    textTransform: 'none',
+                    fontWeight: 800,
+                    color: branch.id === 'vishrambag' ? '#007A31' : '#172C83',
+                  }}
+                >
+                  <MapPin size={15} />
+                  <span>Directions</span>
+                  <ExternalLink size={13} />
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => openBranchWhatsApp(branch)}
+                  style={{
+                    padding: '11px 14px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                    border: '1px solid rgba(255, 255, 255, 0.35)',
+                    color: '#FFFFFF',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '7px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <MessageCircle size={15} />
+                  <span>WhatsApp</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom 2-Column Grid: Timings & Policy + Direct Membership Inquiry Form */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '28px',
+            alignItems: 'stretch',
+          }}
+        >
+          {/* Left: Official Gym Timings & Trial Rules Card */}
+          <div
+            style={{
+              background: 'linear-gradient(145deg, #F4FBF7 0%, #EDF9F2 100%)',
+              border: '1.5px solid rgba(0, 184, 74, 0.22)',
+              borderRadius: '24px',
+              padding: '32px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  color: '#008A38',
+                  fontSize: '0.8rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.07em',
+                  marginBottom: '12px',
+                }}
+              >
+                <Clock size={16} />
+                <span>Official Facility Timings & Info</span>
+              </div>
+
+              <h3 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0F172A', marginBottom: '18px' }}>
+                Train at Either Sangli Branch
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '22px' }}>
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '14px',
+                    padding: '15px 18px',
+                    border: '1px solid rgba(0, 184, 74, 0.16)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span style={{ fontWeight: 700, color: '#334155', fontSize: '0.92rem' }}>Gym Timings</span>
+                  <span style={{ fontWeight: 900, color: '#008A38', fontSize: '0.96rem' }}>05:30 AM – 10:00 PM</span>
+                </div>
+
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '14px',
+                    padding: '15px 18px',
+                    border: '1px solid rgba(0, 184, 74, 0.16)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <span style={{ fontWeight: 700, color: '#334155', fontSize: '0.92rem' }}>One Day Trial Charge</span>
+                  <span style={{ fontWeight: 900, color: '#172C83', fontSize: '0.94rem' }}>Rs. 500/- (No Free Trial)</span>
+                </div>
+
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '14px',
+                    padding: '15px 18px',
+                    border: '1px solid rgba(0, 184, 74, 0.16)',
+                    fontSize: '0.86rem',
+                    color: '#475569',
+                    fontWeight: 600,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  • AC Will Be Shut Down Daily From 12PM To 4PM<br />
+                  • All fees will be received strictly in advance & are non-refundable.
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '14px',
+                padding: '16px 18px',
+                border: '1px solid rgba(0, 184, 74, 0.2)',
+                fontSize: '0.86rem',
+                color: '#0F172A',
+                fontWeight: 700,
+              }}
+            >
+              <div style={{ color: '#008A38', fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
+                • A MAHABAL GROUP VENTURE •
+              </div>
+              <div>Vishrambag Desk: <a href="tel:+917798001777" style={{ color: '#008A38' }}>+91 7798001777</a></div>
+              <div>Vijaynagar Desk: <a href="tel:+919172848777" style={{ color: '#172C83' }}>+91 9172848777</a></div>
+            </div>
+          </div>
+
+          {/* Right: Clean White Direct Inquiry Form */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              border: '1.5px solid rgba(0, 184, 74, 0.18)',
+              borderRadius: '24px',
+              padding: '32px',
+              boxShadow: '0 16px 40px rgba(15, 23, 42, 0.06)',
+            }}
+          >
+            <h3 style={{ fontSize: '1.45rem', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
+              Send a Membership Inquiry
+            </h3>
+            <p style={{ fontSize: '0.88rem', color: '#475569', marginBottom: '22px', lineHeight: 1.6 }}>
+              Choose your preferred branch and submit your details below. Our team will get back to you promptly.
+            </p>
+
+            {submitted ? (
+              <div
+                style={{
+                  backgroundColor: '#ECFDF3',
+                  border: '1.5px solid #00B84A',
+                  borderRadius: '16px',
+                  padding: '30px 22px',
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    width: '54px',
+                    height: '54px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
+                    color: '#FFFFFF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 14px',
+                  }}
+                >
+                  <CheckCircle2 size={28} />
+                </div>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
+                  Inquiry Received!
+                </h4>
+                <p style={{ fontSize: '0.9rem', color: '#334155', marginBottom: '18px', lineHeight: 1.6 }}>
+                  Thank you, <strong>{formData.name || 'valued guest'}</strong>. Our team at <strong>{formData.branch}</strong> has received your inquiry for <strong>{formData.service}</strong>.
+                </p>
+                <button onClick={() => setSubmitted(false)} className="btn btn-primary btn-sm">
+                  Submit Another Inquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter your name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '11px 14px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                        borderRadius: '10px',
+                        color: '#0F172A',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                      Contact Number *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      placeholder="10-digit mobile"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '11px 14px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                        borderRadius: '10px',
+                        color: '#0F172A',
+                        fontSize: '0.9rem',
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                    Preferred Branch *
+                  </label>
+                  <select
+                    value={formData.branch}
+                    onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                      borderRadius: '10px',
+                      color: '#0F172A',
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                    }}
+                  >
+                    <option value="Respire Vishrambag Branch">Respire Vishrambag Branch (R City Mall, Opp. Safa Bakery)</option>
+                    <option value="Respire Vijaynagar Branch">Respire Vijaynagar Branch (Krishna Heights, Opp. KFC)</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                      Service of Interest
+                    </label>
+                    <select
+                      id="preferredService"
+                      value={formData.service}
+                      onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '11px 12px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                        borderRadius: '10px',
+                        color: '#0F172A',
+                        fontSize: '0.88rem',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="Personal Training">Personal Training</option>
+                      <option value="Massage">Sports Massage</option>
+                      <option value="Steam Bath">Steam Bath</option>
+                      <option value="Zumba">Zumba Dance Cardio</option>
+                      <option value="Yoga">Yoga & Mobility</option>
+                      <option value="General Gym Membership">General Gym Membership</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                      Experience Level
+                    </label>
+                    <select
+                      value={formData.program}
+                      onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '11px 12px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                        borderRadius: '10px',
+                        color: '#0F172A',
+                        fontSize: '0.88rem',
+                        outline: 'none',
+                      }}
+                    >
+                      <option value="Beginner">Beginner Level</option>
+                      <option value="Intermediate">Intermediate Level</option>
+                      <option value="Advanced">Advanced / Athlete</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#334155', marginBottom: '5px', textTransform: 'uppercase' }}>
+                    Notes / Preferred Visit Time
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder="Share your fitness goal or preferred slot..."
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '11px 14px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1.5px solid rgba(15, 23, 42, 0.12)',
+                      borderRadius: '10px',
+                      color: '#0F172A',
+                      fontSize: '0.9rem',
+                      outline: 'none',
+                      resize: 'vertical',
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ width: '100%', padding: '14px', fontWeight: 800, fontSize: '0.92rem' }}
+                >
+                  <span>Submit Membership Inquiry</span>
+                  <Send size={16} />
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
