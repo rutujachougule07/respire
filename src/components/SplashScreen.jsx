@@ -5,7 +5,7 @@ export default function SplashScreen({ onFinish }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Exactly 10 seconds total duration
+    // 10 seconds total duration
     // Start smooth fade-out at 9.4s, completely unmount at 10.0s
     const fadeTimer = setTimeout(() => {
       setIsFadingOut(true);
@@ -27,7 +27,7 @@ export default function SplashScreen({ onFinish }) {
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 350);
+    }, 300);
   };
 
   if (!isVisible) return null;
@@ -40,9 +40,8 @@ export default function SplashScreen({ onFinish }) {
         position: 'fixed',
         inset: 0,
         zIndex: 999999,
-        background: 'radial-gradient(ellipse at center, #0A1910 0%, #040805 45%, #000000 100%)',
+        background: 'radial-gradient(ellipse at center, #08160D 0%, #030604 50%, #000000 100%)',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
@@ -50,30 +49,32 @@ export default function SplashScreen({ onFinish }) {
         userSelect: 'none',
         transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         opacity: isFadingOut ? 0 : 1,
-        transform: isFadingOut ? 'scale(1.08)' : 'scale(1)',
+        transform: isFadingOut ? 'scale(1.06)' : 'scale(1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
       }}
     >
-      {/* Deep Attractive Gradient Black Ambient Light Glow */}
+      {/* Attractive Luxury Gradient Black Ambient Nebula */}
       <div
         style={{
           position: 'absolute',
-          width: 'min(90vw, 850px)',
-          height: 'min(90vw, 850px)',
+          width: 'min(95vw, 950px)',
+          height: 'min(95vw, 950px)',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.25) 0%, rgba(0, 184, 74, 0.08) 50%, transparent 72%)',
-          filter: 'blur(60px)',
-          animation: 'bgGlowPulse 4s ease-in-out infinite alternate',
+          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.18) 0%, rgba(0, 184, 74, 0.05) 50%, transparent 75%)',
+          filter: 'blur(70px)',
+          animation: 'ambientNebula 5s ease-in-out infinite alternate',
           pointerEvents: 'none',
         }}
       />
 
       {/* 
-        MAIN CENTER ELEMENT: 
-        ONLY THE NAME "RESPIRE" IN VIBRANT GREEN - MASSIVE, PIN-SHARP, 
-        AND ROTATING IN A COMPLETE CIRCLE (NO SIDE CIRCLES, NO RINGS)
+        CIRCULAR ORBIT MOTION STAGE:
+        Moves smoothly in a complete 360-degree circular orbit,
+        while ALWAYS keeping the text perfectly upright, legible, and forward-facing!
+        ZERO side circles, ZERO rings, ZERO dotted lines.
       */}
       <div
+        className="respire-orbital-wrapper"
         style={{
           position: 'relative',
           zIndex: 10,
@@ -81,106 +82,103 @@ export default function SplashScreen({ onFinish }) {
           alignItems: 'center',
           justifyContent: 'center',
           width: '100%',
-          maxWidth: '920px',
-          padding: '0 24px',
-          perspective: '1400px',
+          maxWidth: '960px',
+          padding: '0 20px',
+          animation: 'respireCircularOrbit 4.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite',
         }}
       >
+        {/* Entrance Zoom + Breath Scale */}
         <div
-          className="respire-giant-rotating-text"
           style={{
+            width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '100%',
-            animation: 'respireCircleMotion 10s ease-in-out infinite',
-            transformStyle: 'preserve-3d',
+            animation: 'respireEntranceZoom 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
           }}
         >
-          {/* Ultra-HD Pin-Sharp 2.3K Vectorized Brand Wordmark */}
+          {/* Ultra-HD Pin-Sharp 2.3K Vectorized Wordmark (100% Clear & Sharp, Never Inverted) */}
           <img
             src="/respire_text_ultra_hd.png"
             alt="RESPIRE"
             style={{
               width: '100%',
-              maxWidth: '850px',
+              maxWidth: '920px',
               height: 'auto',
-              maxHeight: '160px',
+              maxHeight: '190px',
               objectFit: 'contain',
-              // Crisp, solid emerald green shadow with zero blur-fog
+              // Razor-sharp drop shadow that accentuates letters without clouding gaps
               filter:
-                'drop-shadow(0 0 20px rgba(0, 255, 102, 0.85)) drop-shadow(0 15px 35px rgba(0, 201, 82, 0.6))',
+                'drop-shadow(0 0 12px rgba(0, 255, 102, 0.75)) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.95))',
               display: 'block',
+              animation: 'textSheenPulse 2.4s ease-in-out infinite alternate',
             }}
           />
         </div>
       </div>
 
-      {/* Subtle Skip Indicator at Top Right */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '28px',
-          right: '32px',
-          zIndex: 20,
-          fontSize: '0.78rem',
-          fontWeight: 800,
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
-          color: 'rgba(255, 255, 255, 0.55)',
-          padding: '6px 14px',
-          borderRadius: '999px',
-          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          transition: 'all 0.2s ease',
-        }}
-      >
-        Click to Skip ✕
-      </div>
-
       {/* Embedded Animations */}
       <style>{`
         /* 
-          10-Second Continuous Circular Animation:
-          1. 0s - 2s: Zooms in from 360-degree circular spin into sharp focus
-          2. 2s - 8s: Smooth continuous 3D circular rotation (rotateY 360 degrees)
-          3. 8s - 10s: Majestic forward glow pulse before revealing the landing page
+          Full 360-Degree Circular Orbit Motion:
+          The text travels around a complete circle of radius 36px,
+          while continuously rotating its counter-angle so it remains
+          100% horizontally upright, clear, and razor-sharp!
         */
-        @keyframes respireCircleMotion {
+        @keyframes respireCircularOrbit {
           0% {
-            opacity: 0;
-            transform: scale(0.35) rotate(-360deg);
+            transform: rotate(0deg) translateY(-32px) rotate(0deg) scale(0.97);
           }
-          15% {
-            opacity: 1;
-            transform: scale(1.08) rotate(0deg);
+          25% {
+            transform: rotate(90deg) translateY(-32px) rotate(-90deg) scale(1.03);
           }
-          22% {
-            transform: scale(1) rotate(0deg) rotateY(0deg);
+          50% {
+            transform: rotate(180deg) translateY(-32px) rotate(-180deg) scale(1.06);
           }
-          45% {
-            transform: scale(1.04) rotateY(180deg);
-          }
-          70% {
-            transform: scale(1) rotateY(360deg);
-          }
-          85% {
-            transform: scale(1.06) rotateY(360deg);
+          75% {
+            transform: rotate(270deg) translateY(-32px) rotate(-270deg) scale(1.03);
           }
           100% {
-            opacity: 1;
-            transform: scale(1.02) rotateY(360deg);
+            transform: rotate(360deg) translateY(-32px) rotate(-360deg) scale(0.97);
           }
         }
 
-        /* Ambient deep emerald-black background pulse */
-        @keyframes bgGlowPulse {
+        /* Initial 1.2s cinematic zoom entrance */
+        @keyframes respireEntranceZoom {
           0% {
-            transform: scale(0.85);
-            opacity: 0.7;
+            opacity: 0;
+            transform: scale(0.4);
+            filter: blur(10px);
+          }
+          60% {
+            transform: scale(1.05);
+            filter: blur(0px);
           }
           100% {
-            transform: scale(1.2);
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0px);
+          }
+        }
+
+        /* Subtle glowing energy pulse on the text */
+        @keyframes textSheenPulse {
+          0% {
+            filter: drop-shadow(0 0 10px rgba(0, 255, 102, 0.65)) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.9));
+          }
+          100% {
+            filter: drop-shadow(0 0 22px rgba(0, 255, 102, 0.95)) drop-shadow(0 0 45px rgba(0, 201, 82, 0.55)) drop-shadow(0 18px 36px rgba(0, 0, 0, 0.95));
+          }
+        }
+
+        /* Ambient background glow breathing */
+        @keyframes ambientNebula {
+          0% {
+            transform: scale(0.85);
+            opacity: 0.6;
+          }
+          100% {
+            transform: scale(1.15);
             opacity: 1;
           }
         }
