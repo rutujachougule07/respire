@@ -1007,12 +1007,29 @@ export default function Membership({ plans = [] }) {
               selectedBranch === 'branch2'
                 ? '1.5px solid rgba(23, 44, 131, 0.22)'
                 : '1.5px solid rgba(0, 184, 74, 0.22)',
-            borderRadius: '22px',
-            padding: '28px 30px',
-            marginBottom: '40px',
-            boxShadow: '0 12px 32px rgba(15, 23, 42, 0.05)',
+            borderRadius: '24px',
+            padding: '30px 32px',
+            marginBottom: '44px',
+            boxShadow: '0 16px 40px rgba(15, 23, 42, 0.06)',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
+          {/* Top subtle decorative gradient border */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background:
+                selectedBranch === 'branch2'
+                  ? 'linear-gradient(90deg, #172C83 0%, #2563EB 100%)'
+                  : 'linear-gradient(90deg, #007A31 0%, #00D256 100%)',
+            }}
+          />
+
           {/* Header Bar */}
           <div
             style={{
@@ -1020,21 +1037,21 @@ export default function Membership({ plans = [] }) {
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '14px',
-              marginBottom: '20px',
-              paddingBottom: '16px',
+              gap: '16px',
+              marginBottom: '24px',
+              paddingBottom: '18px',
               borderBottom:
                 selectedBranch === 'branch2'
                   ? '1px solid rgba(23, 44, 131, 0.14)'
                   : '1px solid rgba(0, 184, 74, 0.16)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '11px',
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
                   background:
                     selectedBranch === 'branch2'
                       ? 'linear-gradient(135deg, #1E3AA8 0%, #172C83 100%)'
@@ -1049,15 +1066,16 @@ export default function Membership({ plans = [] }) {
                   flexShrink: 0,
                 }}
               >
-                <Info size={20} color="#FFFFFF" />
+                <Info size={22} color="#FFFFFF" />
               </div>
               <div>
                 <h3
                   style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.3rem',
                     fontWeight: 900,
                     color: '#0F172A',
                     margin: '0 0 3px',
+                    letterSpacing: '-0.01em',
                   }}
                 >
                   Important Membership Terms & Timings
@@ -1080,8 +1098,8 @@ export default function Membership({ plans = [] }) {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '9px 18px',
-                borderRadius: '10px',
+                padding: '10px 20px',
+                borderRadius: '12px',
                 backgroundColor:
                   selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
                 border:
@@ -1092,6 +1110,7 @@ export default function Membership({ plans = [] }) {
                 fontSize: '0.88rem',
                 fontWeight: 800,
                 textDecoration: 'none',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               }}
             >
               <Phone size={15} />
@@ -1103,61 +1122,74 @@ export default function Membership({ plans = [] }) {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
               gap: '16px',
-              marginBottom: '20px',
+              marginBottom: '22px',
             }}
           >
             {/* Gym Timing */}
             <div
               style={{
-                backgroundColor: selectedBranch === 'branch2' ? '#F8FAFC' : '#F8FCFA',
+                background:
+                  selectedBranch === 'branch2'
+                    ? 'linear-gradient(135deg, #F0F4FF 0%, #E0E7FF 100%)'
+                    : 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
                 border:
                   selectedBranch === 'branch2'
-                    ? '1.5px solid rgba(23, 44, 131, 0.22)'
-                    : '1.5px solid rgba(0, 184, 74, 0.25)',
-                borderRadius: '14px',
-                padding: '16px 20px',
+                    ? '1.5px solid rgba(23, 44, 131, 0.3)'
+                    : '1.5px solid rgba(0, 184, 74, 0.35)',
+                borderRadius: '16px',
+                padding: '18px 22px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '14px',
-                boxShadow: '0 4px 12px rgba(15, 23, 42, 0.03)',
+                gap: '16px',
+                boxShadow:
+                  selectedBranch === 'branch2'
+                    ? '0 6px 18px rgba(23, 44, 131, 0.08)'
+                    : '0 6px 18px rgba(0, 184, 74, 0.08)',
               }}
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '11px',
-                  backgroundColor:
-                    selectedBranch === 'branch2' ? '#EEF2FF' : '#ECFDF3',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '12px',
+                  background:
+                    selectedBranch === 'branch2'
+                      ? 'linear-gradient(135deg, #2563EB 0%, #172C83 100%)'
+                      : 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
+                  color: '#FFFFFF',
                   flexShrink: 0,
+                  boxShadow:
+                    selectedBranch === 'branch2'
+                      ? '0 4px 12px rgba(23, 44, 131, 0.25)'
+                      : '0 4px 12px rgba(0, 184, 74, 0.25)',
                 }}
               >
-                <Clock size={20} />
+                <Clock size={22} />
               </div>
               <div>
                 <div
                   style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 800,
-                    color: '#64748B',
+                    color: selectedBranch === 'branch2' ? '#1E3A8A' : '#047857',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    marginBottom: '2px',
+                    letterSpacing: '0.07em',
+                    marginBottom: '3px',
                   }}
                 >
                   GYM TIMING
                 </div>
                 <div
                   style={{
-                    fontSize: '1.08rem',
+                    fontSize: '1.18rem',
                     fontWeight: 900,
                     color: '#0F172A',
+                    lineHeight: 1.2,
                   }}
                 >
                   {currentBranch.gymTiming}
@@ -1168,49 +1200,51 @@ export default function Membership({ plans = [] }) {
             {/* AC Timings */}
             <div
               style={{
-                backgroundColor: '#F0F9FF',
-                border: '1.5px solid rgba(14, 165, 233, 0.28)',
-                borderRadius: '14px',
-                padding: '16px 20px',
+                background: 'linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)',
+                border: '1.5px solid rgba(14, 165, 233, 0.35)',
+                borderRadius: '16px',
+                padding: '18px 22px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '14px',
-                boxShadow: '0 4px 12px rgba(14, 165, 233, 0.04)',
+                gap: '16px',
+                boxShadow: '0 6px 18px rgba(14, 165, 233, 0.08)',
               }}
             >
               <div
                 style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '11px',
-                  backgroundColor: '#E0F2FE',
+                  width: '46px',
+                  height: '46px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#0284C7',
+                  color: '#FFFFFF',
                   flexShrink: 0,
+                  boxShadow: '0 4px 12px rgba(14, 165, 233, 0.25)',
                 }}
               >
-                <Wind size={20} />
+                <Wind size={22} />
               </div>
               <div>
                 <div
                   style={{
-                    fontSize: '0.72rem',
+                    fontSize: '0.74rem',
                     fontWeight: 800,
-                    color: '#0284C7',
+                    color: '#0369A1',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    marginBottom: '2px',
+                    letterSpacing: '0.07em',
+                    marginBottom: '3px',
                   }}
                 >
                   AC TIMINGS
                 </div>
                 <div
                   style={{
-                    fontSize: '1.02rem',
+                    fontSize: '1.12rem',
                     fontWeight: 900,
                     color: '#0F172A',
+                    lineHeight: 1.25,
                   }}
                 >
                   {currentBranch.acTiming}
@@ -1219,75 +1253,89 @@ export default function Membership({ plans = [] }) {
             </div>
           </div>
 
-          {/* Exact Rules Grid */}
+          {/* Balanced 2-Column Rules Grid */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '12px',
-              marginBottom: currentBranch.motto ? '22px' : '0',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+              gap: '14px',
+              marginBottom: currentBranch.motto ? '24px' : '0',
             }}
           >
-            {currentBranch.rules.map((rule, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '13px 16px',
-                  borderRadius: '12px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.03)',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <span
+            {currentBranch.rules.map((rule, idx) => {
+              const isLastOdd =
+                currentBranch.rules.length % 2 !== 0 &&
+                idx === currentBranch.rules.length - 1;
+
+              return (
+                <div
+                  key={idx}
                   style={{
-                    display: 'inline-flex',
+                    gridColumn: isLastOdd ? '1 / -1' : 'auto',
+                    display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '6px',
-                    backgroundColor:
+                    gap: '14px',
+                    padding: '15px 18px',
+                    borderRadius: '12px',
+                    backgroundColor: '#FFFFFF',
+                    border:
                       selectedBranch === 'branch2'
-                        ? 'rgba(23, 44, 131, 0.1)'
-                        : 'rgba(0, 184, 74, 0.12)',
-                    color: selectedBranch === 'branch2' ? '#172C83' : '#008A38',
-                    fontWeight: 900,
-                    fontSize: '0.86rem',
-                    flexShrink: 0,
+                        ? '1.5px solid rgba(23, 44, 131, 0.16)'
+                        : '1.5px solid rgba(0, 184, 74, 0.18)',
+                    borderLeft:
+                      selectedBranch === 'branch2'
+                        ? '5px solid #172C83'
+                        : '5px solid #00B84A',
+                    boxShadow: '0 3px 12px rgba(15, 23, 42, 0.04)',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  ❖
-                </span>
-                <span
-                  style={{
-                    fontSize: '0.88rem',
-                    color: '#1E293B',
-                    fontWeight: 700,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  {rule}
-                </span>
-              </div>
-            ))}
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '8px',
+                      backgroundColor:
+                        selectedBranch === 'branch2'
+                          ? '#EEF2FF'
+                          : '#ECFDF3',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CheckCircle2
+                      size={16}
+                      color={selectedBranch === 'branch2' ? '#172C83' : '#008A38'}
+                    />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.92rem',
+                      color: '#0F172A',
+                      fontWeight: 700,
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {rule}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* Authentic Motivational Board from Branch Standee */}
           {currentBranch.motto && (
             <div
               style={{
-                marginTop: '20px',
-                padding: '20px 24px',
+                marginTop: '22px',
+                padding: '22px 26px',
                 borderRadius: '16px',
                 background:
-                  'linear-gradient(135deg, #0F172A 0%, #172C83 100%)',
+                  'linear-gradient(135deg, #090E21 0%, #172C83 60%, #1E3AA8 100%)',
                 color: '#FFFFFF',
-                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.15)',
+                boxShadow: '0 10px 28px rgba(23, 44, 131, 0.25)',
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
@@ -1298,34 +1346,35 @@ export default function Membership({ plans = [] }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div
                   style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '10px',
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
                     backgroundColor: 'rgba(255, 255, 255, 0.12)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
                   }}
                 >
-                  <Quote size={20} color="#00FF66" />
+                  <Quote size={22} color="#00FF66" />
                 </div>
                 <div>
                   <div
                     style={{
-                      fontSize: '0.98rem',
-                      fontWeight: 800,
+                      fontSize: '1.04rem',
+                      fontWeight: 900,
                       color: '#FFFFFF',
                       marginBottom: '4px',
-                      letterSpacing: '0.02em',
+                      letterSpacing: '0.01em',
                     }}
                   >
                     ❖ {currentBranch.motto.quote1}
                   </div>
                   <div
                     style={{
-                      fontSize: '0.92rem',
-                      fontWeight: 700,
+                      fontSize: '0.96rem',
+                      fontWeight: 800,
                       color: '#00FF66',
                       letterSpacing: '0.02em',
                     }}
@@ -1338,15 +1387,15 @@ export default function Membership({ plans = [] }) {
               <div
                 style={{
                   textAlign: 'right',
-                  fontSize: '0.78rem',
+                  fontSize: '0.8rem',
                   fontWeight: 900,
-                  letterSpacing: '0.12em',
+                  letterSpacing: '0.1em',
                   color: '#FFFFFF',
                   textTransform: 'uppercase',
                 }}
               >
                 <div>— {currentBranch.motto.signature}</div>
-                <div style={{ color: '#00FF66', fontSize: '0.72rem' }}>
+                <div style={{ color: '#00FF66', fontSize: '0.74rem', marginTop: '2px' }}>
                   {currentBranch.motto.since}
                 </div>
               </div>

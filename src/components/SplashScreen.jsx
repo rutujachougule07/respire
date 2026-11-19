@@ -5,16 +5,15 @@ export default function SplashScreen({ onFinish }) {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Start fade out at 1.8s
+    // Total animation: 3 seconds (starts fading out at 2.5s, unmounts at 3.0s)
     const fadeTimer = setTimeout(() => {
       setIsFadingOut(true);
-    }, 1800);
+    }, 2500);
 
-    // Completely remove from DOM at 2.3s
     const removeTimer = setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 2300);
+    }, 3000);
 
     return () => {
       clearTimeout(fadeTimer);
@@ -27,7 +26,7 @@ export default function SplashScreen({ onFinish }) {
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 350);
+    }, 300);
   };
 
   if (!isVisible) return null;
@@ -35,14 +34,13 @@ export default function SplashScreen({ onFinish }) {
   return (
     <div
       onClick={handleSkip}
-      className={`respire-splash-screen ${isFadingOut ? 'fade-out' : ''}`}
+      className={`respire-circle-splash ${isFadingOut ? 'fade-out' : ''}`}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 999999,
-        backgroundColor: '#07090E',
+        background: 'radial-gradient(circle at center, #0B1910 0%, #050906 45%, #000000 100%)',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
@@ -50,188 +48,205 @@ export default function SplashScreen({ onFinish }) {
         userSelect: 'none',
         transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
         opacity: isFadingOut ? 0 : 1,
-        transform: isFadingOut ? 'scale(1.05)' : 'scale(1)',
+        transform: isFadingOut ? 'scale(1.06)' : 'scale(1)',
         pointerEvents: isFadingOut ? 'none' : 'auto',
       }}
     >
-      {/* Ambient Radial Green Backlight */}
+      {/* Deep Gradient Black Ambient Glows */}
       <div
         style={{
           position: 'absolute',
-          width: '550px',
-          height: '550px',
+          width: '650px',
+          height: '650px',
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.22) 0%, rgba(0, 184, 74, 0.08) 45%, transparent 70%)',
-          filter: 'blur(45px)',
+          background: 'radial-gradient(circle, rgba(0, 201, 82, 0.28) 0%, rgba(0, 184, 74, 0.1) 40%, transparent 70%)',
+          filter: 'blur(50px)',
+          animation: 'ambientBreath 3s infinite alternate ease-in-out',
           pointerEvents: 'none',
-          animation: 'pulseAura 2s ease-in-out infinite alternate',
         }}
       />
 
-      {/* Main Logo & Title Presentation Container */}
+      {/* Circular Rotating Stage */}
       <div
         style={{
+          position: 'relative',
+          width: 'min(85vw, 420px)',
+          height: 'min(85vw, 420px)',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          position: 'relative',
-          zIndex: 2,
-          padding: '20px',
         }}
       >
-        {/* Animated Green "R" Icon (From User Logo Image 2) */}
+        {/* Outer Glowing Neon Ring 1 - Fast Clockwise Spin */}
         <div
-          className="splash-logo-wrapper"
           style={{
-            marginBottom: '22px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: 'absolute',
+            inset: '10px',
+            borderRadius: '50%',
+            border: '2px dashed rgba(0, 255, 102, 0.45)',
+            boxShadow: '0 0 25px rgba(0, 201, 82, 0.35), inset 0 0 25px rgba(0, 201, 82, 0.2)',
+            animation: 'fullCircleRotate 2.6s linear infinite',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Outer Neon Ring 2 - Counter Clockwise Thin Orbit */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: '30px',
+            borderRadius: '50%',
+            border: '1.5px solid rgba(0, 201, 82, 0.25)',
+            borderTopColor: '#00FF66',
+            borderRightColor: '#00C952',
+            boxShadow: '0 0 35px rgba(0, 255, 102, 0.4)',
+            animation: 'counterCircleRotate 2.2s linear infinite',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Orbiting Electric Neon Dot 1 */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            animation: 'fullCircleRotate 2.4s linear infinite',
+            pointerEvents: 'none',
           }}
         >
-          <img
-            src="/respire_r_logo_transparent.png"
-            alt="Respire Logo"
+          <div
             style={{
-              width: '130px',
-              height: 'auto',
-              maxHeight: '115px',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 12px 28px rgba(0, 201, 82, 0.6))',
-              animation: 'logoEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+              width: '12px',
+              height: '12px',
+              borderRadius: '50%',
+              backgroundColor: '#00FF66',
+              boxShadow: '0 0 18px #00FF66, 0 0 32px #00C952',
+              position: 'absolute',
+              top: '4px',
+              left: '50%',
+              transform: 'translateX(-50%)',
             }}
           />
         </div>
 
-        {/* Animated "RESPIRE" Title (From User Image 1) */}
+        {/* Orbiting Electric Neon Dot 2 (Opposite) */}
         <div
-          className="splash-title-wrapper"
           style={{
-            animation: 'titleEntrance 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards',
-            opacity: 0,
+            position: 'absolute',
+            inset: 0,
+            animation: 'fullCircleRotate 2.4s linear infinite',
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              backgroundColor: '#00C952',
+              boxShadow: '0 0 15px #00C952, 0 0 25px #00FF66',
+              position: 'absolute',
+              bottom: '4px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          />
+        </div>
+
+        {/* 
+          CENTRAL ELEMENT: ONLY THE NAME "RESPIRE" IN VIBRANT GREEN 
+          SPINNING IN A COMPLETE 360-DEGREE CIRCLE 
+        */}
+        <div
+          className="respire-name-orbit-container"
+          style={{
+            position: 'relative',
+            zIndex: 10,
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            gap: '8px',
+            justifyContent: 'center',
+            animation: 'respireCircleSpin 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards',
           }}
         >
           <img
             src="/respire_text_transparent.png"
             alt="RESPIRE"
             style={{
-              height: '46px',
-              width: 'auto',
-              maxWidth: '85vw',
+              width: 'min(72vw, 320px)',
+              height: 'auto',
+              maxHeight: '75px',
               objectFit: 'contain',
-              filter: 'drop-shadow(0 6px 18px rgba(0, 201, 82, 0.45))',
-            }}
-          />
-
-          <div
-            style={{
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              letterSpacing: '0.24em',
-              textTransform: 'uppercase',
-              color: '#94A3B8',
-              opacity: 0.9,
-              marginTop: '4px',
-              animation: 'subEntrance 0.8s ease-out 0.5s forwards',
-            }}
-          >
-            A Mahabal Group Venture
-          </div>
-        </div>
-
-        {/* Minimal High-Tech Energy Progress Bar */}
-        <div
-          style={{
-            width: '160px',
-            height: '3px',
-            borderRadius: '999px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            marginTop: '36px',
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          <div
-            style={{
-              height: '100%',
-              borderRadius: '999px',
-              background: 'linear-gradient(90deg, #00C952 0%, #00FF66 50%, #008A37 100%)',
-              boxShadow: '0 0 10px #00C952',
-              animation: 'loadProgress 1.7s cubic-bezier(0.65, 0, 0.35, 1) forwards',
+              filter:
+                'drop-shadow(0 0 15px #00FF66) drop-shadow(0 0 35px #00C952) drop-shadow(0 0 55px rgba(0, 201, 82, 0.7))',
+              animation: 'respirePulse 1.2s ease-in-out infinite alternate',
             }}
           />
         </div>
       </div>
 
-      {/* Embedded Hardware-Accelerated Animations */}
+      {/* Embedded Animations */}
       <style>{`
-        @keyframes logoEntrance {
+        /* Full 360-degree circular spin of the RESPIRE name */
+        @keyframes respireCircleSpin {
           0% {
             opacity: 0;
-            transform: scale(0.6) translateY(-14px);
-            filter: drop-shadow(0 0 0 rgba(0, 201, 82, 0));
+            transform: scale(0.3) rotate(-360deg);
+            filter: blur(8px);
           }
-          60% {
-            transform: scale(1.08) translateY(0);
-            filter: drop-shadow(0 16px 36px rgba(0, 201, 82, 0.75));
+          30% {
+            opacity: 1;
+            filter: blur(0px);
+          }
+          75% {
+            transform: scale(1.12) rotate(0deg);
           }
           100% {
             opacity: 1;
-            transform: scale(1) translateY(0);
-            filter: drop-shadow(0 12px 28px rgba(0, 201, 82, 0.6));
+            transform: scale(1) rotate(0deg);
           }
         }
 
-        @keyframes titleEntrance {
+        /* Continuous 360-degree circle rotation */
+        @keyframes fullCircleRotate {
           0% {
-            opacity: 0;
-            transform: translateY(18px) scale(0.92);
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* Counter 360-degree circle rotation */
+        @keyframes counterCircleRotate {
+          0% {
+            transform: rotate(360deg);
+          }
+          100% {
+            transform: rotate(0deg);
+          }
+        }
+
+        /* Glowing green pulse */
+        @keyframes respirePulse {
+          0% {
+            transform: scale(0.98);
+            filter: drop-shadow(0 0 12px #00FF66) drop-shadow(0 0 28px #00C952);
+          }
+          100% {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 22px #00FF66) drop-shadow(0 0 45px #00FF66) drop-shadow(0 0 70px rgba(0, 201, 82, 0.85));
+          }
+        }
+
+        /* Ambient background breathing */
+        @keyframes ambientBreath {
+          0% {
+            opacity: 0.6;
+            transform: scale(0.9);
           }
           100% {
             opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        @keyframes subEntrance {
-          0% {
-            opacity: 0;
-            letter-spacing: 0.1em;
-          }
-          100% {
-            opacity: 0.9;
-            letter-spacing: 0.24em;
-          }
-        }
-
-        @keyframes pulseAura {
-          0% {
-            transform: scale(0.92);
-            opacity: 0.7;
-          }
-          100% {
-            transform: scale(1.1);
-            opacity: 1;
-          }
-        }
-
-        @keyframes loadProgress {
-          0% {
-            width: 0%;
-          }
-          40% {
-            width: 55%;
-          }
-          85% {
-            width: 90%;
-          }
-          100% {
-            width: 100%;
+            transform: scale(1.15);
           }
         }
       `}</style>
