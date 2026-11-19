@@ -1,38 +1,29 @@
 import React from 'react';
-import { CheckCircle2, Building2, Award, ArrowRight } from 'lucide-react';
+import { Building2, Award, ShieldCheck, HeartHandshake, CheckCircle2, MapPin, Landmark } from 'lucide-react';
 
 export default function About() {
-  const points = [
+  const companyPillars = [
     {
-      title: 'A Venture of Mahabal Group',
-      desc: 'Backed by the visionary leadership and high trust of the renowned Mahabal Group, setting new benchmarks in health and fitness.',
+      icon: Award,
+      title: 'Decades of Trusted Corporate Heritage',
+      desc: 'Backed by the prestigious Mahabal Group—one of Sangli and Western Maharashtra’s most respected business houses, built on uncompromising ethics and community trust.',
     },
     {
-      title: '2 Prime Sangli Branches',
-      desc: 'Visit us at Vishrambag (7th Floor, R City Mall, Opp. Safa Bakery) or Vijaynagar (3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road).',
+      icon: Landmark,
+      title: 'Vision for Sangli’s Wellness Evolution',
+      desc: 'Founded with the visionary objective of elevating Sangli’s fitness landscape, bringing metro-standard sports science and luxury wellness to local athletes and families.',
     },
     {
-      title: 'Complete Integrated Wellness',
-      desc: 'Beyond heavy lifting: full restorative experience including luxury Steam Bath, sports massage, Zumba, and restorative Yoga.',
+      icon: ShieldCheck,
+      title: 'Uncompromising Quality & Institutional Standards',
+      desc: 'Operated under strict corporate governance: world-class biomechanical equipment, certified staff, certified hygiene protocols, and 100% transparent fee policies.',
     },
     {
-      title: 'Connected Smart Ecosystem',
-      desc: 'Seamless biometric attendance, automated WhatsApp milestone reminders, and trainer-guided body composition tracking.',
+      icon: HeartHandshake,
+      title: 'Deep Regional Roots Across 2 Strategic Hubs',
+      desc: 'A permanent civic commitment to Sangli with two flagship premises: Vishrambag (7th Floor, R City Mall) and Vijaynagar (3rd Floor, Krishna Heights).',
     },
   ];
-
-  const scrollTo = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      const navHeight = 104;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   return (
     <section
@@ -44,16 +35,16 @@ export default function About() {
         overflow: 'hidden',
       }}
     >
-      {/* Soft Mint Decorative Blob */}
+      {/* Soft Decorative Ambient Sheen */}
       <div
         style={{
           position: 'absolute',
-          top: '15%',
-          right: '-8%',
-          width: '480px',
-          height: '480px',
-          background: 'radial-gradient(circle, rgba(0, 184, 74, 0.08) 0%, transparent 70%)',
-          filter: 'blur(50px)',
+          top: '12%',
+          right: '-6%',
+          width: '500px',
+          height: '500px',
+          background: 'radial-gradient(circle, rgba(0, 184, 74, 0.07) 0%, transparent 70%)',
+          filter: 'blur(60px)',
           pointerEvents: 'none',
         }}
       />
@@ -67,13 +58,13 @@ export default function About() {
             alignItems: 'center',
           }}
         >
-          {/* Left Column: Image Showcase */}
+          {/* Left Column: Authentic Mahabal Group Presentation */}
           <div style={{ position: 'relative' }}>
             <div
               style={{
                 borderRadius: '24px',
                 overflow: 'hidden',
-                border: '1px solid rgba(0, 184, 74, 0.2)',
+                border: '1.5px solid rgba(0, 184, 74, 0.22)',
                 boxShadow: '0 24px 50px rgba(15, 23, 42, 0.12)',
                 position: 'relative',
                 height: '490px',
@@ -81,21 +72,21 @@ export default function About() {
             >
               <img
                 src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop"
-                alt="Respire Fitness Interior - A Mahabal Group Venture"
+                alt="Respire Fitness - A Part of Mahabal Group"
                 className="img-cover"
                 style={{ transition: 'transform 0.6s ease' }}
-                onMouseEnter={(e) => (e.target.style.transform = 'scale(1.04)')}
+                onMouseEnter={(e) => (e.target.style.transform = 'scale(1.03)')}
                 onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
               />
               <div
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: 'linear-gradient(180deg, rgba(0,184,74,0.05) 35%, rgba(0, 82, 33, 0.85) 100%)',
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 40%, rgba(5, 30, 15, 0.88) 100%)',
                 }}
               />
 
-              {/* Crisp White Floating Card Pinned Inside Image */}
+              {/* Bottom Pinned Badge */}
               <div
                 style={{
                   position: 'absolute',
@@ -115,113 +106,148 @@ export default function About() {
               >
                 <div>
                   <div style={{ fontSize: '0.74rem', color: '#008A38', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                    2 Premier Sangli Branches
+                    Institutional Stewardship
                   </div>
                   <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>
-                    Vishrambag (R City Mall) & Vijaynagar (Krishna Heights)
+                    A Part of Mahabal Group
                   </div>
                 </div>
                 <div
                   style={{
                     background: 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
                     color: '#FFFFFF',
-                    padding: '7px 14px',
+                    padding: '6px 12px',
                     borderRadius: '8px',
                     fontWeight: 800,
-                    fontSize: '0.8rem',
+                    fontSize: '0.76rem',
                     letterSpacing: '0.05em',
                   }}
                 >
-                  PREMIUM
+                  SANGLI
                 </div>
               </div>
             </div>
 
-            {/* Overlapping Navy + Green Badge */}
+            {/* Overlapping Corporate Heritage Badge */}
             <div
               style={{
                 position: 'absolute',
-                top: '-22px',
-                right: '-14px',
-                background: 'linear-gradient(135deg, #172C83 0%, #2440B5 100%)',
+                top: '-20px',
+                right: '-12px',
+                background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #172C83 100%)',
                 border: '3px solid #FFFFFF',
                 borderRadius: '18px',
-                padding: '15px 22px',
-                boxShadow: '0 14px 32px rgba(23, 44, 131, 0.28)',
+                padding: '14px 20px',
+                boxShadow: '0 14px 32px rgba(15, 23, 42, 0.28)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
               }}
             >
-              <Award size={28} color="#FFFFFF" />
+              <Award size={26} color="#00D256" />
               <div>
-                <div style={{ fontSize: '1.08rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '1.02rem', fontWeight: 900, color: '#FFFFFF', lineHeight: 1.15 }}>
                   Mahabal Group
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#DBEAFE', letterSpacing: '0.04em' }}>
+                <div style={{ fontSize: '0.74rem', color: '#93C5FD', fontWeight: 700, letterSpacing: '0.04em' }}>
                   A Legacy of Excellence
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Content */}
+          {/* Right Column: Strictly Company Background & Values */}
           <div>
             <div className="section-eyebrow">
               <Building2 size={14} />
-              <span>Mahabal Group Venture</span>
+              <span>• A PART OF MAHABAL GROUP •</span>
             </div>
 
-            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '20px' }}>
-              MORE THAN <span className="text-green">JUST A GYM</span>
+            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '18px' }}>
+              ABOUT <span className="text-green">MAHABAL GROUP & RESPIRE</span>
             </h2>
 
-            <p style={{ fontSize: '1.08rem', color: '#1E293B', marginBottom: '18px', lineHeight: 1.7 }}>
-              <strong>Respire Fitness</strong> is not an ordinary training space—it is an elevated fitness sanctuary founded under the prestigious umbrella of the <strong>Mahabal Group</strong>. We bridge the gap between rigorous athletic training and restorative wellness, offering Sangli an international-caliber gym experience.
+            <p style={{ fontSize: '1.06rem', color: '#1E293B', marginBottom: '16px', lineHeight: 1.7, fontWeight: 500 }}>
+              <strong>Respire Fitness</strong> is proudly founded and steered under the esteemed banner of the <strong>Mahabal Group</strong>—a distinguished corporate enterprise that has earned high standing and widespread public trust across Sangli and Maharashtra.
             </p>
 
-            <p style={{ fontSize: '0.98rem', color: '#475569', marginBottom: '30px', lineHeight: 1.7 }}>
-              Perched on the 7th Floor of R City Mall, Vishrambag, our facility pairs cutting-edge equipment with certified personal trainers, restorative spa therapies, energetic group classes, and smart digital health tracking. We empower you to redefine your personal boundaries every single day.
+            <p style={{ fontSize: '0.94rem', color: '#475569', marginBottom: '26px', lineHeight: 1.68 }}>
+              Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand, Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern sports science with transparent, professional management, the Mahabal Group ensures that every member benefits from corporate reliability, safety, and long-term commitment.
             </p>
 
-            {/* Points List */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', marginBottom: '34px' }}>
-              {points.map((pt, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '14px',
-                    padding: '14px 18px',
-                    background: 'linear-gradient(135deg, #F8FCFA 0%, #EFFAF3 100%)',
-                    borderRadius: '14px',
-                    border: '1px solid rgba(0, 184, 74, 0.16)',
-                  }}
-                >
-                  <CheckCircle2 size={20} color="#00B84A" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <div>
-                    <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
-                      {pt.title}
+            {/* Strictly Company Information Pillars */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '14px', marginBottom: '32px' }}>
+              {companyPillars.map((p, idx) => {
+                const Icon = p.icon;
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '14px',
+                      padding: '14px 18px',
+                      background: 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(0, 184, 74, 0.18)',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(0, 184, 74, 0.12)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#008A38',
+                        flexShrink: 0,
+                        marginTop: '2px',
+                      }}
+                    >
+                      <Icon size={19} />
                     </div>
-                    <div style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.5 }}>
-                      {pt.desc}
+                    <div>
+                      <div style={{ fontSize: '0.96rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
+                        {p.title}
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
+                        {p.desc}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-              <button onClick={() => scrollTo('services')} className="btn btn-primary">
-                <span>View All Services</span>
-                <ArrowRight size={16} />
-              </button>
-
-              <button onClick={() => scrollTo('contact')} className="btn btn-secondary">
-                <span>Schedule A Tour</span>
-              </button>
+            {/* Company Credentials Strip (No Marketing Fluff) */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '12px 24px',
+                padding: '14px 20px',
+                borderRadius: '14px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                fontSize: '0.82rem',
+                color: '#334155',
+                fontWeight: 700,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={16} color="#008A38" />
+                <span>A Part of Mahabal Group</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={16} color="#008A38" />
+                <span>2 Sangli Branches (Vishrambag & Vijaynagar)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <CheckCircle2 size={16} color="#008A38" />
+                <span>100% Institutional Governance</span>
+              </div>
             </div>
           </div>
         </div>

@@ -1,10 +1,7 @@
 ﻿import React, { useState } from 'react';
 import {
   ShieldCheck,
-  Bell,
   Clock,
-  RefreshCw,
-  Calendar,
   ArrowRight,
   CheckCircle2,
   Info,
@@ -116,29 +113,6 @@ export default function Membership({ plans = [] }) {
         );
 
   const is5Cols = activePlans.length === 5;
-
-  const features = [
-    {
-      icon: Clock,
-      title: 'Real-Time Membership Status',
-      desc: 'Track your active membership validity, days remaining, and attendance log anytime through smart biometric sync and automated WhatsApp notifications.',
-    },
-    {
-      icon: Bell,
-      title: 'Automated Renewal Reminders',
-      desc: 'Receive proactive alerts prior to expiry via official WhatsApp notifications, ensuring uninterrupted gym access without manual follow-up.',
-    },
-    {
-      icon: RefreshCw,
-      title: 'Hassle-Free Renewals & Upgrades',
-      desc: 'Seamlessly renew or upgrade to a higher tier with instant biometric profile continuity. No biometric re-enrolment needed.',
-    },
-    {
-      icon: Calendar,
-      title: 'Flexible Freeze Policies',
-      desc: 'Structured freeze options available on select long-term plans so you stay supported through travel or recovery.',
-    },
-  ];
 
   return (
     <section
@@ -1001,6 +975,7 @@ export default function Membership({ plans = [] }) {
 
         {/* Official Fee Structure Terms, Timings & AC Rules Box */}
         <div
+          className="membership-terms-panel"
           style={{
             backgroundColor: '#FFFFFF',
             border:
@@ -1255,9 +1230,9 @@ export default function Membership({ plans = [] }) {
 
           {/* Balanced 2-Column Rules Grid */}
           <div
+            className="membership-rules-grid"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
               gap: '14px',
               marginBottom: currentBranch.motto ? '24px' : '0',
             }}
@@ -1402,163 +1377,6 @@ export default function Membership({ plans = [] }) {
             </div>
           )}
         </div>
-
-        {/* Detailed Membership Status & Renewals Panel */}
-        <div
-          style={{
-            background: 'linear-gradient(145deg, #F6FCF9 0%, #EDF9F2 100%)',
-            border: '1.5px solid rgba(0, 184, 74, 0.2)',
-            borderRadius: '24px',
-            padding: '38px 32px',
-            boxShadow: '0 14px 36px rgba(0, 140, 56, 0.07)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-              marginBottom: '28px',
-              borderBottom: '1px solid rgba(0, 184, 74, 0.16)',
-              paddingBottom: '20px',
-            }}
-          >
-            <div
-              style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <RefreshCw size={22} color="#FFFFFF" />
-            </div>
-            <div>
-              <h3
-                style={{
-                  fontSize: '1.35rem',
-                  fontWeight: 900,
-                  color: '#0F172A',
-                }}
-              >
-                Membership Status, Renewals & Freeze Information
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: '#475569' }}>
-                Unified across Vishrambag & Vijaynagar branches with biometric attendance and automated WhatsApp updates
-              </p>
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '20px',
-              marginBottom: '30px',
-            }}
-          >
-            {features.map((feat, idx) => {
-              const Icon = feat.icon;
-              return (
-                <div
-                  key={idx}
-                  style={{
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid rgba(0, 184, 74, 0.15)',
-                    borderRadius: '16px',
-                    padding: '22px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    boxShadow: '0 6px 18px rgba(15, 23, 42, 0.04)',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      backgroundColor: '#ECFDF3',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Icon size={20} color="#008A38" />
-                  </div>
-                  <h4
-                    style={{
-                      fontSize: '1.04rem',
-                      fontWeight: 800,
-                      color: '#0F172A',
-                    }}
-                  >
-                    {feat.title}
-                  </h4>
-                  <p
-                    style={{
-                      fontSize: '0.86rem',
-                      color: '#475569',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {feat.desc}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Vibrant Green Gradient CTA Banner */}
-          <div
-            style={{
-              background:
-                'linear-gradient(135deg, #00C952 0%, #008A37 60%, #006629 100%)',
-              borderRadius: '18px',
-              padding: '26px 28px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '20px',
-              boxShadow: '0 14px 30px rgba(0, 148, 59, 0.24)',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '1.22rem',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  marginBottom: '4px',
-                }}
-              >
-                Ready to Begin Your Transformation?
-              </div>
-              <div
-                style={{
-                  fontSize: '0.9rem',
-                  color: 'rgba(255, 255, 255, 0.92)',
-                }}
-              >
-                Vishrambag: <strong>7798001777</strong> &nbsp;|&nbsp; Vijaynagar (Since 2012): <strong>9172848777</strong>
-              </div>
-            </div>
-
-            <button
-              onClick={() => scrollToContact(selectedBranch)}
-              className="btn btn-white"
-              style={{ fontWeight: 800, fontSize: '0.94rem' }}
-            >
-              <span>Contact Us for Membership Details</span>
-              <ArrowRight size={17} />
-            </button>
-          </div>
-        </div>
       </div>
 
       <style>{`
@@ -1577,7 +1395,7 @@ export default function Membership({ plans = [] }) {
             gap: 20px !important;
           }
         }
-        @media (min-width: 641px) and (max-width: 1023px) {
+        @media (min-width: 641px) {
           .membership-cards-grid.cols-5 {
             grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
             gap: 14px !important;
@@ -1586,11 +1404,20 @@ export default function Membership({ plans = [] }) {
             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             gap: 16px !important;
           }
+          .membership-rules-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
         }
         @media (max-width: 640px) {
           .membership-cards-grid {
             grid-template-columns: 1fr !important;
             gap: 16px !important;
+          }
+          .membership-terms-panel {
+            padding: 22px 18px !important;
+          }
+          .membership-rules-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
