@@ -549,7 +549,7 @@ export default function Membership({ plans = [] }) {
                 </div>
 
                 {/* CTAs */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ marginTop: 'auto' }}>
                   <a
                     href={waDirectLink}
                     target="_blank"
@@ -570,22 +570,6 @@ export default function Membership({ plans = [] }) {
                     <MessageCircle size={14} />
                     <span>Join {durationText} Plan</span>
                   </a>
-
-                  <button
-                    onClick={() => scrollToContact(currentBranch.id)}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: isPopular ? 'rgba(255, 255, 255, 0.85)' : '#64748B',
-                      fontSize: '0.74rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      padding: '4px',
-                      textDecoration: 'underline',
-                    }}
-                  >
-                    Or Send Web Inquiry
-                  </button>
                 </div>
               </div>
             );
