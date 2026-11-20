@@ -42,9 +42,15 @@ function ImageDropzone({
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
-  const [customUrl, setCustomUrl] = useState('');
+  const [isReplacing, setIsReplacing] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Sync isReplacing when image value changes
+  useEffect(() => {
+    if (!value) {
+      setIsReplacing(false);
+    }
+  }, [value]);
 
   const processFile = (file) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -77,18 +83,21 @@ function ImageDropzone({
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.68);
+        const compressed = canvas.toDataURL('image/jpeg', 0.70);
         setIsProcessing(false);
+        setIsReplacing(false);
         onChange(compressed);
       };
       img.onerror = () => {
         setIsProcessing(false);
+        setIsReplacing(false);
         onChange(rawDataUrl);
       };
       img.src = rawDataUrl;
     };
     reader.onerror = () => {
       setIsProcessing(false);
+      setIsReplacing(false);
       alert('Failed to read image file.');
     };
     reader.readAsDataURL(file);
@@ -115,7 +124,9 @@ function ImageDropzone({
     }
   };
 
-  const isCustom = value && defaultImage && value !== defaultImage;
+  const hasImage = Boolean(value && typeof value === 'string' && value.trim().length > 0);
+  const showDropzone = !hasImage || isReplacing;
+  const isCustom = hasImage && defaultImage && value !== defaultImage;
 
   return (
     <div
@@ -127,6 +138,7 @@ function ImageDropzone({
         marginBottom: '18px',
       }}
     >
+      {/* Header with Label and Aspect ratio pill */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A' }}>{label}</span>
@@ -172,167 +184,258 @@ function ImageDropzone({
       </div>
 
       {helperText && (
-        <p style={{ fontSize: '0.76rem', color: '#64748B', margin: '0 0 10px' }}>{helperText}</p>
+        <p style={{ fontSize: '0.76rem', color: '#64748B', margin: '0 0 12px' }}>{helperText}</p>
       )}
 
-      {/* Drag & Drop Zone Box */}
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current && fileInputRef.current.click()}
-        style={{
-          border: isDragging ? '2px dashed #00B84A' : '2px dashed #CBD5E1',
-          borderRadius: '12px',
-          padding: '20px 14px',
-          backgroundColor: isDragging ? 'rgba(0, 184, 74, 0.08)' : '#F8FAFC',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.18s ease',
-          transform: isDragging ? 'scale(1.01)' : 'scale(1)',
-          boxShadow: isDragging ? '0 8px 24px rgba(0, 184, 74, 0.18)' : 'none',
-          marginBottom: '10px',
+      {/* Hidden file input used for both empty zone and edit action */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          if (e.target.files && e.target.files[0]) {
+            processFile(e.target.files[0]);
+            e.target.value = '';
+          }
         }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => e.target.files && e.target.files[0] && processFile(e.target.files[0])}
-          style={{ display: 'none' }}
-        />
+        style={{ display: 'none' }}
+      />
 
+      {/* STATE 1: Empty or In Replace Mode -> Show ONLY the Dashed Drag & Drop Box (Matching Image 2) */}
+      {showDropzone ? (
         <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current && fileInputRef.current.click()}
           style={{
-            width: '42px',
-            height: '42px',
-            borderRadius: '50%',
-            backgroundColor: isDragging ? '#00B84A' : '#FFFFFF',
-            border: '1px solid #E2E8F0',
+            border: isDragging ? '2px dashed #00B84A' : '2px dashed #CBD5E1',
+            borderRadius: '12px',
+            padding: '28px 16px',
+            backgroundColor: isDragging ? 'rgba(0, 184, 74, 0.08)' : '#F8FAFC',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '8px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-            color: isDragging ? '#FFFFFF' : '#008A38',
-            transition: 'all 0.18s ease',
-          }}
-        >
-          <UploadCloud size={20} />
-        </div>
-
-        <div style={{ fontSize: '0.84rem', fontWeight: 800, color: '#0F172A', marginBottom: '3px', textAlign: 'center' }}>
-          {isProcessing ? 'Optimizing Image...' : isDragging ? 'Drop Image to Upload!' : 'Drag & Drop Your Image Here'}
-        </div>
-        <div style={{ fontSize: '0.74rem', color: '#64748B', textAlign: 'center' }}>
-          or <span style={{ color: '#008A38', fontWeight: 800, textDecoration: 'underline' }}>Browse from Device</span> • PNG, JPG, WebP
-        </div>
-      </div>
-
-      {/* Alternative URL Toggle */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-        <button
-          type="button"
-          onClick={() => setShowUrlInput(!showUrlInput)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#64748B',
-            fontSize: '0.75rem',
-            fontWeight: 700,
             cursor: 'pointer',
-            padding: 0,
-            textDecoration: 'underline',
+            transition: 'all 0.18s ease',
+            transform: isDragging ? 'scale(1.01)' : 'scale(1)',
+            boxShadow: isDragging ? '0 8px 24px rgba(0, 184, 74, 0.18)' : 'none',
           }}
         >
-          {showUrlInput ? 'Hide Web URL link' : 'Or paste direct image URL'}
-        </button>
-
-        {value && (
-          <span style={{ fontSize: '0.72rem', color: '#008A38', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            <Check size={12} /> Active Image Live
-          </span>
-        )}
-      </div>
-
-      {showUrlInput && (
-        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-          <input
-            type="text"
-            placeholder="https://images.unsplash.com/... or image link"
-            value={customUrl}
-            onChange={(e) => setCustomUrl(e.target.value)}
+          <div
             style={{
-              flex: 1,
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: '1px solid #CBD5E1',
-              fontSize: '0.8rem',
-              backgroundColor: '#FFFFFF',
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              if (customUrl.trim()) {
-                onChange(customUrl.trim());
-                setCustomUrl('');
-                setShowUrlInput(false);
-              }
-            }}
-            style={{
-              backgroundColor: '#008A38',
-              color: '#FFFFFF',
-              border: 'none',
-              padding: '8px 14px',
-              borderRadius: '8px',
-              fontSize: '0.76rem',
-              fontWeight: 800,
-              cursor: 'pointer',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              backgroundColor: isDragging ? '#00B84A' : '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+              color: isDragging ? '#FFFFFF' : '#008A38',
+              transition: 'all 0.18s ease',
             }}
           >
-            Apply
-          </button>
-        </div>
-      )}
+            <UploadCloud size={22} />
+          </div>
 
-      {/* Live Preview */}
-      {value && (
+          <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', marginBottom: '4px', textAlign: 'center' }}>
+            {isProcessing ? 'Optimizing Image...' : isDragging ? 'Drop Image to Upload!' : 'Drag & Drop Your Image Here'}
+          </div>
+          <div style={{ fontSize: '0.76rem', color: '#64748B', textAlign: 'center' }}>
+            or <span style={{ color: '#008A38', fontWeight: 800, textDecoration: 'underline' }}>Browse from Device</span> • PNG, JPG, WebP
+          </div>
+
+          {isReplacing && hasImage && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsReplacing(false);
+              }}
+              style={{
+                marginTop: '12px',
+                background: '#FFFFFF',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                padding: '5px 12px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                color: '#64748B',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              }}
+            >
+              <X size={13} />
+              <span>Cancel (Keep Current Image)</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        /* STATE 2: Image Present -> Show Image Preview with floating Edit (✏️) & Delete (🗑️) icon buttons */
         <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           style={{
-            marginTop: '10px',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            border: '1px solid #E2E8F0',
-            backgroundColor: '#0A0F18',
             position: 'relative',
-            height: '180px',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            border: isDragging ? '2px dashed #00B84A' : '1.5px solid #E2E8F0',
+            backgroundColor: '#0F172A',
+            height: '210px',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.08)',
+            transition: 'border 0.2s ease',
           }}
         >
           <img
             src={value}
-            alt="Preview"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            alt="Uploaded Preview"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+            }}
           />
+
+          {/* Floating Action Buttons on Image: Edit (✏️) and Delete (🗑️) */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              zIndex: 5,
+            }}
+          >
+            {/* Edit Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsReplacing(true);
+                setTimeout(() => {
+                  if (fileInputRef.current) fileInputRef.current.click();
+                }, 50);
+              }}
+              title="Edit / Replace Image"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #CBD5E1',
+                color: '#0F172A',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.22)',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ECFDF3';
+                e.currentTarget.style.color = '#008A38';
+                e.currentTarget.style.borderColor = '#00B84A';
+                e.currentTarget.style.transform = 'scale(1.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#FFFFFF';
+                e.currentTarget.style.color = '#0F172A';
+                e.currentTarget.style.borderColor = '#CBD5E1';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              <Edit3 size={16} />
+            </button>
+
+            {/* Delete Button */}
+            <button
+              type="button"
+              onClick={() => {
+                onChange('');
+                setIsReplacing(false);
+              }}
+              title="Delete Image"
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '8px',
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FCA5A5',
+                color: '#DC2626',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.22)',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#DC2626';
+                e.currentTarget.style.color = '#FFFFFF';
+                e.currentTarget.style.borderColor = '#DC2626';
+                e.currentTarget.style.transform = 'scale(1.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#FEF2F2';
+                e.currentTarget.style.color = '#DC2626';
+                e.currentTarget.style.borderColor = '#FCA5A5';
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+
+          {/* Live Active Badge bottom-right */}
           <div
             style={{
               position: 'absolute',
               bottom: '8px',
               right: '8px',
-              backgroundColor: 'rgba(0, 0, 0, 0.72)',
+              backgroundColor: 'rgba(15, 23, 42, 0.78)',
               color: '#FFFFFF',
               padding: '3px 8px',
               borderRadius: '6px',
-              fontSize: '0.66rem',
+              fontSize: '0.68rem',
               fontWeight: 700,
               backdropFilter: 'blur(4px)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
             }}
           >
-            Live Preview
+            <Check size={11} color="#00B84A" /> Live Active
           </div>
+
+          {/* Drag over overlay when dragging file onto existing image */}
+          {isDragging && (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundColor: 'rgba(0, 184, 74, 0.92)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                zIndex: 10,
+              }}
+            >
+              <UploadCloud size={38} style={{ marginBottom: '6px' }} />
+              <span style={{ fontSize: '0.94rem', fontWeight: 800 }}>Drop New Image to Replace!</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -776,13 +879,13 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
               label="Hero Fullscreen Background Image"
               helperText="Drag & drop any high-resolution gym photo. Automatically scales and optimizes."
               aspectLabel="16:9 Landscape"
-              value={formData.bgImage || DEFAULT_WEBSITE_CONTENT.hero.bgImage}
+              value={formData.bgImage !== undefined ? formData.bgImage : DEFAULT_WEBSITE_CONTENT.hero.bgImage}
               defaultImage={DEFAULT_WEBSITE_CONTENT.hero.bgImage}
               onChange={(newImg) => {
                 const updated = { ...formData, bgImage: newImg };
                 setFormData(updated);
                 updateSection('hero', updated);
-                notify('✓ Hero image updated live!');
+                notify(newImg ? '✓ Hero image updated live!' : '✓ Hero image removed!');
               }}
               onReset={() => {
                 const updated = { ...formData, bgImage: DEFAULT_WEBSITE_CONTENT.hero.bgImage };
@@ -854,13 +957,13 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
               label="Featured Facility & Heritage Photo"
               helperText="Main photo shown on the left of About section."
               aspectLabel="4:3 Facility Photo"
-              value={formData.image || DEFAULT_WEBSITE_CONTENT.about.image}
+              value={formData.image !== undefined ? formData.image : DEFAULT_WEBSITE_CONTENT.about.image}
               defaultImage={DEFAULT_WEBSITE_CONTENT.about.image}
               onChange={(newImg) => {
                 const updated = { ...formData, image: newImg };
                 setFormData(updated);
                 updateSection('about', updated);
-                notify('✓ About photo updated live!');
+                notify(newImg ? '✓ About photo updated live!' : '✓ About photo removed!');
               }}
               onReset={() => {
                 const updated = { ...formData, image: DEFAULT_WEBSITE_CONTENT.about.image };
@@ -1145,7 +1248,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                       const updated = { ...formData, items: updatedItems };
                       setFormData(updated);
                       updateSection('services', updated);
-                      notify(`✓ ${service.title} image updated live!`);
+                      notify(newImg ? `✓ ${service.title} image updated live!` : `✓ ${service.title} image removed!`);
                     }}
                     onReset={() => {
                       const updatedItems = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
@@ -1310,7 +1413,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                         };
                         setFormData(updated);
                         updateSection('programs', updated);
-                        notify(`✓ ${name} program image updated live!`);
+                        notify(newImg ? `✓ ${name} program image updated live!` : `✓ ${name} program image removed!`);
                       }}
                       onReset={() => {
                         const updated = {
