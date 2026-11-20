@@ -461,8 +461,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         return 'whyUs';
       case 'programs':
         return 'programs';
-      case 'tracking':
-        return 'tracking';
       case 'contact':
         return 'contact';
       default:
@@ -648,7 +646,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     { id: 'services', label: 'Services', icon: Sparkles, desc: 'PT, Massage, Steam & images' },
     { id: 'programs', label: 'Programs', icon: Activity, desc: 'Beginner, Inter, Advanced' },
     { id: 'why_us', label: 'Why Choose Us', icon: Layers, desc: '5 Core Value Props' },
-    { id: 'tracking', label: 'Tracking', icon: Activity, desc: 'Body composition metrics' },
     { id: 'contact', label: 'Contact & Branches', icon: MapPin, desc: 'Phone, hours & policy' },
     { id: 'pt_fees', label: 'PT Fee Structure', icon: Dumbbell, desc: 'Edit branch PT rates' },
   ];
@@ -728,87 +725,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           <p style={{ color: '#94A3B8', fontSize: '0.84rem', margin: '4px 0 0', maxWidth: '600px' }}>
             Edit content and upload images directly in each section tab below. All changes synchronize instantly to the live site.
           </p>
-        </div>
-
-        {/* Actions: View Live Site + Save & Publish Live + Live Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={() => window.open('/', '_blank')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '9px 16px',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              border: '1px solid rgba(255, 255, 255, 0.25)',
-              color: '#FFFFFF',
-              fontSize: '0.84rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
-          >
-            <Eye size={15} />
-            <span>View Live Site</span>
-            <ExternalLink size={13} />
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSaveSection}
-            disabled={isSaving}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '9px 20px',
-              borderRadius: '10px',
-              backgroundColor: '#008A38',
-              border: 'none',
-              color: '#FFFFFF',
-              fontSize: '0.85rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(0, 138, 56, 0.4)',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#00A342')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#008A38')}
-          >
-            <Save size={15} />
-            <span>{isSaving ? 'Publishing...' : 'Save & Publish Live'}</span>
-          </button>
-
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 14px',
-              borderRadius: '999px',
-              backgroundColor: 'rgba(0, 210, 86, 0.12)',
-              border: '1px solid rgba(0, 210, 86, 0.3)',
-              color: '#00D256',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              letterSpacing: '0.02em',
-            }}
-          >
-            <span
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#00D256',
-                boxShadow: '0 0 8px #00D256',
-              }}
-            />
-            <span>Live Synced to Website</span>
-          </div>
         </div>
       </div>
 
@@ -1178,12 +1094,61 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         {/* ============================================================ */}
         {currentSubTab === 'services' && (
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
-              Services Section (PT, Massage, Steam Bath, Zumba, Yoga)
-            </h3>
-            <p style={{ color: '#64748B', fontSize: '0.86rem', marginBottom: '22px' }}>
-              Drag and drop images for each service card, edit titles, and descriptions.
-            </p>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px 0' }}>
+                  Services Section (PT, Massage, Steam Bath, Zumba, Yoga)
+                </h3>
+                <p style={{ color: '#64748B', fontSize: '0.86rem', margin: 0 }}>
+                  Drag and drop images for each service card, edit titles, and descriptions.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const currentItems = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
+                  currentItems.push({
+                    id: `service-${Date.now()}`,
+                    title: 'New Service',
+                    tag: 'Special Offering',
+                    description: 'Customized training protocols designed for your physiology and fitness goals.',
+                    features: ['Personal assessment', 'Custom workout plan', 'Certified coaching'],
+                    image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop',
+                    accent: '#00B84A',
+                  });
+                  const updated = { ...formData, items: currentItems };
+                  autoSaveSection(updated);
+                  notify('✓ New service card added to website!');
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: '#008A38',
+                  color: '#FFFFFF',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 800,
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(0, 138, 56, 0.25)',
+                }}
+              >
+                <Plus size={15} />
+                <span>+ Add New</span>
+              </button>
+            </div>
 
             <div style={{ display: 'grid', gap: '24px' }}>
               {(formData.items || DEFAULT_WEBSITE_CONTENT.services.items).map((service, idx) => (
@@ -1695,212 +1660,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* TAB: FITNESS TRACKING                                        */}
-        {/* ============================================================ */}
-        {currentSubTab === 'tracking' && (
-          <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', marginBottom: '8px' }}>
-              Smart Fitness Tracking Section
-            </h3>
-            <p style={{ color: '#64748B', fontSize: '0.86rem', marginBottom: '22px' }}>
-              Update tracking headlines and biometric monitoring highlights. Add or remove feature cards.
-            </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-              <div>
-                <label style={labelStyle}>Eyebrow</label>
-                <input
-                  type="text"
-                  value={formData.eyebrow || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    autoSaveSection({ ...formData, eyebrow: val });
-                  }}
-                  style={inputStyle}
-                />
-              </div>
-              <div>
-                <label style={labelStyle}>Section Title</label>
-                <input
-                  type="text"
-                  value={formData.title || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    autoSaveSection({ ...formData, title: val });
-                  }}
-                  style={inputStyle}
-                />
-              </div>
-            </div>
-
-            {/* Features List */}
-            <div style={{ marginTop: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>Tracking Metric Cards</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
-                    currentFeatures.push({
-                      title: 'New Tracking Metric',
-                      badge: 'Biometric Analytics',
-                      desc: 'Continuous real-time progress validation and personal milestone celebration.',
-                    });
-                    autoSaveSection({ ...formData, features: currentFeatures });
-                    notify('✓ Added new tracking card!');
-                  }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    backgroundColor: '#ECFDF3',
-                    color: '#008A38',
-                    border: '1px solid #A7F3D0',
-                    padding: '5px 12px',
-                    borderRadius: '8px',
-                    fontSize: '0.76rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Plus size={14} />
-                  <span>Add Metric Card</span>
-                </button>
-              </div>
-
-              <div style={{ display: 'grid', gap: '14px' }}>
-                {(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features).map((feat, fIdx) => (
-                  <div
-                    key={fIdx}
-                    style={{
-                      padding: '16px',
-                      borderRadius: '12px',
-                      backgroundColor: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>Metric #{fIdx + 1} — {feat.title}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
-                          currentFeatures.splice(fIdx, 1);
-                          autoSaveSection({ ...formData, features: currentFeatures });
-                          notify('✓ Metric card removed from website!');
-                        }}
-                        style={{
-                          backgroundColor: '#FEF2F2',
-                          color: '#DC2626',
-                          border: 'none',
-                          padding: '4px 10px',
-                          borderRadius: '6px',
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <Trash2 size={13} />
-                        <span>Delete Metric</span>
-                      </button>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
-                      <div>
-                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Title</label>
-                        <input
-                          type="text"
-                          value={feat.title || ''}
-                          onChange={(e) => {
-                            const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
-                            currentFeatures[fIdx] = { ...currentFeatures[fIdx], title: e.target.value };
-                            autoSaveSection({ ...formData, features: currentFeatures });
-                          }}
-                          style={inputStyle}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Badge Tag</label>
-                        <input
-                          type="text"
-                          value={feat.badge || ''}
-                          onChange={(e) => {
-                            const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
-                            currentFeatures[fIdx] = { ...currentFeatures[fIdx], badge: e.target.value };
-                            autoSaveSection({ ...formData, features: currentFeatures });
-                          }}
-                          style={inputStyle}
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Description</label>
-                      <textarea
-                        rows={2}
-                        value={feat.desc || ''}
-                        onChange={(e) => {
-                          const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
-                          currentFeatures[fIdx] = { ...currentFeatures[fIdx], desc: e.target.value };
-                          autoSaveSection({ ...formData, features: currentFeatures });
-                        }}
-                        style={textareaStyle}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={handleSaveSection}
-                disabled={isSaving}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: '#008A38',
-                  color: '#FFFFFF',
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  fontWeight: 800,
-                  fontSize: '0.86rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <Save size={15} />
-                <span>Save Section</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleResetSection}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  backgroundColor: '#F8FAFC',
-                  color: '#64748B',
-                  padding: '10px 16px',
-                  borderRadius: '10px',
-                  fontWeight: 700,
-                  fontSize: '0.84rem',
-                  border: '1px solid #CBD5E1',
-                  cursor: 'pointer',
-                }}
-              >
-                <RotateCcw size={14} />
-                <span>Reset to Default</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* ============================================================ */}
         {/* TAB: CONTACT & BRANCHES                                      */}

@@ -4,7 +4,6 @@ import About from '../components/About';
 import Services from '../components/Services';
 import Membership from '../components/Membership';
 import Programs from '../components/Programs';
-import FitnessTracking from '../components/FitnessTracking';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Contact from '../components/Contact';
 import { useWebsiteContent } from '../context/WebsiteContentContext';
@@ -26,7 +25,6 @@ export default function HomePage({ plans }) {
       {isVisible('services') && <Services />}
       {isVisible('membership') && <Membership plans={plans} />}
       {isVisible('programs') && <Programs />}
-      {isVisible('tracking') && <FitnessTracking />}
       {isVisible('whyUs') && <WhyChooseUs />}
       {isVisible('contact') && <Contact />}
     </main>
