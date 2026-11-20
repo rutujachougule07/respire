@@ -608,9 +608,16 @@ export default function Membership({ plans = [] }) {
               { planName: 'Alternate Days', price: altP, priceDisplay: `₹${altP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
               { planName: 'Daily Personal Training', price: dayP, priceDisplay: `₹${dayP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
             ];
+            const defaultFeatures = [
+              'Dedicated 1-on-1 Certified Personal Coach',
+              'Custom Bio-mechanics & Posture Analysis',
+              'Targeted Nutrition & Macro Guideline Plan',
+              'Real-Time Form Correction & Injury Prevention',
+            ];
             return {
               ...c,
               pricing,
+              features: Array.isArray(c.features) && c.features.length > 0 ? c.features : defaultFeatures,
             };
           });
           const ptData = {
@@ -722,7 +729,7 @@ export default function Membership({ plans = [] }) {
                 {ptData.categories.map((cat) => {
                   const isPremium = Boolean(cat.isPremium);
                   const waText = encodeURIComponent(
-                    `Hello ${ptData.branchName} (Mahabal Group Venture),\nI would like to inquire about ${cat.title} (${cat.pricing.map((p) => `${p.planName}: ${p.priceDisplay}`).join(' / ')}) at your ${currentBranch.shortName}. Please guide me on trainer slot availability.`
+                    `Hello ${ptData.branchName} (Mahabal Group Venture),\nI would like to inquire about ${cat.title} (${(cat.pricing || []).map((p) => `${p.planName}: ${p.priceDisplay}`).join(' / ')}) at your ${currentBranch.shortName}. Please guide me on trainer slot availability.`
                   );
                   const waLink = `https://wa.me/${ptData.waNumber}?text=${waText}`;
 
@@ -835,7 +842,7 @@ export default function Membership({ plans = [] }) {
                             marginBottom: '24px',
                           }}
                         >
-                          {cat.pricing.map((tier, pIdx) => {
+                          {(cat.pricing || []).map((tier, pIdx) => {
                             const isAlt = tier.planName === 'Alternate Days';
                             return (
                               <div
@@ -920,7 +927,7 @@ export default function Membership({ plans = [] }) {
                             What's Included:
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
-                            {cat.features.map((feat, fIdx) => (
+                            {(cat.features || []).map((feat, fIdx) => (
                               <div
                                 key={fIdx}
                                 style={{
