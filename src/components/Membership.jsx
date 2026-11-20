@@ -645,12 +645,13 @@ export default function Membership({ plans = [] }) {
           return (
             <div
               style={{
-                marginBottom: '46px',
-                padding: '36px 30px',
-                borderRadius: '26px',
+                maxWidth: '960px',
+                margin: '0 auto 32px',
+                padding: '22px 20px',
+                borderRadius: '20px',
                 backgroundColor: isVjn ? '#F5F7FD' : '#F4FBF7',
                 border: isVjn ? '1.5px solid rgba(23, 44, 131, 0.22)' : '1.5px solid rgba(0, 184, 74, 0.25)',
-                boxShadow: '0 16px 40px rgba(15, 23, 42, 0.05)',
+                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)',
                 position: 'relative',
                 overflow: 'hidden',
               }}
@@ -662,9 +663,9 @@ export default function Membership({ plans = [] }) {
                   flexWrap: 'wrap',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  gap: '16px',
-                  marginBottom: '28px',
-                  paddingBottom: '20px',
+                  gap: '10px',
+                  marginBottom: '16px',
+                  paddingBottom: '12px',
                   borderBottom: isVjn ? '1px solid rgba(23, 44, 131, 0.16)' : '1px solid rgba(0, 184, 74, 0.18)',
                 }}
               >
@@ -673,29 +674,29 @@ export default function Membership({ plans = [] }) {
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      padding: '5px 12px',
+                      gap: '6px',
+                      padding: '3px 10px',
                       borderRadius: '999px',
                       backgroundColor: isVjn ? 'rgba(23, 44, 131, 0.12)' : 'rgba(0, 184, 74, 0.14)',
                       border: isVjn ? '1px solid rgba(23, 44, 131, 0.3)' : '1px solid rgba(0, 184, 74, 0.35)',
                       color: isVjn ? '#172C83' : '#008A38',
-                      fontSize: '0.74rem',
+                      fontSize: '0.72rem',
                       fontWeight: 800,
-                      letterSpacing: '0.07em',
+                      letterSpacing: '0.05em',
                       textTransform: 'uppercase',
-                      marginBottom: '10px',
+                      marginBottom: '4px',
                     }}
                   >
-                    <Dumbbell size={14} />
+                    <Dumbbell size={13} />
                     <span>Personal Training (PT) Charges • {currentBranch.shortName}</span>
                   </div>
 
                   <h3
                     style={{
-                      fontSize: 'clamp(1.4rem, 3vw, 1.95rem)',
+                      fontSize: 'clamp(1.2rem, 2.2vw, 1.55rem)',
                       fontWeight: 900,
                       color: '#0F172A',
-                      margin: '0 0 6px',
+                      margin: '0 0 3px',
                       letterSpacing: '-0.01em',
                     }}
                   >
@@ -705,7 +706,7 @@ export default function Membership({ plans = [] }) {
                     </span>
                   </h3>
 
-                  <p style={{ fontSize: '0.92rem', color: '#475569', margin: 0, maxWidth: '780px' }}>
+                  <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, maxWidth: '680px', lineHeight: 1.4 }}>
                     Personalized one-on-one fitness mentoring, progressive overload tracking, and nutrition guidance at{' '}
                     <strong>{ptData.branchName}</strong>. Choose between flexible alternate-day or daily sessions.
                   </p>
@@ -716,20 +717,20 @@ export default function Membership({ plans = [] }) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 18px',
-                    borderRadius: '12px',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '10px',
                     backgroundColor: isVjn ? '#172C83' : '#008A38',
                     color: '#FFFFFF',
                     fontWeight: 800,
-                    fontSize: '0.86rem',
+                    fontSize: '0.8rem',
                     textDecoration: 'none',
                     boxShadow: isVjn
-                      ? '0 6px 18px rgba(23, 44, 131, 0.3)'
-                      : '0 6px 18px rgba(0, 184, 74, 0.3)',
+                      ? '0 4px 12px rgba(23, 44, 131, 0.25)'
+                      : '0 4px 12px rgba(0, 184, 74, 0.25)',
                   }}
                 >
-                  <Phone size={15} />
+                  <Phone size={13} />
                   <span>Call Branch: {ptData.phone}</span>
                 </a>
               </div>
@@ -738,8 +739,8 @@ export default function Membership({ plans = [] }) {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                  gap: '24px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: '14px',
                 }}
               >
                 {ptData.categories.map((cat) => {
@@ -754,7 +755,7 @@ export default function Membership({ plans = [] }) {
                       key={cat.id}
                       style={{
                         backgroundColor: '#FFFFFF',
-                        borderRadius: '22px',
+                        borderRadius: '16px',
                         border: isPremium
                           ? isVjn
                             ? '2px solid #172C83'
@@ -762,13 +763,12 @@ export default function Membership({ plans = [] }) {
                           : '1px solid #E2E8F0',
                         boxShadow: isPremium
                           ? isVjn
-                            ? '0 16px 36px rgba(23, 44, 131, 0.16)'
-                            : '0 16px 36px rgba(0, 184, 74, 0.16)'
-                          : '0 8px 24px rgba(15, 23, 42, 0.05)',
-                        padding: '28px 26px',
+                            ? '0 8px 20px rgba(23, 44, 131, 0.1)'
+                            : '0 8px 20px rgba(0, 184, 74, 0.1)'
+                          : '0 2px 10px rgba(15, 23, 42, 0.03)',
+                        padding: '16px 18px',
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'space-between',
                         position: 'relative',
                       }}
                     >
@@ -777,19 +777,19 @@ export default function Membership({ plans = [] }) {
                         <div
                           style={{
                             position: 'absolute',
-                            top: '-13px',
-                            right: '24px',
+                            top: '-10px',
+                            right: '16px',
                             background: isVjn
                               ? 'linear-gradient(135deg, #172C83 0%, #1E3AA8 100%)'
                               : 'linear-gradient(135deg, #00D256 0%, #007A31 100%)',
                             color: '#FFFFFF',
-                            fontSize: '0.72rem',
+                            fontSize: '0.66rem',
                             fontWeight: 900,
-                            letterSpacing: '0.07em',
+                            letterSpacing: '0.05em',
                             textTransform: 'uppercase',
-                            padding: '4px 14px',
+                            padding: '2px 10px',
                             borderRadius: '999px',
-                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
                           }}
                         >
                           {isVjn ? '★ Senior Master Coach' : '★ Elite Transformation'}
@@ -802,9 +802,9 @@ export default function Membership({ plans = [] }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '6px',
-                            padding: '4px 10px',
-                            borderRadius: '8px',
+                            gap: '4px',
+                            padding: '2px 8px',
+                            borderRadius: '5px',
                             backgroundColor: isPremium
                               ? isVjn
                                 ? 'rgba(23, 44, 131, 0.1)'
@@ -815,20 +815,20 @@ export default function Membership({ plans = [] }) {
                                 ? '#172C83'
                                 : '#008A38'
                               : '#475569',
-                            fontSize: '0.74rem',
+                            fontSize: '0.68rem',
                             fontWeight: 800,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.05em',
-                            marginBottom: '10px',
+                            letterSpacing: '0.04em',
+                            marginBottom: '4px',
                           }}
                         >
-                          <Award size={13} />
+                          <Award size={11} />
                           <span>{cat.badge}</span>
                         </div>
 
                         <h4
                           style={{
-                            fontSize: '1.4rem',
+                            fontSize: '1.18rem',
                             fontWeight: 900,
                             color: '#0F172A',
                             margin: '0 0 8px',
@@ -838,24 +838,26 @@ export default function Membership({ plans = [] }) {
                           {cat.title}
                         </h4>
 
-                        <p
-                          style={{
-                            fontSize: '0.86rem',
-                            color: '#64748B',
-                            lineHeight: 1.5,
-                            margin: '0 0 20px',
-                          }}
-                        >
-                          {cat.description}
-                        </p>
+                        {cat.description ? (
+                          <p
+                            style={{
+                              fontSize: '0.8rem',
+                              color: '#64748B',
+                              lineHeight: 1.35,
+                              margin: '0 0 10px',
+                            }}
+                          >
+                            {cat.description}
+                          </p>
+                        ) : null}
 
                         {/* Pricing Tiers Box (Alternate Days vs Daily) */}
                         <div
                           style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '12px',
-                            marginBottom: '24px',
+                            gap: '6px',
+                            marginBottom: '12px',
                           }}
                         >
                           {(cat.pricing || []).map((tier, pIdx) => {
@@ -867,8 +869,8 @@ export default function Membership({ plans = [] }) {
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  padding: '14px 18px',
-                                  borderRadius: '14px',
+                                  padding: '8px 12px',
+                                  borderRadius: '9px',
                                   backgroundColor: isAlt ? '#F8FAFC' : isVjn ? '#EEF2FF' : '#ECFDF3',
                                   border: isAlt
                                     ? '1px solid #E2E8F0'
@@ -882,44 +884,49 @@ export default function Membership({ plans = [] }) {
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      gap: '6px',
-                                      fontSize: '0.86rem',
+                                      gap: '5px',
+                                      fontSize: '0.82rem',
                                       fontWeight: 800,
                                       color: '#0F172A',
-                                      marginBottom: '2px',
+                                      marginBottom: tier.sessions ? '2px' : '0',
                                     }}
                                   >
                                     <span>{tier.planName}</span>
-                                    <span
-                                      style={{
-                                        fontSize: '0.68rem',
-                                        padding: '2px 6px',
-                                        borderRadius: '4px',
-                                        backgroundColor: isAlt ? '#E2E8F0' : isVjn ? '#172C83' : '#008A38',
-                                        color: isAlt ? '#475569' : '#FFFFFF',
-                                        fontWeight: 700,
-                                      }}
-                                    >
-                                      {tier.tag}
-                                    </span>
+                                    {tier.tag && (
+                                      <span
+                                        style={{
+                                          fontSize: '0.62rem',
+                                          padding: '1px 5px',
+                                          borderRadius: '3px',
+                                          backgroundColor: isAlt ? '#E2E8F0' : isVjn ? '#172C83' : '#008A38',
+                                          color: isAlt ? '#475569' : '#FFFFFF',
+                                          fontWeight: 700,
+                                        }}
+                                      >
+                                        {tier.tag}
+                                      </span>
+                                    )}
                                   </div>
-                                  <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600 }}>
-                                    {tier.sessions}
-                                  </div>
+                                  {tier.sessions && (
+                                    <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 600 }}>
+                                      {tier.sessions}
+                                    </div>
+                                  )}
                                 </div>
 
                                 <div style={{ textAlign: 'right' }}>
                                   <div
                                     style={{
-                                      fontSize: '1.45rem',
+                                      fontSize: '1.2rem',
                                       fontWeight: 900,
                                       color: isAlt ? '#0F172A' : isVjn ? '#172C83' : '#008A38',
                                       letterSpacing: '-0.02em',
+                                      lineHeight: 1.1,
                                     }}
                                   >
                                     {tier.priceDisplay}
                                   </div>
-                                  <div style={{ fontSize: '0.7rem', color: '#94A3B8', fontWeight: 700 }}>
+                                  <div style={{ fontSize: '0.64rem', color: '#94A3B8', fontWeight: 700 }}>
                                     per month
                                   </div>
                                 </div>
@@ -929,35 +936,35 @@ export default function Membership({ plans = [] }) {
                         </div>
 
                         {/* Feature Bullet Points */}
-                        <div style={{ marginBottom: '24px' }}>
+                        <div style={{ marginBottom: '12px' }}>
                           <div
                             style={{
-                              fontSize: '0.74rem',
+                              fontSize: '0.68rem',
                               fontWeight: 800,
                               color: '#94A3B8',
                               textTransform: 'uppercase',
-                              letterSpacing: '0.07em',
-                              marginBottom: '10px',
+                              letterSpacing: '0.06em',
+                              marginBottom: '5px',
                             }}
                           >
                             What's Included:
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                             {(cat.features || []).map((feat, fIdx) => (
                               <div
                                 key={fIdx}
                                 style={{
                                   display: 'flex',
                                   alignItems: 'flex-start',
-                                  gap: '8px',
-                                  fontSize: '0.84rem',
+                                  gap: '6px',
+                                  fontSize: '0.78rem',
                                   color: '#334155',
                                   fontWeight: 600,
-                                  lineHeight: 1.4,
+                                  lineHeight: 1.3,
                                 }}
                               >
                                 <CheckCircle2
-                                  size={15}
+                                  size={13}
                                   color={isVjn ? '#172C83' : '#00B84A'}
                                   style={{ flexShrink: 0, marginTop: '2px' }}
                                 />
@@ -969,7 +976,7 @@ export default function Membership({ plans = [] }) {
                       </div>
 
                       {/* CTAs */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'auto', paddingTop: '6px' }}>
                         <a
                           href={waLink}
                           target="_blank"
@@ -977,18 +984,20 @@ export default function Membership({ plans = [] }) {
                           className="btn btn-primary"
                           style={{
                             width: '100%',
-                            fontSize: '0.86rem',
-                            padding: '12px',
+                            fontSize: '0.82rem',
+                            padding: '9px 12px',
+                            borderRadius: '9px',
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '8px',
+                            gap: '6px',
                             textDecoration: 'none',
                             backgroundColor: isVjn ? '#172C83' : '#008A38',
                             borderColor: isVjn ? '#172C83' : '#008A38',
+                            fontWeight: 800,
                           }}
                         >
-                          <MessageCircle size={15} />
+                          <MessageCircle size={14} />
                           <span>Book {cat.title}</span>
                         </a>
 
@@ -998,10 +1007,10 @@ export default function Membership({ plans = [] }) {
                             background: 'transparent',
                             border: 'none',
                             color: '#64748B',
-                            fontSize: '0.78rem',
+                            fontSize: '0.74rem',
                             fontWeight: 700,
                             cursor: 'pointer',
-                            padding: '6px',
+                            padding: '2px',
                             textDecoration: 'underline',
                           }}
                         >
