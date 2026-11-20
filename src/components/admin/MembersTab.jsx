@@ -24,6 +24,24 @@ function getDaysRemaining(expiryDate) {
   return Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
 }
 
+
+export const SPECIAL_TRAINING_OPTIONS = {
+  vishrambag: [
+    { id: 'none', label: 'None (Regular Gym Only)', price: 0 },
+    { id: 'vb-gen-alt', label: 'General PT - Alternate Days (₹7,000/mo)', price: 7000 },
+    { id: 'vb-gen-daily', label: 'General PT - Daily Coaching (₹10,000/mo)', price: 10000 },
+    { id: 'vb-prem-alt', label: 'Premium PT - Alternate Days (₹9,000/mo)', price: 9000 },
+    { id: 'vb-prem-daily', label: 'Premium PT - Daily VIP (₹13,000/mo)', price: 13000 },
+  ],
+  branch2: [
+    { id: 'none', label: 'None (Regular Gym Only)', price: 0 },
+    { id: 'vjn-jr-alt', label: 'Junior PT - Alternate Days (₹4,500/mo)', price: 4500 },
+    { id: 'vjn-jr-daily', label: 'Junior PT - Daily Sessions (₹8,000/mo)', price: 8000 },
+    { id: 'vjn-sr-alt', label: 'Senior PT - Alternate Days (₹5,500/mo)', price: 5500 },
+    { id: 'vjn-sr-daily', label: 'Senior PT - Daily Master (₹10,000/mo)', price: 10000 },
+  ],
+};
+
 function addMonths(dateStr, months) {
   const d = new Date(dateStr);
   d.setMonth(d.getMonth() + Number(months || 1));
@@ -40,6 +58,32 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
 
   const defaultBranch = activeBranchId === 'all' ? 'vishrambag' : activeBranchId;
 
+  const getBranchPlans = (branchId) => {
+    return plans.filter((p) => {
+      if (branchId === 'branch2' || branchId === 'vijaynagar') {
+        return p.branchId === 'branch2' || p.branchId === 'vijaynagar';
+      }
+      return p.branchId === 'vishrambag' || !p.branchId;
+    });
+  };
+
+  const getBranchTrainers = (branchId) => {
+    return trainers.filter((t) => {
+      if (!t.branchId) return true;
+      if (branchId === 'branch2' || branchId === 'vijaynagar') {
+        return t.branchId === 'branch2' || t.branchId === 'vijaynagar';
+      }
+      return t.branchId === 'vishrambag';
+    });
+  };
+
+  const availableBranchPlans = getBranchPlans(form?.branchId || defaultBranch);
+  const availableBranchTrainers = getBranchTrainers(form?.branchId || defaultBranch);
+  const currentBranchPT =
+    (form?.branchId === 'branch2' || form?.branchId === 'vijaynagar')
+      ? SPECIAL_TRAINING_OPTIONS.branch2
+      : SPECIAL_TRAINING_OPTIONS.vishrambag;
+
   const emptyForm = {
     branchId: defaultBranch,
     name: '',
@@ -47,10 +91,12 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     email: '',
     gender: 'Male',
     age: 25,
-    planId: plans[0]?.id || '',
-    trainerId: trainers[0]?.id || '',
+    planId: '',
+    trainerId: '',
+    specialTraining: 'none',
+    specialTrainingLabel: '',
     joinDate: '2026-11-18',
-    expiryDate: addMonths('2026-11-18', plans[0]?.durationMonths || 1),
+    expiryDate: addMonths('2026-11-18', 1),
     program: 'Beginner',
     addOns: [],
     weight: '70 kg',
@@ -62,12 +108,17 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
 
   const openAddModal = () => {
     setEditingMember(null);
-    const defaultPlan = plans.find((p) => p.status === 'Active') || plans[0];
+    const targetBranch = activeBranchId === 'all' ? 'vishrambag' : activeBranchId;
+    const branchPlans = getBranchPlans(targetBranch);
+    const branchTrainers = getBranchTrainers(targetBranch);
+    const defaultPlan = branchPlans[0] || plans[0];
     setForm({
       ...emptyForm,
-      branchId: activeBranchId === 'all' ? 'vishrambag' : activeBranchId,
+      branchId: targetBranch,
       planId: defaultPlan?.id || '',
-      trainerId: trainers[0]?.id || '',
+      trainerId: branchTrainers[0]?.id || '',
+      specialTraining: 'none',
+      specialTrainingLabel: '',
       expiryDate: addMonths('2026-11-18', defaultPlan?.durationMonths || 1),
     });
     setIsFormOpen(true);
@@ -84,6 +135,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       age: m.age,
       planId: m.planId,
       trainerId: m.trainerId || '',
+      specialTraining: m.specialTraining || 'none',
+      specialTrainingLabel: m.specialTrainingLabel || '',
       joinDate: m.joinDate,
       expiryDate: m.expiryDate,
       program: m.program,
@@ -93,6 +146,48 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       bmi: m.bodyMetrics?.bmi || '',
     });
     setIsFormOpen(true);
+  };
+
+  const handleBranchChange = (newBranchId) => {
+    const branchPlans = getBranchPlans(newBranchId);
+    const branchTrainers = getBranchTrainers(newBranchId);
+    const firstPlan = branchPlans[0];
+    const isCurrentTrainerInBranch = branchTrainers.some((t) => t.id === form.trainerId);
+
+    setForm((prev) => ({
+      ...prev,
+      branchId: newBranchId,
+      planId: firstPlan ? firstPlan.id : '',
+      expiryDate: firstPlan ? addMonths(prev.joinDate, firstPlan.durationMonths) : prev.expiryDate,
+      trainerId: isCurrentTrainerInBranch ? prev.trainerId : (branchTrainers[0]?.id || ''),
+      specialTraining: 'none',
+      specialTrainingLabel: '',
+      addOns: prev.addOns.filter((a) => a !== 'Personal Training'),
+    }));
+  };
+
+  const handleSpecialTrainingChange = (ptId) => {
+    const ptList =
+      form.branchId === 'branch2' || form.branchId === 'vijaynagar'
+        ? SPECIAL_TRAINING_OPTIONS.branch2
+        : SPECIAL_TRAINING_OPTIONS.vishrambag;
+    const selectedPT = ptList.find((pt) => pt.id === ptId);
+    setForm((prev) => {
+      let updatedAddons = [...prev.addOns];
+      if (ptId && ptId !== 'none') {
+        if (!updatedAddons.includes('Personal Training')) {
+          updatedAddons.push('Personal Training');
+        }
+      } else {
+        updatedAddons = updatedAddons.filter((a) => a !== 'Personal Training');
+      }
+      return {
+        ...prev,
+        specialTraining: ptId,
+        specialTrainingLabel: selectedPT && ptId !== 'none' ? selectedPT.label : '',
+        addOns: updatedAddons,
+      };
+    });
   };
 
   const handlePlanChange = (newPlanId) => {
@@ -146,6 +241,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
           planId: form.planId,
           planName: selectedPlan ? selectedPlan.name : editingMember.planName,
           trainerId: form.trainerId,
+          specialTraining: form.specialTraining || 'none',
+          specialTrainingLabel: form.specialTrainingLabel || '',
           joinDate: form.joinDate,
           expiryDate: form.expiryDate,
           program: form.program,
@@ -173,6 +270,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
           planId: form.planId,
           planName: selectedPlan ? selectedPlan.name : '1 Month Membership',
           trainerId: form.trainerId,
+          specialTraining: form.specialTraining || 'none',
+          specialTrainingLabel: form.specialTrainingLabel || '',
           joinDate: form.joinDate,
           expiryDate: form.expiryDate,
           status: 'Active',
@@ -394,6 +493,24 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                       <td style={{ padding: '15px 18px' }}>
                         <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#0F172A' }}>{m.planName}</div>
                         <div style={{ fontSize: '0.74rem', color: '#008A38', fontWeight: 600 }}>{m.program} Level</div>
+                        {m.specialTraining && m.specialTraining !== 'none' && (
+                          <div style={{ marginTop: '5px' }}>
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                padding: '2px 8px',
+                                borderRadius: '6px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                backgroundColor: '#FEF3C7',
+                                color: '#92400E',
+                                border: '1px solid #FDE68A',
+                              }}
+                            >
+                              ⚡ {m.specialTrainingLabel || m.specialTraining}
+                            </span>
+                          </div>
+                        )}
                       </td>
 
                       <td style={{ padding: '15px 18px', fontSize: '0.86rem', color: '#334155', fontWeight: 600 }}>
@@ -574,7 +691,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>BRANCH *</label>
                   <select
                     value={form.branchId}
-                    onChange={(e) => setForm({ ...form, branchId: e.target.value })}
+                    onChange={(e) => handleBranchChange(e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem', backgroundColor: '#FFFFFF' }}
                   >
                     <option value="vishrambag">Respire Vishrambag Branch (R City Mall)</option>
@@ -643,13 +760,15 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>MEMBERSHIP PLAN</label>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                    MEMBERSHIP PLAN ({form.branchId === 'branch2' ? 'Vijaynagar' : 'Vishrambag'}) *
+                  </label>
                   <select
                     value={form.planId}
                     onChange={(e) => handlePlanChange(e.target.value)}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem', backgroundColor: '#FFFFFF' }}
                   >
-                    {plans.map((p) => (
+                    {availableBranchPlans.map((p) => (
                       <option key={p.id} value={p.id}>
                         {p.name} ({p.durationMonths}M - ₹{p.price})
                       </option>
@@ -657,20 +776,57 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>ASSIGN TRAINER</label>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                    ASSIGN TRAINER ({form.branchId === 'branch2' ? 'Vijaynagar' : 'Vishrambag'})
+                  </label>
                   <select
                     value={form.trainerId}
                     onChange={(e) => setForm({ ...form, trainerId: e.target.value })}
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.88rem', backgroundColor: '#FFFFFF' }}
                   >
                     <option value="">Unassigned</option>
-                    {trainers.map((t) => (
+                    {availableBranchTrainers.map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.name} ({t.specialty})
                       </option>
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Special Training / Personal Training (PT) Selection */}
+              <div style={{ backgroundColor: '#F0FDF4', border: '1.5px solid #86EFAC', borderRadius: '12px', padding: '12px 14px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.74rem', fontWeight: 800, color: '#166534', marginBottom: '6px' }}>
+                  <span>⚡ SPECIAL TRAINING / PERSONAL TRAINING (PT)</span>
+                  <span style={{ fontSize: '0.7rem', color: '#15803D', fontWeight: 700 }}>
+                    {form.branchId === 'branch2' ? 'Vijaynagar Branch Rates' : 'Vishrambag Branch Rates'}
+                  </span>
+                </label>
+                <select
+                  value={form.specialTraining || 'none'}
+                  onChange={(e) => handleSpecialTrainingChange(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '9px',
+                    border: form.specialTraining && form.specialTraining !== 'none' ? '2px solid #00B84A' : '1.5px solid #CBD5E1',
+                    fontSize: '0.88rem',
+                    backgroundColor: '#FFFFFF',
+                    fontWeight: form.specialTraining && form.specialTraining !== 'none' ? 700 : 500,
+                    color: '#0F172A',
+                  }}
+                >
+                  {currentBranchPT.map((pt) => (
+                    <option key={pt.id} value={pt.id}>
+                      {pt.label}
+                    </option>
+                  ))}
+                </select>
+                {form.specialTraining && form.specialTraining !== 'none' && (
+                  <p style={{ margin: '6px 0 0', fontSize: '0.74rem', color: '#166534', fontWeight: 600 }}>
+                    ✓ Special PT Selected: {form.specialTrainingLabel}
+                  </p>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
@@ -923,6 +1079,17 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 </span>
                 <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>{getTrainerName(viewingMember.trainerId)}</span>
               </div>
+
+              {viewingMember.specialTraining && viewingMember.specialTraining !== 'none' && (
+                <div style={{ backgroundColor: '#FEF3C7', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FDE68A' }}>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 800, color: '#B45309', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    ⚡ Special Training (Personal Training)
+                  </div>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 900, color: '#78350F' }}>
+                    {viewingMember.specialTrainingLabel || viewingMember.specialTraining}
+                  </div>
+                </div>
+              )}
 
               <div>
                 <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
