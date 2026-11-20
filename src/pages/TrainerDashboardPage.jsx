@@ -32,6 +32,7 @@ import SessionNotesTab from '../components/trainer/SessionNotesTab';
 import ProductivityTab from '../components/trainer/ProductivityTab';
 import CompletedSessionsTab from '../components/trainer/CompletedSessionsTab';
 import MemberProgressTab from '../components/trainer/MemberProgressTab';
+import TrainerProfileTab from '../components/trainer/TrainerProfileTab';
 
 export default function TrainerDashboardPage() {
   const { trainerProfile, trainerUser, logout } = useTrainerAuth();
@@ -219,6 +220,11 @@ export default function TrainerDashboardPage() {
       label: 'Member Progress',
       icon: Activity,
     },
+    {
+      id: 'profile',
+      label: 'Trainer Profile',
+      icon: User,
+    },
   ];
 
   const SidebarContent = () => (
@@ -324,48 +330,7 @@ export default function TrainerDashboardPage() {
         </div>
       </div>
 
-      {/* Coach Info Snapshot */}
-      <div
-        style={{
-          padding: '12px 18px',
-          borderBottom: '1px solid #F1F5F9',
-          backgroundColor: '#FAFAFA',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        <div
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: '#00B84A',
-            color: '#FFFFFF',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '0.95rem',
-            fontWeight: 900,
-            flexShrink: 0,
-            overflow: 'hidden',
-          }}
-        >
-          {trainerProfile?.photo ? (
-            <img src={trainerProfile.photo} alt={trainerProfile.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            (trainerProfile?.name || 'T')[0].toUpperCase()
-          )}
-        </div>
-        <div style={{ overflow: 'hidden', flex: 1 }}>
-          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-            {trainerProfile?.name || 'Trainer Coach'}
-          </div>
-          <div style={{ fontSize: '0.7rem', color: '#64748B', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-            {trainerProfile?.specialty || 'Personal Trainer'}
-          </div>
-        </div>
-      </div>
+
 
       {/* 2. SCROLLABLE NAVIGATION LINKS */}
       <div
@@ -803,6 +768,17 @@ export default function TrainerDashboardPage() {
               allProgress={myProgress}
               showToast={showToast}
               initialSelectedMemberId={progressMemberId}
+            />
+          )}
+
+          {/* TAB 8: TRAINER PROFILE */}
+          {activeTab === 'profile' && (
+            <TrainerProfileTab
+              trainerProfile={trainerProfile}
+              myMembers={myMembers}
+              mySessions={mySessions}
+              completedSessions={completedSessions}
+              showToast={showToast}
             />
           )}
         </main>
