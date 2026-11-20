@@ -22,7 +22,7 @@ export default function Navbar() {
           return;
         }
 
-        const sections = ['contact', 'features', 'programs', 'membership', 'services', 'about', 'hero'];
+        const sections = ['contact', 'programs', 'membership', 'services', 'about', 'hero'];
         for (const section of sections) {
           const el = document.getElementById(section);
           if (el) {
@@ -70,7 +70,6 @@ export default function Navbar() {
     { label: 'Services', path: '/services', id: 'services' },
     { label: 'Membership', path: '/membership', id: 'membership' },
     { label: 'Programs', path: '/programs', id: 'programs' },
-    { label: 'Features', path: '/#features', id: 'features' },
     { label: 'Contact', path: '/contact', id: 'contact' },
   ];
 

@@ -141,7 +141,10 @@ export async function loginTrainerWithFirebase(email, password) {
   };
 
   try {
+    localStorage.setItem('rf_trainer_session', JSON.stringify(session));
+    localStorage.setItem('rf_trainer_profile', JSON.stringify(trainerData));
     sessionStorage.setItem('rf_trainer_session', JSON.stringify(session));
+    sessionStorage.setItem('rf_trainer_profile', JSON.stringify(trainerData));
   } catch {
     // ignore
   }
@@ -159,7 +162,10 @@ export async function logoutTrainerFromFirebase() {
     // ignore
   }
   try {
+    localStorage.removeItem('rf_trainer_session');
+    localStorage.removeItem('rf_trainer_profile');
     sessionStorage.removeItem('rf_trainer_session');
+    sessionStorage.removeItem('rf_trainer_profile');
   } catch {
     // ignore
   }

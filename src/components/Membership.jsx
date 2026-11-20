@@ -646,12 +646,12 @@ export default function Membership({ plans = [] }) {
             <div
               style={{
                 maxWidth: '960px',
-                margin: '0 auto 32px',
-                padding: '22px 20px',
-                borderRadius: '20px',
+                margin: '0 auto 40px',
+                padding: '28px clamp(18px, 3vw, 28px)',
+                borderRadius: '22px',
                 backgroundColor: isVjn ? '#F5F7FD' : '#F4FBF7',
                 border: isVjn ? '1.5px solid rgba(23, 44, 131, 0.22)' : '1.5px solid rgba(0, 184, 74, 0.25)',
-                boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)',
+                boxShadow: '0 10px 28px rgba(15, 23, 42, 0.05)',
                 position: 'relative',
                 overflow: 'hidden',
               }}
@@ -663,28 +663,28 @@ export default function Membership({ plans = [] }) {
                   flexWrap: 'wrap',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  gap: '10px',
-                  marginBottom: '16px',
-                  paddingBottom: '12px',
+                  gap: '16px',
+                  marginBottom: '26px',
+                  paddingBottom: '20px',
                   borderBottom: isVjn ? '1px solid rgba(23, 44, 131, 0.16)' : '1px solid rgba(0, 184, 74, 0.18)',
                 }}
               >
-                <div>
+                <div style={{ flex: '1 1 500px' }}>
                   <div
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '6px',
-                      padding: '3px 10px',
+                      gap: '7px',
+                      padding: '4px 12px',
                       borderRadius: '999px',
                       backgroundColor: isVjn ? 'rgba(23, 44, 131, 0.12)' : 'rgba(0, 184, 74, 0.14)',
                       border: isVjn ? '1px solid rgba(23, 44, 131, 0.3)' : '1px solid rgba(0, 184, 74, 0.35)',
                       color: isVjn ? '#172C83' : '#008A38',
-                      fontSize: '0.72rem',
+                      fontSize: '0.74rem',
                       fontWeight: 800,
-                      letterSpacing: '0.05em',
+                      letterSpacing: '0.06em',
                       textTransform: 'uppercase',
-                      marginBottom: '4px',
+                      marginBottom: '10px',
                     }}
                   >
                     <Dumbbell size={13} />
@@ -693,11 +693,12 @@ export default function Membership({ plans = [] }) {
 
                   <h3
                     style={{
-                      fontSize: 'clamp(1.2rem, 2.2vw, 1.55rem)',
+                      fontSize: 'clamp(1.25rem, 2.3vw, 1.62rem)',
                       fontWeight: 900,
                       color: '#0F172A',
-                      margin: '0 0 3px',
+                      margin: '0 0 10px',
                       letterSpacing: '-0.01em',
+                      lineHeight: 1.3,
                     }}
                   >
                     1-ON-1 CERTIFIED{' '}
@@ -706,9 +707,17 @@ export default function Membership({ plans = [] }) {
                     </span>
                   </h3>
 
-                  <p style={{ fontSize: '0.84rem', color: '#475569', margin: 0, maxWidth: '680px', lineHeight: 1.4 }}>
+                  <p
+                    style={{
+                      fontSize: '0.91rem',
+                      color: '#475569',
+                      margin: 0,
+                      maxWidth: '720px',
+                      lineHeight: 1.55,
+                    }}
+                  >
                     Personalized one-on-one fitness mentoring, progressive overload tracking, and nutrition guidance at{' '}
-                    <strong>{ptData.branchName}</strong>. Choose between flexible alternate-day or daily sessions.
+                    <strong style={{ color: '#0F172A' }}>{ptData.branchName}</strong>. Choose between flexible alternate-day or daily sessions.
                   </p>
                 </div>
 
@@ -717,20 +726,21 @@ export default function Membership({ plans = [] }) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 14px',
-                    borderRadius: '10px',
+                    gap: '8px',
+                    padding: '10px 18px',
+                    borderRadius: '12px',
                     backgroundColor: isVjn ? '#172C83' : '#008A38',
                     color: '#FFFFFF',
                     fontWeight: 800,
-                    fontSize: '0.8rem',
+                    fontSize: '0.84rem',
                     textDecoration: 'none',
                     boxShadow: isVjn
-                      ? '0 4px 12px rgba(23, 44, 131, 0.25)'
-                      : '0 4px 12px rgba(0, 184, 74, 0.25)',
+                      ? '0 6px 16px rgba(23, 44, 131, 0.25)'
+                      : '0 6px 16px rgba(0, 184, 74, 0.25)',
+                    transition: 'all 0.2s ease',
                   }}
                 >
-                  <Phone size={13} />
+                  <Phone size={14} />
                   <span>Call Branch: {ptData.phone}</span>
                 </a>
               </div>
@@ -739,8 +749,8 @@ export default function Membership({ plans = [] }) {
               <div
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '14px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  gap: '22px',
                 }}
               >
                 {ptData.categories.map((cat) => {

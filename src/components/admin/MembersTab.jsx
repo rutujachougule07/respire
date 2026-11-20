@@ -1339,7 +1339,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   style={{ opacity: isSaving ? 0.7 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}
                 >
                   <CheckCircle2 size={15} />
-                  <span>{isSaving ? 'Saving to Cloud...' : editingMember ? 'Save Changes' : 'Register Member'}</span>
+                  <span>{isSaving ? 'Saving...' : 'Save'}</span>
                 </button>
               </div>
             </form>

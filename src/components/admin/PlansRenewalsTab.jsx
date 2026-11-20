@@ -193,7 +193,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
     setTempPtRates(updated);
     setNewPlanData({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
     setShowAddPlanForm(false);
-    showToast?.('✓ Plan added to list. Click "Save to Cloud" to publish live.');
+    showToast?.('✓ Plan added to list. Click "Save" to publish live.');
   };
 
   const savePTRatesCloud = async () => {
@@ -1295,7 +1295,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                   style={{ opacity: isSavingPlan ? 0.75 : 1 }}
                 >
                   <CheckCircle2 size={15} />
-                  <span>{isSavingPlan ? 'Saving Plan...' : (editingPlan ? 'Save Changes' : 'Add Plan')}</span>
+                  <span>{isSavingPlan ? 'Saving...' : 'Save'}</span>
                 </button>
               </div>
             </form>
@@ -1629,7 +1629,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                 style={{ opacity: isSavingPTRates ? 0.75 : 1, display: 'inline-flex', alignItems: 'center', gap: '7px' }}
               >
                 <CheckCircle2 size={16} />
-                <span>{isSavingPTRates ? 'Saving to Cloud...' : 'Save to Cloud'}</span>
+                <span>{isSavingPTRates ? 'Saving...' : 'Save'}</span>
               </button>
             </div>
           </div>

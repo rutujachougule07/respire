@@ -13,6 +13,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     whyUs: true,
     contact: true,
   },
+  customSections: [],
   hero: {
     visible: true,
     bgImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop',

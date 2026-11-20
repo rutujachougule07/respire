@@ -733,7 +733,7 @@ export default function SessionNotesTab({
                   disabled={isSubmitting}
                   style={{ flex: 2, padding: '11px', borderRadius: '10px', border: 'none', backgroundColor: '#00B84A', color: '#FFFFFF', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 184, 74, 0.3)' }}
                 >
-                  {isSubmitting ? 'Saving...' : editingNote ? 'Update Note' : 'Save Session Note'}
+                  {isSubmitting ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>

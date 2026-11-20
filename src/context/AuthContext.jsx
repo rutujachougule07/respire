@@ -108,9 +108,8 @@ export function AuthProvider({ children }) {
             // ignore
           }
         } else {
-          // Not an authorized gym role
+          // Not an authorized gym admin role (may be a trainer or other user)
           if (!tabSession) {
-            await signOut(auth).catch(() => {});
             setCurrentUser(null);
             setAdminSession(null);
             sessionStorage.removeItem('rf_tab_admin_session');

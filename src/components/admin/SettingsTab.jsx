@@ -576,6 +576,65 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     savePTRatesToFirestore(updated);
   };
 
+  // Custom Sections Management
+  const customSections = content?.customSections || [];
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [newSectionForm, setNewSectionForm] = useState({
+    title: '',
+    tabLabel: '',
+    eyebrow: '',
+    description: '',
+    image: '',
+    items: [{ title: '', badge: '', desc: '' }],
+  });
+
+  const handleAddCustomSection = async (e) => {
+    e.preventDefault();
+    if (!newSectionForm.title.trim()) {
+      notify('Please enter a section title.');
+      return;
+    }
+    const newSection = {
+      id: `sec_${Date.now()}`,
+      title: newSectionForm.title.trim(),
+      tabLabel: newSectionForm.tabLabel.trim() || newSectionForm.title.trim(),
+      eyebrow: newSectionForm.eyebrow.trim(),
+      description: newSectionForm.description.trim(),
+      image: newSectionForm.image || '',
+      visible: true,
+      items: (newSectionForm.items || []).filter((it) => it.title && it.title.trim()),
+    };
+    const updatedCustom = [...customSections, newSection];
+    await updateSection('customSections', updatedCustom);
+    notify('✓ New website section created!');
+    setShowAddSectionModal(false);
+    setNewSectionForm({
+      title: '',
+      tabLabel: '',
+      eyebrow: '',
+      description: '',
+      image: '',
+      items: [{ title: '', badge: '', desc: '' }],
+    });
+    setCurrentSubTab(`custom_${newSection.id}`);
+  };
+
+  const handleUpdateCustomSection = async (sectionId, updatedFields) => {
+    const updatedCustom = customSections.map((cs) =>
+      cs.id === sectionId ? { ...cs, ...updatedFields } : cs
+    );
+    await updateSection('customSections', updatedCustom);
+    notify('✓ Section updated!');
+  };
+
+  const handleDeleteCustomSection = async (sectionId) => {
+    if (!window.confirm('Are you sure you want to delete this custom section from the website?')) return;
+    const updatedCustom = customSections.filter((cs) => cs.id !== sectionId);
+    await updateSection('customSections', updatedCustom);
+    notify('✓ Custom section removed.');
+    setCurrentSubTab('home');
+  };
+
   useEffect(() => {
     if (activeSubTab && activeSubTab !== currentSubTab) {
       setCurrentSubTab(activeSubTab);
@@ -640,7 +699,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     }
   };
 
-  const tabs = [
+  const baseTabs = [
     { id: 'home', label: 'Home / Hero', icon: Home, desc: 'Visual banner & cue' },
     { id: 'about', label: 'About Us', icon: Info, desc: 'Heritage story & photo' },
     { id: 'services', label: 'Services', icon: Sparkles, desc: 'PT, Massage, Steam & images' },
@@ -648,6 +707,18 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     { id: 'why_us', label: 'Why Choose Us', icon: Layers, desc: '5 Core Value Props' },
     { id: 'contact', label: 'Contact & Branches', icon: MapPin, desc: 'Phone, hours & policy' },
     { id: 'pt_fees', label: 'PT Fee Structure', icon: Dumbbell, desc: 'Edit branch PT rates' },
+  ];
+
+  const tabs = [
+    ...baseTabs,
+    ...customSections.map((cs) => ({
+      id: `custom_${cs.id}`,
+      label: cs.tabLabel || cs.title || 'Custom Section',
+      icon: Sparkles,
+      desc: cs.description || 'Custom Section',
+      isCustom: true,
+      customData: cs,
+    })),
   ];
 
   const inputStyle = {
@@ -733,6 +804,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         style={{
           display: 'flex',
           gap: '8px',
+          alignItems: 'center',
           overflowX: 'auto',
           paddingBottom: '12px',
           marginBottom: '20px',
@@ -767,6 +839,38 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
             </button>
           );
         })}
+
+        {/* Add Section Button */}
+        <button
+          type="button"
+          onClick={() => setShowAddSectionModal(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '10px 18px',
+            borderRadius: '12px',
+            border: '1.5px dashed #00B84A',
+            backgroundColor: '#ECFDF3',
+            color: '#008A38',
+            fontWeight: 800,
+            fontSize: '0.84rem',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            transition: 'all 0.18s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#00B84A';
+            e.currentTarget.style.color = '#FFFFFF';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#ECFDF3';
+            e.currentTarget.style.color = '#008A38';
+          }}
+        >
+          <Plus size={16} />
+          <span>+ Add Section</span>
+        </button>
       </div>
 
       {/* TAB CONTENT AREA */}
@@ -831,7 +935,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save Section</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
               <button
                 type="button"
@@ -1063,7 +1167,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save About Section</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
               <button
                 type="button"
@@ -1329,7 +1433,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save All Services</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
             </div>
           </div>
@@ -1447,7 +1551,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save Programs</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
             </div>
           </div>
@@ -1634,7 +1738,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save Section</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
               <button
                 type="button"
@@ -1721,7 +1825,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 }}
               >
                 <Save size={15} />
-                <span>Save Contact Settings</span>
+                <span>{isSaving ? 'Saving...' : 'Save'}</span>
               </button>
               <button
                 type="button"
@@ -1752,7 +1856,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
             <div style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0F172A', marginBottom: '4px' }}>Personal Training Fee Structure</h3>
-                <p style={{ fontSize: '0.82rem', color: '#64748B' }}>Edit Alternate Days & Daily Training prices for each branch. Changes save to Firestore instantly.</p>
+                <p style={{ fontSize: '0.82rem', color: '#64748B' }}>Edit Alternate Days & Daily Training prices for each branch. Changes save instantly.</p>
               </div>
               {/* Branch toggle */}
               <div style={{ display: 'flex', gap: '8px' }}>
@@ -1835,7 +1939,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                             disabled={isSavingPT}
                             style={{ padding: '8px 18px', borderRadius: '8px', backgroundColor: '#00B84A', color: '#fff', border: 'none', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer' }}
                           >
-                            {isSavingPT ? 'Saving...' : '✓ Save'}
+                            {isSavingPT ? 'Saving...' : 'Save'}
                           </button>
                           <button
                             type="button"
@@ -1938,7 +2042,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                         disabled={isSavingPT}
                         style={{ padding: '9px 20px', borderRadius: '8px', backgroundColor: '#00B84A', color: '#fff', border: 'none', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer' }}
                       >
-                        {isSavingPT ? 'Saving...' : '✓ Add Plan'}
+                        {isSavingPT ? 'Saving...' : 'Save'}
                       </button>
                       <button
                         type="button"
@@ -1955,7 +2059,422 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           </div>
         )}
 
+        {/* ============================================================ */}
+        {/* CUSTOM SECTION EDITOR                                         */}
+        {/* ============================================================ */}
+        {currentSubTab.startsWith('custom_') && (() => {
+          const sectionId = currentSubTab.replace('custom_', '');
+          const currentSec = customSections.find((cs) => cs.id === sectionId);
+          if (!currentSec) {
+            return (
+              <div style={{ padding: '30px', textAlign: 'center', color: '#64748B' }}>
+                Section not found.{' '}
+                <button type="button" onClick={() => setCurrentSubTab('home')} style={{ color: '#008A38', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
+                  Return to Home
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: '0 0 4px 0' }}>
+                    {currentSec.title} (Custom Section)
+                  </h3>
+                  <p style={{ color: '#64748B', fontSize: '0.84rem', margin: 0 }}>
+                    Edit section title, cover photo, description and feature cards. All changes sync live.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateCustomSection(currentSec.id, { visible: currentSec.visible === false ? true : false })}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '7px 14px',
+                      borderRadius: '8px',
+                      backgroundColor: currentSec.visible !== false ? '#ECFDF3' : '#F1F5F9',
+                      color: currentSec.visible !== false ? '#008A38' : '#64748B',
+                      border: '1px solid',
+                      borderColor: currentSec.visible !== false ? '#A7F3D0' : '#CBD5E1',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {currentSec.visible !== false ? <Eye size={14} /> : <EyeOff size={14} />}
+                    <span>{currentSec.visible !== false ? 'Live on Site' : 'Hidden from Site'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCustomSection(currentSec.id)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '7px 14px',
+                      borderRadius: '8px',
+                      backgroundColor: '#FEF2F2',
+                      color: '#DC2626',
+                      border: '1px solid #FECACA',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Trash2 size={14} />
+                    <span>Delete Section</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Form fields */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', marginBottom: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Section Title</label>
+                  <input
+                    type="text"
+                    value={currentSec.title || ''}
+                    onChange={(e) => handleUpdateCustomSection(currentSec.id, { title: e.target.value })}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Tab Navigation Label</label>
+                  <input
+                    type="text"
+                    value={currentSec.tabLabel || ''}
+                    onChange={(e) => handleUpdateCustomSection(currentSec.id, { tabLabel: e.target.value })}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>Eyebrow / Small Header</label>
+                  <input
+                    type="text"
+                    value={currentSec.eyebrow || ''}
+                    onChange={(e) => handleUpdateCustomSection(currentSec.id, { eyebrow: e.target.value })}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={labelStyle}>Section Overview / Paragraph</label>
+                <textarea
+                  rows={2}
+                  value={currentSec.description || ''}
+                  onChange={(e) => handleUpdateCustomSection(currentSec.id, { description: e.target.value })}
+                  style={textareaStyle}
+                />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <ImageDropzone
+                  label="Section Photo / Banner"
+                  helperText="Drag and drop photo for this section."
+                  aspectLabel="16:9 Landscape"
+                  value={currentSec.image}
+                  onChange={(newImg) => handleUpdateCustomSection(currentSec.id, { image: newImg })}
+                  onReset={() => handleUpdateCustomSection(currentSec.id, { image: '' })}
+                />
+              </div>
+
+              {/* Feature Cards / Value Props inside custom section */}
+              <div style={{ marginTop: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>Feature / Highlights Cards</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const items = [...(currentSec.items || [])];
+                      items.push({ title: 'New Feature', badge: 'Highlight', desc: 'Description of this feature or offering.' });
+                      handleUpdateCustomSection(currentSec.id, { items });
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      backgroundColor: '#ECFDF3',
+                      color: '#008A38',
+                      border: '1px solid #A7F3D0',
+                      padding: '5px 12px',
+                      borderRadius: '8px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Plus size={14} />
+                    <span>Add Card</span>
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gap: '12px' }}>
+                  {(currentSec.items || []).map((card, cIdx) => (
+                    <div
+                      key={cIdx}
+                      style={{
+                        padding: '16px',
+                        borderRadius: '12px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>Card #{cIdx + 1} — {card.title}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const items = [...(currentSec.items || [])];
+                            items.splice(cIdx, 1);
+                            handleUpdateCustomSection(currentSec.id, { items });
+                          }}
+                          style={{
+                            backgroundColor: '#FEF2F2',
+                            color: '#DC2626',
+                            border: 'none',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          <Trash2 size={13} />
+                          <span>Delete Card</span>
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Title</label>
+                          <input
+                            type="text"
+                            value={card.title || ''}
+                            onChange={(e) => {
+                              const items = [...(currentSec.items || [])];
+                              items[cIdx] = { ...items[cIdx], title: e.target.value };
+                              handleUpdateCustomSection(currentSec.id, { items });
+                            }}
+                            style={inputStyle}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Badge Tag</label>
+                          <input
+                            type="text"
+                            value={card.badge || ''}
+                            onChange={(e) => {
+                              const items = [...(currentSec.items || [])];
+                              items[cIdx] = { ...items[cIdx], badge: e.target.value };
+                              handleUpdateCustomSection(currentSec.id, { items });
+                            }}
+                            style={inputStyle}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Description</label>
+                        <textarea
+                          rows={2}
+                          value={card.desc || ''}
+                          onChange={(e) => {
+                            const items = [...(currentSec.items || [])];
+                            items[cIdx] = { ...items[cIdx], desc: e.target.value };
+                            handleUpdateCustomSection(currentSec.id, { items });
+                          }}
+                          style={textareaStyle}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Save Button for Custom Section */}
+              <div style={{ marginTop: '22px' }}>
+                <button
+                  type="button"
+                  onClick={() => notify('✓ Section saved live!')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: '#008A38',
+                    color: '#FFFFFF',
+                    padding: '10px 22px',
+                    borderRadius: '10px',
+                    fontWeight: 800,
+                    fontSize: '0.86rem',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Save size={15} />
+                  <span>Save</span>
+                </button>
+              </div>
+            </div>
+          );
+        })()}
+
       </div>
+
+      {/* Modal: Add New Website Section */}
+      {showAddSectionModal && (
+        <div
+          onClick={() => setShowAddSectionModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2600,
+            backgroundColor: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '560px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.3)',
+              border: '1.5px solid #E2E8F0',
+            }}
+          >
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid #E2E8F0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                color: '#FFFFFF',
+                borderTopLeftRadius: '20px',
+                borderTopRightRadius: '20px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(0, 184, 74, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00D256' }}>
+                  <Plus size={20} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 900, margin: 0, color: '#FFFFFF' }}>Add New Website Section</h3>
+                  <div style={{ fontSize: '0.74rem', color: '#94A3B8' }}>Create and publish a new section on your landing page</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddSectionModal(false)}
+                style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddCustomSection} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={labelStyle}>SECTION TITLE *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. World-Class Facilities, Member Transformations, Spa Sanctuary"
+                  value={newSectionForm.title}
+                  onChange={(e) => {
+                    const title = e.target.value;
+                    setNewSectionForm((prev) => ({
+                      ...prev,
+                      title,
+                      tabLabel: prev.tabLabel || title,
+                    }));
+                  }}
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={labelStyle}>TAB BUTTON NAME</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Facilities, Amenities"
+                    value={newSectionForm.tabLabel}
+                    onChange={(e) => setNewSectionForm((prev) => ({ ...prev, tabLabel: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>EYEBROW / BADGE TAG</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Sangli's Finest"
+                    value={newSectionForm.eyebrow}
+                    onChange={(e) => setNewSectionForm((prev) => ({ ...prev, eyebrow: e.target.value }))}
+                    style={inputStyle}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={labelStyle}>SECTION DESCRIPTION</label>
+                <textarea
+                  rows={2}
+                  placeholder="Tell visitors about this section..."
+                  value={newSectionForm.description}
+                  onChange={(e) => setNewSectionForm((prev) => ({ ...prev, description: e.target.value }))}
+                  style={textareaStyle}
+                />
+              </div>
+
+              <div>
+                <ImageDropzone
+                  label="Section Photo / Cover Image"
+                  helperText="Drag and drop or paste image URL."
+                  aspectLabel="16:9 Landscape"
+                  value={newSectionForm.image}
+                  onChange={(img) => setNewSectionForm((prev) => ({ ...prev, image: img }))}
+                  onReset={() => setNewSectionForm((prev) => ({ ...prev, image: '' }))}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddSectionModal(false)}
+                  style={{ padding: '10px 18px', borderRadius: '10px', border: '1.5px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#475569', fontWeight: 700, fontSize: '0.84rem', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', backgroundColor: '#00B84A', color: '#FFFFFF', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 184, 74, 0.3)' }}
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

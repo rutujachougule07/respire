@@ -814,7 +814,7 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '6px' }}>
                 <button type="button" onClick={() => setIsFormOpen(false)} className="btn btn-secondary btn-sm">Cancel</button>
                 <button type="submit" disabled={isSaving} className="btn btn-primary btn-sm" style={{ opacity: isSaving ? 0.7 : 1 }}>
-                  {isSaving ? 'Processing Firebase Auth...' : (editingTrainer ? 'Save Profile' : 'Create Trainer Account')}
+                  {isSaving ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </form>
