@@ -108,21 +108,21 @@ export default function TrainerProfileTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
-      {/* 1. HERO PROFILE BANNER */}
+      {/* 1. HERO PROFILE CARD - White & Green Respire Theme */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 60%, #064E3B 100%)',
-          borderRadius: '22px',
-          padding: '30px 32px',
-          color: '#FFFFFF',
+          backgroundColor: '#FFFFFF',
+          borderRadius: '20px',
+          padding: '28px 30px',
+          color: '#0F172A',
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '24px',
-          boxShadow: '0 16px 36px rgba(15, 23, 42, 0.15)',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
+          border: '1.5px solid #E2E8F0',
           position: 'relative',
-          overflow: 'hidden',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
@@ -131,7 +131,7 @@ export default function TrainerProfileTab({
             style={{
               width: '84px',
               height: '84px',
-              borderRadius: '22px',
+              borderRadius: '20px',
               background: 'linear-gradient(135deg, #00D256 0%, #008A38 100%)',
               color: '#FFFFFF',
               display: 'flex',
@@ -139,10 +139,9 @@ export default function TrainerProfileTab({
               justifyContent: 'center',
               fontSize: '2.2rem',
               fontWeight: 900,
-              boxShadow: '0 8px 24px rgba(0, 184, 74, 0.4)',
+              boxShadow: '0 6px 18px rgba(0, 184, 74, 0.25)',
               flexShrink: 0,
               overflow: 'hidden',
-              border: '3px solid rgba(255, 255, 255, 0.25)',
             }}
           >
             {trainerProfile?.photo && typeof trainerProfile.photo === 'string' ? (
@@ -166,11 +165,11 @@ export default function TrainerProfileTab({
                   gap: '5px',
                   padding: '3px 10px',
                   borderRadius: '999px',
-                  backgroundColor: 'rgba(0, 210, 86, 0.2)',
-                  border: '1px solid rgba(0, 210, 86, 0.4)',
+                  backgroundColor: '#ECFDF3',
+                  border: '1px solid #A7F3D0',
                   fontSize: '0.72rem',
                   fontWeight: 800,
-                  color: '#4ADE80',
+                  color: '#008A38',
                   textTransform: 'uppercase',
                   letterSpacing: '0.04em',
                 }}
@@ -186,30 +185,30 @@ export default function TrainerProfileTab({
                   gap: '4px',
                   padding: '3px 10px',
                   borderRadius: '999px',
-                  backgroundColor: 'rgba(250, 204, 21, 0.2)',
-                  border: '1px solid rgba(250, 204, 21, 0.4)',
+                  backgroundColor: '#FEF9C3',
+                  border: '1px solid #FDE047',
                   fontSize: '0.72rem',
                   fontWeight: 800,
-                  color: '#FDE047',
+                  color: '#A16207',
                 }}
               >
-                <Star size={12} fill="#FDE047" />
+                <Star size={12} fill="#CA8A04" color="#CA8A04" />
                 <span>{trainerRating} Rating</span>
               </span>
             </div>
 
-            <h2 style={{ fontSize: '1.9rem', fontWeight: 900, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px', letterSpacing: '-0.02em' }}>
               {trainerName}
             </h2>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', fontSize: '0.86rem', color: '#CBD5E1' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#86EFAC', fontWeight: 700 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', fontSize: '0.86rem', color: '#64748B' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#008A38', fontWeight: 800 }}>
                 <Dumbbell size={15} />
                 {trainerSpecialty}
               </span>
 
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Building2 size={15} color="#94A3B8" />
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#475569' }}>
+                <Building2 size={15} color="#64748B" />
                 {branchName}
               </span>
             </div>
@@ -225,14 +224,14 @@ export default function TrainerProfileTab({
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '999px',
-              backgroundColor: 'rgba(0, 210, 86, 0.15)',
-              color: '#4ADE80',
+              backgroundColor: '#ECFDF3',
+              color: '#008A38',
               fontWeight: 800,
               fontSize: '0.8rem',
-              border: '1px solid rgba(0, 210, 86, 0.3)',
+              border: '1px solid #A7F3D0',
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ADE80' }}></span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#00B84A' }}></span>
             Active Duty
           </span>
         </div>

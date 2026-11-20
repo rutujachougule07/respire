@@ -43,20 +43,20 @@ export default function DashboardOverviewTab({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Welcome Banner */}
+      {/* Welcome Card - Clean White & Green Respire Theme */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+          backgroundColor: '#FFFFFF',
           borderRadius: '18px',
           padding: '24px 28px',
-          color: '#FFFFFF',
+          color: '#0F172A',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: '16px',
-          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.1)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.03)',
+          border: '1.5px solid #E2E8F0',
         }}
       >
         <div>
@@ -65,10 +65,10 @@ export default function DashboardOverviewTab({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              backgroundColor: 'rgba(0, 184, 74, 0.15)',
-              border: '1px solid rgba(0, 184, 74, 0.4)',
-              color: '#00D256',
-              padding: '3px 10px',
+              backgroundColor: '#ECFDF3',
+              border: '1px solid #A7F3D0',
+              color: '#008A38',
+              padding: '4px 10px',
               borderRadius: '20px',
               fontSize: '0.72rem',
               fontWeight: 800,
@@ -80,11 +80,11 @@ export default function DashboardOverviewTab({
             <Dumbbell size={13} />
             <span>Respire Fitness Coach Hub</span>
           </div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#FFFFFF', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
             Welcome back, {trainerProfile?.name || 'Coach'}!
           </h2>
-          <p style={{ color: '#94A3B8', fontSize: '0.88rem', margin: 0, maxWidth: '620px', lineHeight: 1.5 }}>
-            You have <strong style={{ color: '#00D256' }}>{todaySessions.length} session(s)</strong> scheduled today and <strong style={{ color: '#FFFFFF' }}>{myMembers.length} active client(s)</strong> assigned to your training roster.
+          <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0, maxWidth: '620px', lineHeight: 1.5 }}>
+            You have <strong style={{ color: '#008A38' }}>{todaySessions.length} session(s)</strong> scheduled today and <strong style={{ color: '#0F172A' }}>{myMembers.length} active client(s)</strong> assigned to your training roster.
           </p>
         </div>
 
@@ -105,10 +105,10 @@ export default function DashboardOverviewTab({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 4px 14px rgba(0, 184, 74, 0.35)',
+              boxShadow: '0 4px 14px rgba(0, 184, 74, 0.25)',
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#00A342')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#008A38')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00B84A')}
           >
             <Plus size={16} />
@@ -119,9 +119,9 @@ export default function DashboardOverviewTab({
             type="button"
             onClick={onOpenNoteModal}
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              color: '#FFFFFF',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: '#F8FAFC',
+              color: '#334155',
+              border: '1.5px solid #CBD5E1',
               borderRadius: '10px',
               padding: '10px 18px',
               fontSize: '0.84rem',
@@ -132,8 +132,14 @@ export default function DashboardOverviewTab({
               gap: '8px',
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#F1F5F9';
+              e.currentTarget.style.color = '#0F172A';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#F8FAFC';
+              e.currentTarget.style.color = '#334155';
+            }}
           >
             <FileText size={16} />
             <span>Log Session Note</span>
