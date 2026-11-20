@@ -60,7 +60,7 @@ function ImageDropzone({
       // Client-side canvas compression: keeps images crisp & fast, prevents oversized payload
       const img = new Image();
       img.onload = () => {
-        const MAX_DIM = 1200;
+        const MAX_DIM = 960;
         let w = img.width;
         let h = img.height;
         if (w > MAX_DIM || h > MAX_DIM) {
@@ -77,7 +77,7 @@ function ImageDropzone({
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.76);
+        const compressed = canvas.toDataURL('image/jpeg', 0.68);
         setIsProcessing(false);
         onChange(compressed);
       };
@@ -404,14 +404,20 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   const [newPTCategory, setNewPTCategory] = useState({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
   const [editingPTIdx, setEditingPTIdx] = useState(null);
 
-  // Load PT rates from Firestore on mount
+  // Load PT rates directly from plans/vishrambag and plans/vijaynagar
   useEffect(() => {
     const loadPTRates = async () => {
       try {
-        const snap = await getDoc(doc(db, 'settings', 'ptFeeStructure'));
-        if (snap.exists()) {
-          setPtRates(snap.data());
+        const vbSnap = await getDoc(doc(db, 'plans', 'vishrambag'));
+        const vjnSnap = await getDoc(doc(db, 'plans', 'vijaynagar'));
+        const newRates = JSON.parse(JSON.stringify(DEFAULT_PT_RATES));
+        if (vbSnap.exists() && Array.isArray(vbSnap.data()?.specialPlans)) {
+          newRates.vishrambag = { categories: vbSnap.data().specialPlans };
         }
+        if (vjnSnap.exists() && Array.isArray(vjnSnap.data()?.specialPlans)) {
+          newRates.branch2 = { categories: vjnSnap.data().specialPlans };
+        }
+        setPtRates(newRates);
       } catch (e) {
         console.error('Could not load PT rates from Firestore', e);
       } finally {
@@ -424,9 +430,14 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   const savePTRatesToFirestore = async (updatedRates) => {
     setIsSavingPT(true);
     try {
-      await setDoc(doc(db, 'settings', 'ptFeeStructure'), updatedRates);
+      if (updatedRates.vishrambag?.categories) {
+        await setDoc(doc(db, 'plans', 'vishrambag'), { specialPlans: updatedRates.vishrambag.categories }, { merge: true });
+      }
+      if (updatedRates.branch2?.categories) {
+        await setDoc(doc(db, 'plans', 'vijaynagar'), { specialPlans: updatedRates.branch2.categories }, { merge: true });
+      }
       setPtRates(updatedRates);
-      notify('✓ PT Fee Structure saved successfully!');
+      notify('✓ PT Fee Structure saved directly to plans collection!');
     } catch (e) {
       console.error(e);
       notify('Error saving PT rates. Please retry.');
@@ -470,6 +481,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     }
   }, [activeSubTab]);
 
+  // Initialize form data when sub-tab changes
   useEffect(() => {
     if (content) {
       const sectionKey = getSectionKey(currentSubTab);
@@ -477,9 +489,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         setFormData(JSON.parse(JSON.stringify(content[sectionKey])));
       }
     }
-  }, [currentSubTab, content]);
-
-
+  }, [currentSubTab]);
 
   const handleSubTabClick = (tabId) => {
     setCurrentSubTab(tabId);
@@ -501,10 +511,18 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   const handleSaveSection = async (e) => {
     if (e) e.preventDefault();
     setIsSaving(true);
+    if (currentSubTab === 'pt_fees') {
+      try {
+        await savePTRatesToFirestore(ptRates);
+      } finally {
+        setIsSaving(false);
+      }
+      return;
+    }
     const sectionKey = getSectionKey(currentSubTab);
     try {
       await updateSection(sectionKey, formData);
-      notify('✓ Section updated and published live!');
+      notify(`✓ Published live to website!`);
     } catch (err) {
       console.error(err);
       notify('Error saving changes. Please retry.');
@@ -609,32 +627,85 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           </p>
         </div>
 
-        {/* Live Auto-Save Status Badge */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '7px 14px',
-            borderRadius: '999px',
-            backgroundColor: 'rgba(0, 210, 86, 0.12)',
-            border: '1px solid rgba(0, 210, 86, 0.3)',
-            color: '#00D256',
-            fontSize: '0.78rem',
-            fontWeight: 800,
-            letterSpacing: '0.02em',
-          }}
-        >
-          <span
+        {/* Actions: View Live Site + Save & Publish Live + Live Status */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => window.open('/', '_blank')}
             style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#00D256',
-              boxShadow: '0 0 8px #00D256',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 16px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              color: '#FFFFFF',
+              fontSize: '0.84rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
             }}
-          />
-          <span>Auto-Saved Live to Cloud</span>
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.18)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
+          >
+            <Eye size={15} />
+            <span>View Live Site</span>
+            <ExternalLink size={13} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSaveSection}
+            disabled={isSaving}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 20px',
+              borderRadius: '10px',
+              backgroundColor: '#008A38',
+              border: 'none',
+              color: '#FFFFFF',
+              fontSize: '0.85rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(0, 138, 56, 0.4)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#00A342')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#008A38')}
+          >
+            <Save size={15} />
+            <span>{isSaving ? 'Publishing...' : 'Save & Publish Live'}</span>
+          </button>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 14px',
+              borderRadius: '999px',
+              backgroundColor: 'rgba(0, 210, 86, 0.12)',
+              border: '1px solid rgba(0, 210, 86, 0.3)',
+              color: '#00D256',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              letterSpacing: '0.02em',
+            }}
+          >
+            <span
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#00D256',
+                boxShadow: '0 0 8px #00D256',
+              }}
+            />
+            <span>Live Synced to Website</span>
+          </div>
         </div>
       </div>
 
@@ -689,105 +760,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           boxShadow: '0 8px 30px rgba(15, 23, 42, 0.05)',
         }}
       >
-        {/* Universal Section Visibility & Live Control Banner */}
-        {currentSubTab !== 'pt_fees' && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '16px 20px',
-              borderRadius: '14px',
-              backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#ECFDF3' : '#FEF2F2',
-              border: isSectionVisible(getSectionKey(currentSubTab)) ? '1.5px solid #00B84A' : '1.5px solid #EF4444',
-              marginBottom: '26px',
-              flexWrap: 'wrap',
-              gap: '14px',
-              boxShadow: isSectionVisible(getSectionKey(currentSubTab))
-                ? '0 4px 14px rgba(0, 184, 74, 0.08)'
-                : '0 4px 14px rgba(239, 68, 68, 0.08)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div
-                style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#00B84A' : '#EF4444',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  flexShrink: 0,
-                  boxShadow: isSectionVisible(getSectionKey(currentSubTab))
-                    ? '0 4px 12px rgba(0, 184, 74, 0.25)'
-                    : '0 4px 12px rgba(239, 68, 68, 0.25)',
-                }}
-              >
-                {isSectionVisible(getSectionKey(currentSubTab)) ? <Eye size={22} /> : <EyeOff size={22} />}
-              </div>
-              <div>
-                <div
-                  style={{
-                    fontWeight: 900,
-                    fontSize: '0.98rem',
-                    color: isSectionVisible(getSectionKey(currentSubTab)) ? '#008A38' : '#DC2626',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <span>
-                    {isSectionVisible(getSectionKey(currentSubTab))
-                      ? '● SECTION IS LIVE ON WEBSITE'
-                      : '○ SECTION IS HIDDEN / REMOVED'}
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px' }}>
-                  {isSectionVisible(getSectionKey(currentSubTab))
-                    ? 'This section is currently visible to all visitors on the landing page.'
-                    : 'This section is removed and completely hidden from the public website.'}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleToggleCurrentSection}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 20px',
-                borderRadius: '10px',
-                fontWeight: 800,
-                fontSize: '0.86rem',
-                cursor: 'pointer',
-                border: 'none',
-                backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#FEE2E2' : '#00B84A',
-                color: isSectionVisible(getSectionKey(currentSubTab)) ? '#991B1B' : '#FFFFFF',
-                boxShadow: isSectionVisible(getSectionKey(currentSubTab))
-                  ? '0 2px 8px rgba(239, 68, 68, 0.15)'
-                  : '0 4px 14px rgba(0, 184, 74, 0.25)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {isSectionVisible(getSectionKey(currentSubTab)) ? (
-                <>
-                  <Trash2 size={16} />
-                  <span>Remove / Hide Section from Website</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={16} />
-                  <span>Restore & Show Section Live</span>
-                </>
-              )}
-            </button>
-          </div>
-        )}
-
         {/* ============================================================ */}
         {/* TAB: HOME / HERO                                             */}
         {/* ============================================================ */}
