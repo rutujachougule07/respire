@@ -945,24 +945,36 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 </div>
               </div>
 
-              {/* EXACT IMAGE 1 STYLE: SIDE-BY-SIDE 1fr 1fr WITH CLEAN WHITE/GREY BORDER */}
+              {/* SIDE-BY-SIDE 1fr 1fr: EXACT SAME EQUAL WIDTH & HEIGHT (minWidth: 0) */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'start' }}>
                 {/* 1. Add-on Services (Left) */}
-                <div ref={addonDropdownRef} style={{ position: 'relative' }}>
-                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                <div ref={addonDropdownRef} style={{ position: 'relative', minWidth: 0 }}>
+                  <label
+                    style={{
+                      display: 'block',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      color: '#475569',
+                      marginBottom: '6px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
                     ADD-ON SERVICES
                   </label>
 
-                  {/* Dropdown Header Trigger - Same as Image 1 select */}
+                  {/* Dropdown Header Trigger */}
                   <button
                     type="button"
                     onClick={() => setIsAddonDropdownOpen(!isAddonDropdownOpen)}
                     style={{
                       width: '100%',
-                      padding: '10px 12px',
+                      height: '42px',
+                      padding: '0 12px',
                       borderRadius: '9px',
                       border: '1.5px solid #CBD5E1',
-                      fontSize: '0.88rem',
+                      fontSize: '0.86rem',
                       backgroundColor: '#FFFFFF',
                       color: '#0F172A',
                       display: 'flex',
@@ -974,9 +986,9 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                     }}
                   >
                     <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      -- Select Add-on Service to Enroll / Remove --
+                      -- Select Add-on Service --
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: '#64748B', marginLeft: '6px' }}>
+                    <span style={{ fontSize: '0.68rem', color: '#64748B', marginLeft: '6px', flexShrink: 0 }}>
                       {isAddonDropdownOpen ? '▲' : '▼'}
                     </span>
                   </button>
@@ -1206,31 +1218,36 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   )}
                 </div>
 
-                {/* 2. Special Training / Personal Training (PT) Selection (Right) - Same as Image 1 */}
-                <div>
+                {/* 2. Special Training / Personal Training (PT) Selection (Right) */}
+                <div style={{ minWidth: 0 }}>
                   <label
                     style={{
                       display: 'block',
                       fontSize: '0.74rem',
                       fontWeight: 800,
                       color: '#475569',
-                      marginBottom: '5px',
+                      marginBottom: '6px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
-                    SPECIAL TRAINING / PERSONAL TRAINING (PT)
+                    SPECIAL TRAINING (PT)
                   </label>
                   <select
                     value={form.specialTraining || 'none'}
                     onChange={(e) => handleSpecialTrainingChange(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '10px 12px',
+                      height: '42px',
+                      padding: '0 12px',
                       borderRadius: '9px',
                       border: '1.5px solid #CBD5E1',
-                      fontSize: '0.88rem',
+                      fontSize: '0.86rem',
                       backgroundColor: '#FFFFFF',
                       fontWeight: 500,
                       color: '#0F172A',
+                      boxSizing: 'border-box',
                     }}
                   >
                     {currentBranchPT.map((pt) => (
@@ -1241,7 +1258,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   </select>
                   {form.specialTraining && form.specialTraining !== 'none' && (
                     <p style={{ margin: '6px 0 0', fontSize: '0.74rem', color: '#008A38', fontWeight: 600 }}>
-                      ✓ Special PT: {form.specialTrainingLabel}
+                      ✓ {form.specialTrainingLabel}
                     </p>
                   )}
                 </div>
