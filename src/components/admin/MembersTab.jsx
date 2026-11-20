@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Trash2,
 } from 'lucide-react';
-import { saveMemberToFirestore, updateMemberStatusInFirestore, deleteMemberFromFirestore } from '../../services/firestoreService';
+import { saveMemberToFirestore, updateMemberStatusInFirestore, deleteMemberFromFirestore, deduplicateById } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');
@@ -77,13 +77,6 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     });
   };
 
-  const availableBranchPlans = getBranchPlans(form?.branchId || defaultBranch);
-  const availableBranchTrainers = getBranchTrainers(form?.branchId || defaultBranch);
-  const currentBranchPT =
-    (form?.branchId === 'branch2' || form?.branchId === 'vijaynagar')
-      ? SPECIAL_TRAINING_OPTIONS.branch2
-      : SPECIAL_TRAINING_OPTIONS.vishrambag;
-
   const emptyForm = {
     branchId: defaultBranch,
     name: '',
@@ -105,6 +98,13 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
   };
 
   const [form, setForm] = useState(emptyForm);
+
+  const availableBranchPlans = getBranchPlans(form?.branchId || defaultBranch);
+  const availableBranchTrainers = getBranchTrainers(form?.branchId || defaultBranch);
+  const currentBranchPT =
+    (form?.branchId === 'branch2' || form?.branchId === 'vijaynagar')
+      ? SPECIAL_TRAINING_OPTIONS.branch2
+      : SPECIAL_TRAINING_OPTIONS.vishrambag;
 
   const openAddModal = () => {
     setEditingMember(null);
@@ -455,13 +455,13 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   </td>
                 </tr>
               ) : (
-                filteredMembers.map((m) => {
+                deduplicateById(filteredMembers).map((m, idx) => {
                   const days = getDaysRemaining(m.expiryDate);
                   const isExpiring = m.status === 'Active' && days <= 15 && days >= 0;
                   const isExpired = m.status === 'Active' && days < 0;
 
                   return (
-                    <tr key={m.id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.15s' }}>
+                    <tr key={`${m.id || 'mem'}-${idx}`} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.15s' }}>
                       <td style={{ padding: '15px 18px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <div
@@ -481,16 +481,16 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                           >
                             {m.name.charAt(0)}
                           </div>
-                          <div>
-                            <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>{m.name}</div>
-                            <div style={{ fontSize: '0.76rem', color: '#64748B' }}>
-                              {m.id} • {m.phone}
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A', whiteSpace: 'nowrap' }}>{m.name}</div>
+                            <div style={{ fontSize: '0.74rem', color: '#64748B', whiteSpace: 'nowrap' }}>
+                              <span style={{ fontWeight: 600, color: '#008A38' }}>{m.id}</span> • {m.phone}
                             </div>
                           </div>
                         </div>
                       </td>
 
-                      <td style={{ padding: '15px 18px' }}>
+                      <td style={{ padding: '15px 18px', whiteSpace: 'nowrap' }}>
                         <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#0F172A' }}>{m.planName}</div>
                         <div style={{ fontSize: '0.74rem', color: '#008A38', fontWeight: 600 }}>{m.program} Level</div>
                         {m.specialTraining && m.specialTraining !== 'none' && (
@@ -513,11 +513,11 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                         )}
                       </td>
 
-                      <td style={{ padding: '15px 18px', fontSize: '0.86rem', color: '#334155', fontWeight: 600 }}>
+                      <td style={{ padding: '15px 18px', fontSize: '0.86rem', color: '#334155', fontWeight: 600, whiteSpace: 'nowrap' }}>
                         {getTrainerName(m.trainerId)}
                       </td>
 
-                      <td style={{ padding: '15px 18px' }}>
+                      <td style={{ padding: '15px 18px', whiteSpace: 'nowrap' }}>
                         <div style={{ fontSize: '0.86rem', fontWeight: 700, color: isExpired ? '#DC2626' : isExpiring ? '#D97706' : '#0F172A' }}>
                           {m.expiryDate}
                         </div>
@@ -530,7 +530,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                         </div>
                       </td>
 
-                      <td style={{ padding: '15px 18px' }}>
+                      <td style={{ padding: '15px 18px', whiteSpace: 'nowrap' }}>
                         <span
                           style={{
                             display: 'inline-flex',
@@ -547,83 +547,130 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                         </span>
                       </td>
 
-                      <td style={{ padding: '15px 18px', textAlign: 'right' }}>
-                        <div style={{ display: 'inline-flex', gap: '6px' }}>
+                      <td style={{ padding: '15px 18px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end' }}>
+                          {/* 1. View Button (Icon only) */}
                           <button
                             onClick={() => setViewingMember(m)}
                             title="View Full Profile"
+                            aria-label="View Full Profile"
                             style={{
-                              padding: '7px 10px',
+                              width: '32px',
+                              height: '32px',
                               borderRadius: '8px',
                               backgroundColor: '#EEF2FF',
                               color: '#172C83',
+                              border: '1px solid rgba(23, 44, 131, 0.18)',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px',
-                              fontSize: '0.76rem',
-                              fontWeight: 700,
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              padding: 0,
+                              transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#172C83';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#EEF2FF';
+                              e.currentTarget.style.color = '#172C83';
                             }}
                           >
-                            <Eye size={14} />
-                            <span>View</span>
+                            <Eye size={15} />
                           </button>
 
+                          {/* 2. Edit Button (Icon only) */}
                           <button
                             onClick={() => openEditModal(m)}
                             title="Edit Member"
+                            aria-label="Edit Member"
                             style={{
-                              padding: '7px 10px',
+                              width: '32px',
+                              height: '32px',
                               borderRadius: '8px',
                               backgroundColor: '#ECFDF3',
                               color: '#008A38',
+                              border: '1px solid rgba(0, 184, 74, 0.25)',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px',
-                              fontSize: '0.76rem',
-                              fontWeight: 700,
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              padding: 0,
+                              transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#008A38';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#ECFDF3';
+                              e.currentTarget.style.color = '#008A38';
                             }}
                           >
-                            <Edit3 size={14} />
-                            <span>Edit</span>
+                            <Edit3 size={15} />
                           </button>
 
+                          {/* 3. Deactivate / Activate Button (Icon only) */}
                           <button
                             onClick={() => toggleMemberStatus(m)}
                             title={m.status === 'Active' ? 'Deactivate Account' : 'Reactivate Account'}
+                            aria-label={m.status === 'Active' ? 'Deactivate Account' : 'Reactivate Account'}
                             style={{
-                              padding: '7px 10px',
+                              width: '32px',
+                              height: '32px',
                               borderRadius: '8px',
-                              backgroundColor: m.status === 'Active' ? '#FEF2F2' : '#DCFCE7',
-                              color: m.status === 'Active' ? '#DC2626' : '#15803D',
+                              backgroundColor: m.status === 'Active' ? '#FFF1F2' : '#DCFCE7',
+                              color: m.status === 'Active' ? '#E11D48' : '#15803D',
+                              border: m.status === 'Active' ? '1px solid rgba(225, 29, 72, 0.22)' : '1px solid rgba(21, 128, 61, 0.22)',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px',
-                              fontSize: '0.76rem',
-                              fontWeight: 700,
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              padding: 0,
+                              transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = m.status === 'Active' ? '#E11D48' : '#15803D';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = m.status === 'Active' ? '#FFF1F2' : '#DCFCE7';
+                              e.currentTarget.style.color = m.status === 'Active' ? '#E11D48' : '#15803D';
                             }}
                           >
-                            {m.status === 'Active' ? <UserX size={14} /> : <UserCheck size={14} />}
-                            <span>{m.status === 'Active' ? 'Deactivate' : 'Activate'}</span>
+                            {m.status === 'Active' ? <UserX size={15} /> : <UserCheck size={15} />}
                           </button>
 
+                          {/* 4. Delete Button (Icon only) */}
                           <button
                             onClick={() => handleDeleteMember(m)}
-                            title="Delete Member from Firebase"
+                            title="Delete Member"
+                            aria-label="Delete Member"
                             style={{
-                              padding: '7px 10px',
+                              width: '32px',
+                              height: '32px',
                               borderRadius: '8px',
                               backgroundColor: '#FEF2F2',
                               color: '#DC2626',
                               border: '1px solid #FECACA',
                               display: 'inline-flex',
                               alignItems: 'center',
-                              gap: '5px',
-                              fontSize: '0.76rem',
-                              fontWeight: 700,
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              padding: 0,
+                              transition: 'all 0.15s ease',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#DC2626';
+                              e.currentTarget.style.color = '#FFFFFF';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#FEF2F2';
+                              e.currentTarget.style.color = '#DC2626';
                             }}
                           >
-                            <Trash2 size={14} />
-                            <span>Delete</span>
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </td>

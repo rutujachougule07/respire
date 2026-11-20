@@ -439,38 +439,64 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                           </button>
                         </td>
                         <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                          <div style={{ display: 'inline-flex', gap: '8px' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                             <button
                               onClick={() => openEditPlan(plan)}
+                              title="Edit Plan"
+                              aria-label="Edit Plan"
                               style={{
-                                padding: '7px 12px',
+                                width: '32px',
+                                height: '32px',
                                 borderRadius: '8px',
                                 backgroundColor: '#ECFDF3',
                                 color: '#008A38',
-                                fontSize: '0.78rem',
-                                fontWeight: 800,
+                                border: '1px solid rgba(0, 184, 74, 0.25)',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '5px',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0,
+                                transition: 'all 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#008A38';
+                                e.currentTarget.style.color = '#FFFFFF';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#ECFDF3';
+                                e.currentTarget.style.color = '#008A38';
                               }}
                             >
-                              <Edit3 size={14} /> Edit
+                              <Edit3 size={15} />
                             </button>
                             <button
                               onClick={() => handleDeletePlan(plan)}
+                              title="Delete Plan"
+                              aria-label="Delete Plan"
                               style={{
-                                padding: '7px 12px',
+                                width: '32px',
+                                height: '32px',
                                 borderRadius: '8px',
                                 backgroundColor: '#FEF2F2',
                                 color: '#DC2626',
-                                fontSize: '0.78rem',
-                                fontWeight: 800,
+                                border: '1px solid #FECACA',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: '5px',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                padding: 0,
+                                transition: 'all 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = '#DC2626';
+                                e.currentTarget.style.color = '#FFFFFF';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = '#FEF2F2';
+                                e.currentTarget.style.color = '#DC2626';
                               }}
                             >
-                              <Trash2 size={14} /> Delete
+                              <Trash2 size={15} />
                             </button>
                           </div>
                         </td>
