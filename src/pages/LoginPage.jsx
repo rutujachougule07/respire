@@ -8,8 +8,8 @@ import {
   ShieldCheck,
   AlertCircle,
   ArrowRight,
-  ArrowLeft,
   CheckCircle2,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -103,42 +103,7 @@ export default function LoginPage() {
         }}
       />
 
-      {/* Return to Home Link */}
-      <div style={{ width: '100%', maxWidth: '440px', marginBottom: '14px', position: 'relative', zIndex: 2 }}>
-        <Link
-          to="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: '#FFFFFF',
-            backgroundColor: 'rgba(0, 0, 0, 0.65)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            padding: '7px 16px',
-            borderRadius: '999px',
-            fontSize: '0.82rem',
-            fontWeight: 700,
-            textDecoration: 'none',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = '#00D256';
-            e.currentTarget.style.borderColor = 'rgba(0, 210, 86, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-          }}
-        >
-          <ArrowLeft size={16} />
-          <span>Back to Respire Fitness Home</span>
-        </Link>
-      </div>
-
-      {/* Main Luxury White Login Card — Exact Crisp Styling from Yesterday */}
+      {/* Main Luxury White Login Card */}
       <div
         style={{
           width: '100%',
@@ -159,6 +124,42 @@ export default function LoginPage() {
             background: 'linear-gradient(90deg, #007A31 0%, #00D256 50%, #172C83 100%)',
           }}
         />
+
+        {/* Top-Right 'X' Close Button */}
+        <Link
+          to="/"
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            backgroundColor: '#F1F5F9',
+            border: '1px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#64748B',
+            textDecoration: 'none',
+            zIndex: 10,
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#E2E8F0';
+            e.currentTarget.style.color = '#0F172A';
+            e.currentTarget.style.transform = 'scale(1.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#F1F5F9';
+            e.currentTarget.style.color = '#64748B';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+          aria-label="Close"
+          title="Close"
+        >
+          <X size={17} />
+        </Link>
 
         {/* Clean Branded Header */}
         <div
