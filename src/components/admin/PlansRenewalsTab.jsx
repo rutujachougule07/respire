@@ -90,7 +90,7 @@ function addMonths(dateStr, months) {
   return start.toISOString().split('T')[0];
 }
 
-export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast, isSuperAdmin }) {
+export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast, isSuperAdmin = false }) {
   const [renewalFilter, setRenewalFilter] = useState('Expiring');
   const [planBranchFilter, setPlanBranchFilter] = useState('all');
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
@@ -106,21 +106,51 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   const [showAddPlanForm, setShowAddPlanForm] = useState(false);
   const [newPlanData, setNewPlanData] = useState({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
 
-  // Sync PT rates live with Firestore
+  // Sync PT rates live directly from plans/vishrambag and plans/vijaynagar
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'ptFeeStructure'), (snap) => {
+    const unsubVb = onSnapshot(doc(db, 'plans', 'vishrambag'), (snap) => {
       if (snap.exists()) {
-        const data = snap.data();
-        if (data?.vishrambag?.categories && data?.branch2?.categories) {
-          setPtRates(data);
-          setTempPtRates(data);
+        const special = snap.data()?.specialPlans;
+        if (Array.isArray(special)) {
+          setPtRates((prev) => ({
+            ...prev,
+            vishrambag: { categories: special },
+          }));
+          setTempPtRates((prev) => ({
+            ...prev,
+            vishrambag: { categories: special },
+          }));
         }
       }
     });
-    return () => unsub();
+
+    const unsubVjn = onSnapshot(doc(db, 'plans', 'vijaynagar'), (snap) => {
+      if (snap.exists()) {
+        const special = snap.data()?.specialPlans;
+        if (Array.isArray(special)) {
+          setPtRates((prev) => ({
+            ...prev,
+            branch2: { categories: special },
+          }));
+          setTempPtRates((prev) => ({
+            ...prev,
+            branch2: { categories: special },
+          }));
+        }
+      }
+    });
+
+    return () => {
+      unsubVb();
+      unsubVjn();
+    };
   }, []);
 
   const openPTRatesModal = () => {
+    if (!isSuperAdmin) {
+      showToast?.('Access denied: Only Super Admin can modify PT fee structure.');
+      return;
+    }
     setTempPtRates(JSON.parse(JSON.stringify(ptRates)));
     setShowAddPlanForm(false);
     setNewPlanData({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
@@ -167,6 +197,10 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   };
 
   const savePTRatesCloud = async () => {
+    if (!isSuperAdmin) {
+      showToast?.('Access denied: Only Super Admin can modify PT fee structure.');
+      return;
+    }
     setIsSavingPTRates(true);
     try {
       const prepared = JSON.parse(JSON.stringify(tempPtRates));
@@ -188,10 +222,30 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
         }
       });
 
-      await setDoc(doc(db, 'settings', 'ptFeeStructure'), prepared);
+      // Save directly to plans/vishrambag and plans/vijaynagar
+      if (prepared.vishrambag?.categories) {
+        await setDoc(
+          doc(db, 'plans', 'vishrambag'),
+          {
+            specialPlans: prepared.vishrambag.categories,
+          },
+          { merge: true }
+        );
+      }
+
+      if (prepared.branch2?.categories) {
+        await setDoc(
+          doc(db, 'plans', 'vijaynagar'),
+          {
+            specialPlans: prepared.branch2.categories,
+          },
+          { merge: true }
+        );
+      }
+
       setPtRates(prepared);
       setIsPTRatesModalOpen(false);
-      showToast?.('✓ Official PT Fee Structure saved & published live!');
+      showToast?.('✓ Official PT Fee Structure saved & published live in plans collection!');
     } catch (e) {
       console.error(e);
       showToast?.('Error saving PT Fee Structure. Please retry.');
@@ -214,6 +268,10 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   });
 
   const openAddPlan = () => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can add fee plans.');
+      return;
+    }
     setEditingPlan(null);
     setPlanForm({
       branchId: planBranchFilter !== 'all' ? planBranchFilter : 'vishrambag',
@@ -231,6 +289,10 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   };
 
   const openEditPlan = (plan) => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can edit fee plans.');
+      return;
+    }
     setEditingPlan(plan);
     setPlanForm({
       branchId: plan.branchId || 'vishrambag',
@@ -253,6 +315,10 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
 
   const handleSavePlan = async (e) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can modify fee plans.');
+      return;
+    }
     if (isSavingPlan) return; // Prevent double submission
     setIsSavingPlan(true);
 
@@ -314,7 +380,12 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   };
 
   const handleDeletePlan = async (plan) => {
-    await deletePlanFromFirestore(plan.id).catch((err) =>
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can delete fee plans.');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to delete "${plan.durationLabel || plan.name}" plan?`)) return;
+    await deletePlanFromFirestore(plan.id, plan.branchId).catch((err) =>
       console.warn('Firestore plan delete notice:', err.message)
     );
     setPlans((prev) => prev.filter((p) => p.id !== plan.id));
@@ -322,6 +393,10 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
   };
 
   const togglePlanStatus = async (plan) => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can change fee plan status.');
+      return;
+    }
     const next = plan.status === 'Active' ? 'Paused' : 'Active';
     const updated = { ...plan, status: next };
     await savePlanToFirestore(updated).catch((err) =>
@@ -396,13 +471,17 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               Membership Fee Structure & Renewals
             </h2>
             <p style={{ fontSize: '0.88rem', color: '#64748B' }}>
-              Add, Edit, or Delete official membership plans (changes sync live to the website).
+              {isSuperAdmin
+                ? 'Add, Edit, or Delete official membership plans (changes sync live to the website).'
+                : 'Official membership fee structure (managed centrally by Super Admin).'}
             </p>
           </div>
-          <button onClick={openAddPlan} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
-            <Plus size={16} />
-            <span>Add New Plan</span>
-          </button>
+          {isSuperAdmin && (
+            <button onClick={openAddPlan} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
+              <Plus size={16} />
+              <span>Add New Plan</span>
+            </button>
+          )}
         </div>
 
         {/* Clean Fee Structure Table (Exact Standee Mirror + Edit/Delete Actions) */}
@@ -431,25 +510,31 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
             <div>
               <div style={{ fontSize: '1.08rem', fontWeight: 900 }}>RESPIRE FITNESS — Membership Fee Structure</div>
               <div style={{ fontSize: '0.76rem', color: '#D1FAE5', fontWeight: 600 }}>
-                Live pricing table synced with your website • Edit, Delete, or Add tiers anytime
+                {isSuperAdmin
+                  ? 'Live pricing table synced with your website • Edit, Delete, or Add tiers anytime'
+                  : 'Live pricing table synced with website • View-only mode for Branch Managers'}
               </div>
             </div>
-            <button
-              onClick={openAddPlan}
-              style={{
-                padding: '7px 14px',
-                borderRadius: '8px',
-                backgroundColor: '#FFFFFF',
-                color: '#007A31',
-                fontSize: '0.78rem',
-                fontWeight: 800,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <Plus size={14} /> Add Fee Tier
-            </button>
+            {isSuperAdmin && (
+              <button
+                onClick={openAddPlan}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#007A31',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  border: 'none',
+                }}
+              >
+                <Plus size={14} /> Add Fee Tier
+              </button>
+            )}
           </div>
 
           {/* Branch Filter Tabs for Plans */}
@@ -523,14 +608,16 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Plan Title</th>
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Charges (₹)</th>
                   <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase' }}>Status</th>
-                  <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                  {isSuperAdmin && (
+                    <th style={{ padding: '13px 20px', fontSize: '0.75rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', textAlign: 'right' }}>Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {plans.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: '28px', textAlign: 'center', color: '#64748B' }}>
-                      No plans added yet. Click "Add New Plan" to create one.
+                    <td colSpan={isSuperAdmin ? 6 : 5} style={{ padding: '28px', textAlign: 'center', color: '#64748B' }}>
+                      {isSuperAdmin ? 'No plans added yet. Click "Add New Plan" to create one.' : 'No plans registered yet.'}
                     </td>
                   </tr>
                 ) : (
@@ -586,83 +673,103 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                           ₹{Number(plan.price).toLocaleString('en-IN')}/-
                         </td>
                         <td style={{ padding: '14px 20px' }}>
-                          <button
-                            onClick={() => togglePlanStatus(plan)}
-                            title="Click to toggle Active/Paused"
-                            style={{
-                              padding: '4px 11px',
-                              borderRadius: '999px',
-                              fontSize: '0.74rem',
-                              fontWeight: 800,
-                              backgroundColor: plan.status === 'Active' ? '#DCFCE7' : '#F1F5F9',
-                              color: plan.status === 'Active' ? '#15803D' : '#64748B',
-                            }}
-                          >
-                            {plan.status}
-                          </button>
-                        </td>
-                        <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                          {isSuperAdmin ? (
                             <button
-                              onClick={() => openEditPlan(plan)}
-                              title="Edit Plan"
-                              aria-label="Edit Plan"
+                              onClick={() => togglePlanStatus(plan)}
+                              title="Click to toggle Active/Paused"
                               style={{
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: '8px',
-                                backgroundColor: '#ECFDF3',
-                                color: '#008A38',
-                                border: '1px solid rgba(0, 184, 74, 0.25)',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
+                                padding: '4px 11px',
+                                borderRadius: '999px',
+                                fontSize: '0.74rem',
+                                fontWeight: 800,
+                                backgroundColor: plan.status === 'Active' ? '#DCFCE7' : '#F1F5F9',
+                                color: plan.status === 'Active' ? '#15803D' : '#64748B',
+                                border: 'none',
                                 cursor: 'pointer',
-                                padding: 0,
-                                transition: 'all 0.15s ease',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#008A38';
-                                e.currentTarget.style.color = '#FFFFFF';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#ECFDF3';
-                                e.currentTarget.style.color = '#008A38';
                               }}
                             >
-                              <Edit3 size={15} />
+                              {plan.status}
                             </button>
-                            <button
-                              onClick={() => handleDeletePlan(plan)}
-                              title="Delete Plan"
-                              aria-label="Delete Plan"
+                          ) : (
+                            <span
                               style={{
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: '8px',
-                                backgroundColor: '#FEF2F2',
-                                color: '#DC2626',
-                                border: '1px solid #FECACA',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                padding: 0,
-                                transition: 'all 0.15s ease',
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#DC2626';
-                                e.currentTarget.style.color = '#FFFFFF';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#FEF2F2';
-                                e.currentTarget.style.color = '#DC2626';
+                                padding: '4px 11px',
+                                borderRadius: '999px',
+                                fontSize: '0.74rem',
+                                fontWeight: 800,
+                                backgroundColor: plan.status === 'Active' ? '#DCFCE7' : '#F1F5F9',
+                                color: plan.status === 'Active' ? '#15803D' : '#64748B',
+                                display: 'inline-block',
                               }}
                             >
-                              <Trash2 size={15} />
-                            </button>
-                          </div>
+                              {plan.status}
+                            </span>
+                          )}
                         </td>
+                        {isSuperAdmin && (
+                          <td style={{ padding: '14px 20px', textAlign: 'right' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <button
+                                onClick={() => openEditPlan(plan)}
+                                title="Edit Plan"
+                                aria-label="Edit Plan"
+                                style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '8px',
+                                  backgroundColor: '#ECFDF3',
+                                  color: '#008A38',
+                                  border: '1px solid rgba(0, 184, 74, 0.25)',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#008A38';
+                                  e.currentTarget.style.color = '#FFFFFF';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#ECFDF3';
+                                  e.currentTarget.style.color = '#008A38';
+                                }}
+                              >
+                                <Edit3 size={15} />
+                              </button>
+                              <button
+                                onClick={() => handleDeletePlan(plan)}
+                                title="Delete Plan"
+                                aria-label="Delete Plan"
+                                style={{
+                                  width: '32px',
+                                  height: '32px',
+                                  borderRadius: '8px',
+                                  backgroundColor: '#FEF2F2',
+                                  color: '#DC2626',
+                                  border: '1px solid #FECACA',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'all 0.15s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#DC2626';
+                                  e.currentTarget.style.color = '#FFFFFF';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = '#FEF2F2';
+                                  e.currentTarget.style.color = '#DC2626';
+                                }}
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     );
                   })
@@ -1037,7 +1144,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
       </div>
 
       {/* Add / Edit Plan Modal */}
-      {isPlanModalOpen && (
+      {isPlanModalOpen && isSuperAdmin && (
         <div
           onClick={() => setIsPlanModalOpen(false)}
           style={{
@@ -1222,7 +1329,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
       )}
 
       {/* PT FEE STRUCTURE EDIT / ADD MODAL */}
-      {isPTRatesModalOpen && (
+      {isPTRatesModalOpen && isSuperAdmin && (
         <div
           onClick={() => setIsPTRatesModalOpen(false)}
           style={{
