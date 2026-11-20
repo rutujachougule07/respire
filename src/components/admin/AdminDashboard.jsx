@@ -14,16 +14,6 @@ import {
   ArrowLeft,
   Building2,
   MessageSquare,
-  Globe,
-  Settings,
-  ChevronDown,
-  Home,
-  Info,
-  Sparkles,
-  Layers,
-  Activity,
-  MapPin,
-  FileText,
 } from 'lucide-react';
 import {
   BRANCHES,
@@ -202,6 +192,23 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       badge: newInquiriesCount > 0 ? `${newInquiriesCount} New` : null,
     },
     { id: 'analytics', label: 'Revenue & Analytics', icon: BarChart3, badge: null },
+    {
+      id: 'settings',
+      label: 'Website Settings',
+      icon: Settings,
+      badge: 'CMS',
+      hasSubItems: true,
+      subItems: [
+        { id: 'home', label: 'Home / Hero', icon: Home },
+        { id: 'about', label: 'About Us', icon: Info },
+        { id: 'services', label: 'Services', icon: Sparkles },
+        { id: 'why_us', label: 'Why Choose Us', icon: Layers },
+        { id: 'programs', label: 'Programs', icon: Activity },
+        { id: 'tracking', label: 'Fitness Tracking', icon: Activity },
+        { id: 'contact', label: 'Contact & Branches', icon: MapPin },
+        { id: 'footer', label: 'Footer & Info', icon: FileText },
+      ],
+    },
   ];
 
   const handleInspectBranch = (branchId) => {
@@ -350,93 +357,186 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             const isNewBadge = item.id === 'inquiries' && String(item.badge || '').includes('New');
 
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setMobileSidebarOpen(false);
-                }}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 12px',
-                  borderRadius: '10px',
-                  background: active
-                    ? 'linear-gradient(135deg, #00D256 0%, #008A38 100%)'
-                    : 'transparent',
-                  color: active ? '#FFFFFF' : '#475569',
-                  fontWeight: active ? 800 : 600,
-                  fontSize: '0.86rem',
-                  textAlign: 'left',
-                  border: 'none',
-                  boxShadow: active ? '0 4px 14px rgba(0, 184, 74, 0.28)' : 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.18s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.backgroundColor = '#F8FAFC';
-                    e.currentTarget.style.color = '#0F172A';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#475569';
-                  }
-                }}
-              >
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                  <Icon
-                    size={17}
-                    color={active ? '#FFFFFF' : '#64748B'}
-                    style={{ flexShrink: 0 }}
-                  />
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {item.label}
+              <React.Fragment key={item.id}>
+                <button
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    if (item.hasSubItems) {
+                      setSettingsMenuOpen((prev) => (activeTab === item.id ? !prev : true));
+                    } else {
+                      setMobileSidebarOpen(false);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    borderRadius: '10px',
+                    background: active
+                      ? 'linear-gradient(135deg, #00D256 0%, #008A38 100%)'
+                      : 'transparent',
+                    color: active ? '#FFFFFF' : '#475569',
+                    fontWeight: active ? 800 : 600,
+                    fontSize: '0.86rem',
+                    textAlign: 'left',
+                    border: 'none',
+                    boxShadow: active ? '0 4px 14px rgba(0, 184, 74, 0.28)' : 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.18s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      e.currentTarget.style.color = '#0F172A';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#475569';
+                    }
+                  }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                    <Icon
+                      size={17}
+                      color={active ? '#FFFFFF' : '#64748B'}
+                      style={{ flexShrink: 0 }}
+                    />
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {item.label}
+                    </span>
                   </span>
-                </span>
 
-                {item.badge !== null && (
-                  <span
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    {item.badge !== null && (
+                      <span
+                        style={{
+                          padding: '2px 8px',
+                          borderRadius: '999px',
+                          fontSize: '0.68rem',
+                          fontWeight: 700,
+                          flexShrink: 0,
+                          letterSpacing: '0.02em',
+                          ...(isDueBadge
+                            ? {
+                                backgroundColor: '#FEF3C7',
+                                border: '1px solid #FDE68A',
+                                color: '#B45309',
+                              }
+                            : isNewBadge
+                            ? {
+                                backgroundColor: '#EFF6FF',
+                                border: '1px solid #BFDBFE',
+                                color: '#1D4ED8',
+                              }
+                            : active
+                            ? {
+                                backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                                border: '1px solid rgba(255, 255, 255, 0.4)',
+                                color: '#FFFFFF',
+                              }
+                            : {
+                                backgroundColor: '#F1F5F9',
+                                border: '1px solid #E2E8F0',
+                                color: '#64748B',
+                              }),
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+
+                    {item.hasSubItems && (
+                      <ChevronDown
+                        size={15}
+                        style={{
+                          transform: settingsMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.2s ease',
+                          color: active ? '#FFFFFF' : '#94A3B8',
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                  </span>
+                </button>
+
+                {/* Sub-items for Website Settings */}
+                {item.hasSubItems && settingsMenuOpen && (
+                  <div
                     style={{
-                      padding: '2px 8px',
-                      borderRadius: '999px',
-                      fontSize: '0.68rem',
-                      fontWeight: 700,
-                      flexShrink: 0,
-                      letterSpacing: '0.02em',
-                      ...(isDueBadge
-                        ? {
-                            backgroundColor: '#FEF3C7',
-                            border: '1px solid #FDE68A',
-                            color: '#B45309',
-                          }
-                        : isNewBadge
-                        ? {
-                            backgroundColor: '#EFF6FF',
-                            border: '1px solid #BFDBFE',
-                            color: '#1D4ED8',
-                          }
-                        : active
-                        ? {
-                            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                            border: '1px solid rgba(255, 255, 255, 0.4)',
-                            color: '#FFFFFF',
-                          }
-                        : {
-                            backgroundColor: '#F1F5F9',
-                            border: '1px solid #E2E8F0',
-                            color: '#64748B',
-                          }),
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '3px',
+                      paddingLeft: '14px',
+                      margin: '4px 0 6px 14px',
+                      borderLeft: '2px solid rgba(0, 184, 74, 0.35)',
                     }}
                   >
-                    {item.badge}
-                  </span>
+                    {item.subItems.map((sub) => {
+                      const SubIcon = sub.icon;
+                      const subActive = activeTab === 'settings' && settingsSubTab === sub.id;
+                      return (
+                        <button
+                          key={sub.id}
+                          onClick={() => {
+                            setActiveTab('settings');
+                            setSettingsSubTab(sub.id);
+                            setMobileSidebarOpen(false);
+                          }}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '7px 10px',
+                            borderRadius: '8px',
+                            background: subActive ? '#ECFDF3' : 'transparent',
+                            color: subActive ? '#008A38' : '#64748B',
+                            fontWeight: subActive ? 800 : 600,
+                            fontSize: '0.8rem',
+                            textAlign: 'left',
+                            border: subActive
+                              ? '1px solid rgba(0, 184, 74, 0.3)'
+                              : '1px solid transparent',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!subActive) {
+                              e.currentTarget.style.backgroundColor = '#F8FAFC';
+                              e.currentTarget.style.color = '#0F172A';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!subActive) {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                              e.currentTarget.style.color = '#64748B';
+                            }
+                          }}
+                        >
+                          <SubIcon
+                            size={14}
+                            color={subActive ? '#008A38' : '#94A3B8'}
+                            style={{ flexShrink: 0 }}
+                          />
+                          <span
+                            style={{
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {sub.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 )}
-              </button>
+              </React.Fragment>
             );
           })}
         </nav>
@@ -633,26 +733,6 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
                 })}
               </div>
             )}
-
-            <button
-              onClick={handleLogout}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 14px',
-                borderRadius: '10px',
-                backgroundColor: '#FEE2E2',
-                color: '#DC2626',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <LogOut size={14} />
-              <span>Logout</span>
-            </button>
           </div>
         </header>
 
@@ -724,6 +804,14 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
               addonRevenue={scopedAddons}
               setAddonRevenue={setAddonRevenue}
               activeBranchId={effectiveBranchId}
+              showToast={showToast}
+            />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsTab
+              activeSubTab={settingsSubTab}
+              onSubTabChange={setSettingsSubTab}
               showToast={showToast}
             />
           )}
