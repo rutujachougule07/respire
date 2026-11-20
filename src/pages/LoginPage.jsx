@@ -483,6 +483,26 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {/* Link to Trainer Portal */}
+            <div
+              style={{
+                marginTop: '18px',
+                paddingTop: '14px',
+                borderTop: '1px solid #F1F5F9',
+                textAlign: 'center',
+                fontSize: '0.82rem',
+                color: '#64748B',
+              }}
+            >
+              Are you a Respire Coach?{' '}
+              <Link
+                to="/trainer-login"
+                style={{ color: '#008A38', fontWeight: 800, textDecoration: 'none' }}
+              >
+                Trainer Portal Login &rarr;
+              </Link>
+            </div>
           </form>
         </div>
       </div>

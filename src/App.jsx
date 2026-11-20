@@ -14,6 +14,9 @@ import MembershipPage from './pages/MembershipPage';
 import ProgramsPage from './pages/ProgramsPage';
 import ContactPage from './pages/ContactPage';
 import LoginPage from './pages/LoginPage';
+import TrainerLoginPage from './pages/TrainerLoginPage';
+import TrainerDashboardPage from './pages/TrainerDashboardPage';
+import TrainerProtectedRoute from './components/TrainerProtectedRoute';
 import NotFoundPage from './pages/NotFoundPage';
 import { INITIAL_PLANS } from './components/admin/initialData';
 import { subscribeToCollection, deduplicateById } from './services/firestoreService';
@@ -106,6 +109,25 @@ export default function App() {
         {/* Authentication Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route path="/trainer-login" element={<TrainerLoginPage />} />
+
+        {/* Protected Trainer Portal */}
+        <Route
+          path="/trainer-dashboard"
+          element={
+            <TrainerProtectedRoute>
+              <TrainerDashboardPage />
+            </TrainerProtectedRoute>
+          }
+        />
+        <Route
+          path="/trainer-dashboard/*"
+          element={
+            <TrainerProtectedRoute>
+              <TrainerDashboardPage />
+            </TrainerProtectedRoute>
+          }
+        />
 
         {/* Protected Admin Portal */}
         <Route

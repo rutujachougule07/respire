@@ -80,6 +80,59 @@ export async function deleteAddonFromFirestore(addonId) {
   await deleteDoc(addonRef);
 }
 
+export const DEFAULT_SPECIAL_PLANS = {
+  vishrambag: [
+    {
+      id: 'pt-vb-general',
+      title: 'GENERAL PERSONAL TRAINING',
+      badge: 'Certified Coach',
+      alternatePrice: 7000,
+      dailyPrice: 10000,
+      pricing: [
+        { planName: 'Alternate Days', price: 7000, priceDisplay: '₹7,000/-', duration: '1 Month' },
+        { planName: 'Daily Personal Training', price: 10000, priceDisplay: '₹10,000/-', duration: '1 Month' },
+      ],
+    },
+    {
+      id: 'pt-vb-premium',
+      title: 'PREMIUM PERSONAL TRAINING',
+      badge: 'Elite Specialist',
+      alternatePrice: 9000,
+      dailyPrice: 13000,
+      isPremium: true,
+      pricing: [
+        { planName: 'Alternate Days', price: 9000, priceDisplay: '₹9,000/-', duration: '1 Month' },
+        { planName: 'Daily Personal Training', price: 13000, priceDisplay: '₹13,000/-', duration: '1 Month' },
+      ],
+    },
+  ],
+  vijaynagar: [
+    {
+      id: 'pt-vjn-junior',
+      title: 'JUNIOR PERSONAL TRAINER',
+      badge: 'Junior Coach',
+      alternatePrice: 4500,
+      dailyPrice: 8000,
+      pricing: [
+        { planName: 'Alternate Days', price: 4500, priceDisplay: '₹4,500/-', duration: '1 Month' },
+        { planName: 'Daily Personal Training', price: 8000, priceDisplay: '₹8,000/-', duration: '1 Month' },
+      ],
+    },
+    {
+      id: 'pt-vjn-senior',
+      title: 'SENIOR PERSONAL TRAINER',
+      badge: 'Senior Coach',
+      alternatePrice: 5500,
+      dailyPrice: 10000,
+      isPremium: true,
+      pricing: [
+        { planName: 'Alternate Days', price: 5500, priceDisplay: '₹5,500/-', duration: '1 Month' },
+        { planName: 'Daily Personal Training', price: 10000, priceDisplay: '₹10,000/-', duration: '1 Month' },
+      ],
+    },
+  ],
+};
+
 export async function seedInitialDataIfEmpty() {
   if (isSeeding) {
     return { success: true, message: 'Seeding already in progress' };
@@ -89,41 +142,71 @@ export async function seedInitialDataIfEmpty() {
     isSeeding = true;
     await purgeAllDummyDataFromFirestore();
 
+    const vbRef = doc(db, 'plans', 'vishrambag');
+    const vjnRef = doc(db, 'plans', 'vijaynagar');
+
+    const vbSnap = await getDoc(vbRef).catch(() => null);
+    const vjnSnap = await getDoc(vjnRef).catch(() => null);
+
+    const defaultVbRegular = INITIAL_PLANS.filter((p) => p.branchId === 'vishrambag');
+    const defaultVjnRegular = INITIAL_PLANS.filter((p) => p.branchId === 'branch2' || p.branchId === 'vijaynagar');
+
+    // 1. Seed or merge plans/vishrambag with regularPlans & specialPlans
+    if (!vbSnap || !vbSnap.exists() || !vbSnap.data()?.regularPlans) {
+      await setDoc(
+        vbRef,
+        {
+          branchId: 'vishrambag',
+          branchName: 'Respire Vishrambag Branch (R City Mall)',
+          regularPlans: defaultVbRegular,
+          specialPlans: DEFAULT_SPECIAL_PLANS.vishrambag,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+
+    // 2. Seed or merge plans/vijaynagar with regularPlans & specialPlans
+    if (!vjnSnap || !vjnSnap.exists() || !vjnSnap.data()?.regularPlans) {
+      await setDoc(
+        vjnRef,
+        {
+          branchId: 'branch2',
+          branchName: 'Respire Vijaynagar Branch (Krishna Heights)',
+          regularPlans: defaultVjnRegular,
+          specialPlans: DEFAULT_SPECIAL_PLANS.vijaynagar,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+
+    // 3. Purge legacy standalone loose plan docs so Firestore displays ONLY vishrambag and vijaynagar in plans
+    const legacyFlatPlanIds = [
+      'plan-1', 'plan-2', 'plan-3', 'plan-4',
+      'plan-vjn-day', 'plan-vjn-1', 'plan-vjn-2', 'plan-vjn-3', 'plan-vjn-4',
+    ];
+    for (const pId of legacyFlatPlanIds) {
+      await deleteDoc(doc(db, 'plans', pId)).catch(() => {});
+    }
+
+    // 4. Clean up legacy duplicate documents from system/settings
+    await deleteDoc(doc(db, 'system', 'pt_rates')).catch(() => {});
+    await deleteDoc(doc(db, 'settings', 'ptFeeStructure')).catch(() => {});
+
     const seedLockRef = doc(db, 'system', 'seed_status_v3');
-    const seedLockSnap = await getDoc(seedLockRef).catch(() => null);
-
-    if (seedLockSnap && seedLockSnap.exists() && seedLockSnap.data()?.isSeeded) {
-      isSeeding = false;
-      return { success: true, message: 'Database already initialized' };
-    }
-
-    // Seed ONLY official plans (no mock members or trainers)
-    for (const plan of INITIAL_PLANS) {
-      const planRef = doc(db, 'plans', plan.id);
-      await setDoc(planRef, { ...plan, updatedAt: serverTimestamp() }, { merge: true });
-    }
-
-    await setDoc(
-      doc(db, 'system', 'pt_rates'),
-      {
-        ...PERSONAL_TRAINING_RATES,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-
     await setDoc(
       seedLockRef,
       {
         isSeeded: true,
         seededAt: serverTimestamp(),
-        version: '3.0.0',
+        version: '3.1.0',
       },
       { merge: true }
     );
 
     isSeeding = false;
-    return { success: true, message: 'Official gym plans initialized' };
+    return { success: true, message: 'Branch-wise plans structure initialized' };
   } catch (error) {
     isSeeding = false;
     console.warn('Firestore seeding notice:', error.message);
@@ -141,6 +224,30 @@ export function subscribeToCollection(collectionName, onData, onError) {
           id: d.id,
           ...d.data(),
         }));
+
+        // If listening to 'plans', flatten regularPlans for backwards compatibility with all member views
+        if (collectionName === 'plans') {
+          let flatPlans = [];
+          let hasBranchDoc = false;
+          items.forEach((item) => {
+            if (item.regularPlans && Array.isArray(item.regularPlans)) {
+              hasBranchDoc = true;
+              const bId = item.id === 'vijaynagar' ? 'branch2' : item.id;
+              flatPlans.push(
+                ...item.regularPlans.map((p) => ({
+                  ...p,
+                  branchId: p.branchId || bId,
+                }))
+              );
+            }
+          });
+
+          if (hasBranchDoc) {
+            onData(deduplicateById(flatPlans));
+            return;
+          }
+        }
+
         onData(deduplicateById(items));
       },
       (error) => {
@@ -196,30 +303,82 @@ export async function updateMemberStatusInFirestore(memberId, status) {
 }
 
 /**
- * Adds or updates a membership plan in Firestore idempotently.
+ * Adds or updates a membership plan inside branch document (plans/vishrambag or plans/vijaynagar).
  */
 export async function savePlanToFirestore(plan) {
   if (!plan.id) {
     throw new Error('Plan ID is required');
   }
-  const planRef = doc(db, 'plans', plan.id);
+  const branchDoc = (plan.branchId === 'branch2' || plan.branchId === 'vijaynagar') ? 'vijaynagar' : 'vishrambag';
+  const branchRef = doc(db, 'plans', branchDoc);
+
+  const snap = await getDoc(branchRef).catch(() => null);
+  let currentRegular = [];
+  if (snap && snap.exists() && Array.isArray(snap.data()?.regularPlans)) {
+    currentRegular = snap.data().regularPlans;
+  } else {
+    currentRegular = INITIAL_PLANS.filter((p) =>
+      branchDoc === 'vijaynagar' ? (p.branchId === 'branch2' || p.branchId === 'vijaynagar') : p.branchId === 'vishrambag'
+    );
+  }
+
+  const existingIdx = currentRegular.findIndex((p) => p.id === plan.id);
+  let updatedRegular;
+  if (existingIdx >= 0) {
+    updatedRegular = [...currentRegular];
+    updatedRegular[existingIdx] = { ...updatedRegular[existingIdx], ...plan };
+  } else {
+    updatedRegular = [...currentRegular, plan];
+  }
+
   await setDoc(
-    planRef,
+    branchRef,
     {
-      ...plan,
+      branchId: branchDoc === 'vijaynagar' ? 'branch2' : 'vishrambag',
+      branchName: branchDoc === 'vijaynagar' ? 'Respire Vijaynagar Branch (Krishna Heights)' : 'Respire Vishrambag Branch (R City Mall)',
+      regularPlans: updatedRegular,
       updatedAt: serverTimestamp(),
     },
     { merge: true }
   );
+
   return plan;
 }
 
 /**
- * Deletes a membership plan from Firestore.
+ * Deletes a membership plan from branch document regularPlans.
  */
-export async function deletePlanFromFirestore(planId) {
-  const planRef = doc(db, 'plans', planId);
-  await deleteDoc(planRef);
+export async function deletePlanFromFirestore(planId, branchId) {
+  const branchesToSearch = branchId
+    ? [(branchId === 'branch2' || branchId === 'vijaynagar') ? 'vijaynagar' : 'vishrambag']
+    : ['vishrambag', 'vijaynagar'];
+
+  for (const bDoc of branchesToSearch) {
+    const branchRef = doc(db, 'plans', bDoc);
+    const snap = await getDoc(branchRef).catch(() => null);
+    if (snap && snap.exists() && Array.isArray(snap.data()?.regularPlans)) {
+      const filtered = snap.data().regularPlans.filter((p) => p.id !== planId);
+      if (filtered.length !== snap.data().regularPlans.length) {
+        await setDoc(branchRef, { regularPlans: filtered, updatedAt: serverTimestamp() }, { merge: true });
+      }
+    }
+  }
+}
+
+/**
+ * Saves special personal training (PT) plans directly to plans/vishrambag or plans/vijaynagar.
+ */
+export async function saveBranchSpecialPlans(branchId, specialPlans) {
+  const branchDoc = (branchId === 'branch2' || branchId === 'vijaynagar') ? 'vijaynagar' : 'vishrambag';
+  const branchRef = doc(db, 'plans', branchDoc);
+  await setDoc(
+    branchRef,
+    {
+      specialPlans,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
 }
 
 /**
@@ -311,3 +470,85 @@ export async function updateInquiryStatusInFirestore(inquiryId, status) {
   const inquiryRef = doc(db, 'inquiries', inquiryId);
   await setDoc(inquiryRef, { status, updatedAt: serverTimestamp() }, { merge: true });
 }
+
+/**
+ * =========================================================================
+ * TRAINER DASHBOARD: SESSIONS, WORKOUT NOTES & PROFILE OPERATIONS
+ * =========================================================================
+ */
+
+/**
+ * Saves or updates a personal training session in Firestore.
+ */
+export async function saveTrainerSessionToFirestore(session) {
+  if (!session.id) {
+    session.id = `sess_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  }
+  const sessionRef = doc(db, 'trainer_sessions', session.id);
+  const payload = {
+    ...session,
+    updatedAt: serverTimestamp(),
+  };
+  await setDoc(sessionRef, payload, { merge: true });
+  return payload;
+}
+
+/**
+ * Updates session status (e.g. 'Scheduled', 'In Progress', 'Completed', 'Cancelled').
+ */
+export async function updateTrainerSessionStatusInFirestore(sessionId, status) {
+  const sessionRef = doc(db, 'trainer_sessions', sessionId);
+  await setDoc(sessionRef, { status, updatedAt: serverTimestamp() }, { merge: true });
+}
+
+/**
+ * Deletes a training session.
+ */
+export async function deleteTrainerSessionFromFirestore(sessionId) {
+  const sessionRef = doc(db, 'trainer_sessions', sessionId);
+  await deleteDoc(sessionRef);
+}
+
+/**
+ * Saves a workout / session note for an assigned member.
+ */
+export async function saveTrainerNoteToFirestore(note) {
+  if (!note.id) {
+    note.id = `note_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  }
+  const noteRef = doc(db, 'trainer_notes', note.id);
+  const payload = {
+    ...note,
+    createdAt: note.createdAt || new Date().toISOString(),
+    updatedAt: serverTimestamp(),
+  };
+  await setDoc(noteRef, payload, { merge: true });
+  return payload;
+}
+
+/**
+ * Deletes a session note.
+ */
+export async function deleteTrainerNoteFromFirestore(noteId) {
+  const noteRef = doc(db, 'trainer_notes', noteId);
+  await deleteDoc(noteRef);
+}
+
+/**
+ * Allows an authenticated trainer to update permitted personal details (phone, bio, specialty, photo).
+ * Role or account permissions can NEVER be altered through this method.
+ */
+export async function updateTrainerProfileInFirestore(trainerId, updates) {
+  const safeUpdates = {
+    phone: updates.phone || '',
+    bio: updates.bio || '',
+    specialty: updates.specialty || '',
+    experience: updates.experience || '',
+    photo: updates.photo !== undefined ? updates.photo : '',
+    updatedAt: serverTimestamp(),
+  };
+  const trRef = doc(db, 'trainers', trainerId);
+  await setDoc(trRef, safeUpdates, { merge: true });
+  return safeUpdates;
+}
+

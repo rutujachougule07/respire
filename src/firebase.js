@@ -5,7 +5,7 @@ import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
 // Firebase configuration for Respire Fitness
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyC4edzQAonqiJDoRVaoIVqWl2_bIWlI5zo",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "respire-7001f.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "respire-7001f",

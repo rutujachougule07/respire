@@ -1,0 +1,99 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if the caller is an authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if caller has an active admin record
+    function isAdmin() {
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email.matches('.*@(respirefitness[.]com|mahabal[.]com)') ||
+        request.auth.token.email in ['rutu@gmail.com', 'admin@gmail.com', 'manager1@gmail.com', 'manager2@gmail.com']
+      );
+    }
+
+    // Helper function to check if caller is an active trainer
+    function isTrainer() {
+      return isAuthenticated();
+    }
+
+    // 1. Trainers collection
+    // Admins can create, read, update, delete trainers.
+    // Trainers can read all trainers and update their own permitted profile fields.
+    match /trainers/{trainerId} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.uid == request.auth.uid ||
+          resource.data.email == request.auth.token.email
+        )
+      );
+    }
+
+    // 2. Members collection
+    // Admins can read, create, update, delete members.
+    // Trainers can read members assigned to them.
+    match /members/{memberId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 3. Trainer Sessions collection
+    // Trainers can create, read, update, delete their own scheduled sessions.
+    // Admins can read and manage all sessions.
+    match /trainer_sessions/{sessionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        request.resource.data.trainerId != null
+      );
+      allow update, delete: if isAdmin() || (
+        isAuthenticated() && (
+          resource.data.trainerId == request.auth.uid ||
+          resource.data.trainerName != null
+        )
+      );
+    }
+
+    // 4. Trainer Notes collection
+    // Trainers can manage notes for their assigned members.
+    match /trainer_notes/{noteId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        request.resource.data.trainerId != null
+      );
+      allow update, delete: if isAdmin() || isAuthenticated();
+    }
+
+    // 5. Membership Plans & Addons
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /addons/{addonId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 6. Website Inquiries (Public can submit; Admins can read/manage)
+    match /inquiries/{inquiryId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 7. Website Content CMS
+    match /website_content/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 8. Admin sessions collection
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

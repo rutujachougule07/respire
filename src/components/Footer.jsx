@@ -229,6 +229,29 @@ export default function Footer({ onAdminLogin }) {
                     <span>›</span> Staff & Admin Portal
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/trainer-login"
+                    style={{
+                      fontSize: '0.88rem',
+                      color: '#00D256',
+                      fontWeight: 700,
+                      transition: 'all 0.2s ease',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      textDecoration: 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateX(4px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateX(0)';
+                    }}
+                  >
+                    <span>›</span> Trainer Portal Login
+                  </Link>
+                </li>
               </ul>
             </div>
 
