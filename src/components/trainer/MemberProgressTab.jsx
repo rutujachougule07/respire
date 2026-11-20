@@ -111,7 +111,7 @@ export default function MemberProgressTab({
     setForm({
       memberId: currentMember?.id || myMembers[0]?.id || '',
       date: new Date().toISOString().split('T')[0],
-      weight: comparison?.latest?.weight || currentMember?.weight || '',
+      weight: comparison?.latest?.weight || currentMember?.bodyMetrics?.weight?.replace(/[^\d.]/g, '') || currentMember?.weight || '',
       height: comparison?.latest?.height || currentMember?.height || '',
       chest: comparison?.latest?.measurements?.chest || comparison?.latest?.chest || '',
       waist: comparison?.latest?.measurements?.waist || comparison?.latest?.waist || '',
@@ -309,7 +309,7 @@ export default function MemberProgressTab({
                 <Scale size={18} color="#00B84A" />
               </div>
               <div style={{ fontSize: '1.9rem', fontWeight: 900, color: '#0F172A', lineHeight: 1 }}>
-                {comparison?.latest?.weight ? `${comparison.latest.weight} kg` : currentMember?.weight ? `${currentMember.weight} kg` : '—'}
+                {comparison?.latest?.weight ? `${comparison.latest.weight} kg` : (currentMember?.bodyMetrics?.weight || (currentMember?.weight ? `${currentMember.weight} kg` : '—'))}
               </div>
               {comparison?.previous && (
                 <div style={{ marginTop: '8px', fontSize: '0.74rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
