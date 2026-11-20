@@ -552,3 +552,45 @@ export async function updateTrainerProfileInFirestore(trainerId, updates) {
   return safeUpdates;
 }
 
+/**
+ * Saves a member progress tracking record in Firestore.
+ * Always creates a new historical record to preserve historical progress.
+ */
+export async function saveMemberProgressToFirestore(progress) {
+  if (!progress.id) {
+    progress.id = `prog_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  }
+  const progRef = doc(db, 'member_progress', progress.id);
+  const payload = {
+    ...progress,
+    createdAt: progress.createdAt || new Date().toISOString(),
+    updatedAt: serverTimestamp(),
+  };
+  await setDoc(progRef, payload, { merge: true });
+
+  // Update member document with latest stats snapshot if memberId is present
+  if (progress.memberId) {
+    const memRef = doc(db, 'members', progress.memberId);
+    const memberUpdates = {};
+    if (progress.weight !== undefined && progress.weight !== '') memberUpdates.weight = Number(progress.weight);
+    if (progress.height !== undefined && progress.height !== '') memberUpdates.height = Number(progress.height);
+    if (progress.bmi !== undefined && progress.bmi !== '') memberUpdates.bmi = Number(progress.bmi);
+    if (progress.fitnessGoals) memberUpdates.fitnessGoals = progress.fitnessGoals;
+    if (progress.measurements) memberUpdates.latestMeasurements = progress.measurements;
+    memberUpdates.lastProgressDate = progress.date || new Date().toISOString().split('T')[0];
+    memberUpdates.updatedAt = serverTimestamp();
+    await setDoc(memRef, memberUpdates, { merge: true }).catch(() => {});
+  }
+
+  return payload;
+}
+
+/**
+ * Deletes a member progress record.
+ */
+export async function deleteMemberProgressFromFirestore(progressId) {
+  const progRef = doc(db, 'member_progress', progressId);
+  await deleteDoc(progRef);
+}
+
+

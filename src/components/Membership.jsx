@@ -35,15 +35,31 @@ import { doc, onSnapshot } from 'firebase/firestore';
 export default function Membership({ plans = [] }) {
   const { content } = useWebsiteContent();
   const [selectedBranch, setSelectedBranch] = useState('vishrambag');
-  const [livePTRates, setLivePTRates] = useState(null);
+  const [livePTRates, setLivePTRates] = useState({ vishrambag: null, branch2: null });
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'ptFeeStructure'), (snap) => {
-      if (snap.exists()) {
-        setLivePTRates(snap.data());
+    const unsubVb = onSnapshot(doc(db, 'plans', 'vishrambag'), (snap) => {
+      if (snap.exists() && Array.isArray(snap.data()?.specialPlans)) {
+        setLivePTRates((prev) => ({
+          ...prev,
+          vishrambag: { categories: snap.data().specialPlans },
+        }));
       }
     });
-    return () => unsub();
+
+    const unsubVjn = onSnapshot(doc(db, 'plans', 'vijaynagar'), (snap) => {
+      if (snap.exists() && Array.isArray(snap.data()?.specialPlans)) {
+        setLivePTRates((prev) => ({
+          ...prev,
+          branch2: { categories: snap.data().specialPlans },
+        }));
+      }
+    });
+
+    return () => {
+      unsubVb();
+      unsubVjn();
+    };
   }, []);
 
   if (content?.membership?.visible === false || content?.sectionVisibility?.membership === false) {

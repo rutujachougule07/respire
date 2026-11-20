@@ -10,10 +10,10 @@ export default function FitnessTracking() {
     return null;
   }
 
-  const eyebrow = trackingData.eyebrow || 'Digital Fitness Ecosystem';
-  const title = trackingData.title || 'SMART FITNESS TRACKING';
+  const eyebrow = trackingData.eyebrow ?? 'Digital Fitness Ecosystem';
+  const title = trackingData.title ?? 'SMART FITNESS TRACKING';
   const subtitle =
-    trackingData.subtitle ||
+    trackingData.subtitle ??
     'Say goodbye to guesswork. Respire Fitness leverages structured body composition analysis, biometric integration, and milestone tracking to validate every drop of sweat.';
 
   const defaultFeatures = [
@@ -72,17 +72,24 @@ export default function FitnessTracking() {
     >
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Section Header */}
+        {/* Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
-            <LineChart size={14} />
-            <span>{eyebrow}</span>
-          </div>
-          <h2 className="section-title">
-            {title}
-          </h2>
-          <p className="section-subtitle">
-            {subtitle}
-          </p>
+          {eyebrow ? (
+            <div className="section-eyebrow">
+              <LineChart size={14} />
+              <span>{eyebrow}</span>
+            </div>
+          ) : null}
+          {title ? (
+            <h2 className="section-title">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="section-subtitle">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
 
         {/* 5 Feature Cards */}

@@ -11,13 +11,13 @@ export default function Contact() {
     return null;
   }
 
-  const eyebrow = contactData.eyebrow || 'Visit Our 2 Branches in Sangli';
-  const title = contactData.title || 'CONNECT WITH RESPIRE FITNESS';
+  const eyebrow = contactData.eyebrow ?? 'Visit Our 2 Branches in Sangli';
+  const title = contactData.title ?? 'CONNECT WITH RESPIRE FITNESS';
   const subtitle =
-    contactData.subtitle ||
+    contactData.subtitle ??
     'Visit either of our premium Sangli branches — Vishrambag or Vijaynagar — or submit an inquiry below.';
-  const vishrambagPhone = contactData.vishrambagPhone || '+91 7798001777';
-  const vijaynagarPhone = contactData.vijaynagarPhone || '+91 9172848777';
+  const vishrambagPhone = contactData.vishrambagPhone ?? '+91 7798001777';
+  const vijaynagarPhone = contactData.vijaynagarPhone ?? '+91 9172848777';
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -62,16 +62,22 @@ export default function Contact() {
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
-            <MapPin size={14} />
-            <span>{eyebrow}</span>
-          </div>
-          <h2 className="section-title">
-            {title}
-          </h2>
-          <p className="section-subtitle">
-            {subtitle}
-          </p>
+          {eyebrow ? (
+            <div className="section-eyebrow">
+              <MapPin size={14} />
+              <span>{eyebrow}</span>
+            </div>
+          ) : null}
+          {title ? (
+            <h2 className="section-title">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="section-subtitle">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
 
         {/* Bottom 2-Column Grid: Timings & Policy + Direct Membership Inquiry Form */}

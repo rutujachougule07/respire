@@ -11,15 +11,15 @@ export default function About() {
   }
 
   const aboutImage =
-    aboutData.image ||
+    aboutData.image ??
     'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop';
-  const eyebrow = aboutData.eyebrow || '• A PART OF MAHABAL GROUP •';
-  const title = aboutData.title || 'ABOUT MAHABAL GROUP & RESPIRE';
+  const eyebrow = aboutData.eyebrow ?? '• A PART OF MAHABAL GROUP •';
+  const title = aboutData.title ?? 'ABOUT MAHABAL GROUP & RESPIRE';
   const leadParagraph =
-    aboutData.leadParagraph ||
+    aboutData.leadParagraph ??
     'Respire Fitness is proudly founded and steered under the esteemed banner of the Mahabal Group—a distinguished corporate enterprise that has earned high standing and widespread public trust across Sangli and Western Maharashtra.';
   const secondaryParagraph =
-    aboutData.secondaryParagraph ||
+    aboutData.secondaryParagraph ??
     'Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand, Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern sports science with transparent, professional management, the Mahabal Group ensures that every member benefits from corporate reliability, safety, and long-term commitment.';
 
   const defaultPillars = [
@@ -203,30 +203,38 @@ export default function About() {
 
           {/* Right Column: Company Background & Information */}
           <div>
-            <div className="section-eyebrow">
-              <Building2 size={14} />
-              <span>{eyebrow}</span>
-            </div>
+            {eyebrow ? (
+              <div className="section-eyebrow">
+                <Building2 size={14} />
+                <span>{eyebrow}</span>
+              </div>
+            ) : null}
 
-            <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>
-              {title}
-            </h2>
+            {title ? (
+              <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>
+                {title}
+              </h2>
+            ) : null}
 
-            <p
-              style={{
-                fontSize: '1.04rem',
-                color: '#1E293B',
-                marginBottom: '14px',
-                lineHeight: 1.68,
-                fontWeight: 500,
-              }}
-            >
-              {leadParagraph}
-            </p>
+            {leadParagraph ? (
+              <p
+                style={{
+                  fontSize: '1.04rem',
+                  color: '#1E293B',
+                  marginBottom: '14px',
+                  lineHeight: 1.68,
+                  fontWeight: 500,
+                }}
+              >
+                {leadParagraph}
+              </p>
+            ) : null}
 
-            <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '22px', lineHeight: 1.65 }}>
-              {secondaryParagraph}
-            </p>
+            {secondaryParagraph ? (
+              <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '22px', lineHeight: 1.65 }}>
+                {secondaryParagraph}
+              </p>
+            ) : null}
 
             {/* Company Credentials Strip */}
             <div
@@ -243,18 +251,19 @@ export default function About() {
                 fontWeight: 700,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={16} color="#008A38" />
-                <span>A Part of Mahabal Group</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={16} color="#008A38" />
-                <span>2 Sangli Branches (Vishrambag & Vijaynagar)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle2 size={16} color="#008A38" />
-                <span>100% Institutional Governance</span>
-              </div>
+              {(aboutData.credentials && Array.isArray(aboutData.credentials)
+                ? aboutData.credentials
+                : [
+                    'A Part of Mahabal Group',
+                    '2 Sangli Branches (Vishrambag & Vijaynagar)',
+                    '100% Institutional Governance',
+                  ]
+              ).map((cred, cIdx) => (
+                <div key={cIdx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <CheckCircle2 size={16} color="#008A38" />
+                  <span>{cred}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

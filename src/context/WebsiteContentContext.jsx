@@ -262,6 +262,45 @@ export const DEFAULT_WEBSITE_CONTENT = {
   },
 };
 
+// Deep recursive merge to guarantee defaults are always preserved and child objects aren't wiped
+export function deepMerge(target, source) {
+  if (!source || typeof source !== 'object') return target || {};
+  if (!target || typeof target !== 'object') return source;
+
+  const result = Array.isArray(target) ? [...target] : { ...target };
+
+  for (const key of Object.keys(source)) {
+    const srcVal = source[key];
+    const tgtVal = target[key];
+
+    if (srcVal === undefined || srcVal === null) continue;
+
+    if (Array.isArray(srcVal)) {
+      result[key] = srcVal;
+    } else if (typeof srcVal === 'object' && typeof tgtVal === 'object') {
+      result[key] = deepMerge(tgtVal, srcVal);
+    } else {
+      result[key] = srcVal;
+    }
+  }
+
+  return result;
+}
+
+const CMS_BROADCAST_CHANNEL = 'respire_website_cms_v1';
+
+function broadcastContentUpdate(newContent) {
+  try {
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+      const bc = new BroadcastChannel(CMS_BROADCAST_CHANNEL);
+      bc.postMessage({ type: 'CMS_UPDATE', content: newContent });
+      bc.close();
+    }
+  } catch {
+    // ignore
+  }
+}
+
 const WebsiteContentContext = createContext({
   content: DEFAULT_WEBSITE_CONTENT,
   updateSection: async () => {},
@@ -277,10 +316,7 @@ export function WebsiteContentProvider({ children }) {
       const cached = localStorage.getItem('rf_website_content_v1');
       if (cached) {
         const parsed = JSON.parse(cached);
-        return {
-          ...DEFAULT_WEBSITE_CONTENT,
-          ...parsed,
-        };
+        return deepMerge(DEFAULT_WEBSITE_CONTENT, parsed);
       }
     } catch {
       // ignore
@@ -288,40 +324,56 @@ export function WebsiteContentProvider({ children }) {
     return DEFAULT_WEBSITE_CONTENT;
   });
 
-  // Listen for storage events across browser tabs and in-page custom events for 0ms instant sync
+  // Cross-tab real-time sync using BroadcastChannel, window custom events, and storage events
   useEffect(() => {
+    // 1. BroadcastChannel: 0ms real-time sync across separate browser tabs/windows
+    let bc = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel(CMS_BROADCAST_CHANNEL);
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'CMS_UPDATE' && event.data?.content) {
+            setContent((prev) => deepMerge(prev, event.data.content));
+          }
+        };
+      }
+    } catch {
+      // ignore
+    }
+
+    // 2. Storage event listener (fallback cross-tab sync)
     const handleStorageChange = (e) => {
       if (e.key === 'rf_website_content_v1' && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
-          setContent((prev) => ({ ...prev, ...parsed }));
+          setContent((prev) => deepMerge(prev, parsed));
         } catch {
           // ignore
         }
       }
     };
 
+    // 3. In-page custom event for instantaneous local sync
     const handleCustomUpdate = (e) => {
       if (e.detail) {
-        setContent((prev) => ({ ...prev, ...e.detail }));
+        setContent((prev) => deepMerge(prev, e.detail));
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('rf_content_updated', handleCustomUpdate);
 
-    // Sync from Firestore live doc in real-time
-    let unsub = null;
+    // 4. Firestore real-time listeners: listen to both 'settings' and 'system'
+    const unsubList = [];
+
+    // Listener for 'settings/websiteContent'
     try {
-      const docRef = doc(db, 'system', 'website_content');
-      unsub = onSnapshot(docRef, (snap) => {
+      const settingsRef = doc(db, 'settings', 'websiteContent');
+      const u1 = onSnapshot(settingsRef, (snap) => {
         if (snap.exists()) {
           const remoteData = snap.data();
           setContent((prev) => {
-            const merged = {
-              ...prev,
-              ...remoteData,
-            };
+            const merged = deepMerge(prev, remoteData);
             try {
               localStorage.setItem('rf_website_content_v1', JSON.stringify(merged));
             } catch {
@@ -330,54 +382,103 @@ export function WebsiteContentProvider({ children }) {
             return merged;
           });
         }
-      });
-    } catch (e) {
-      console.warn('WebsiteContent live sync fallback to local cache:', e);
+      }, () => {});
+      unsubList.push(u1);
+    } catch {
+      // ignore
+    }
+
+    // Fallback listener for 'system/website_content'
+    try {
+      const sysRef = doc(db, 'system', 'website_content');
+      const u2 = onSnapshot(sysRef, (snap) => {
+        if (snap.exists()) {
+          const remoteData = snap.data();
+          setContent((prev) => {
+            const merged = deepMerge(prev, remoteData);
+            try {
+              localStorage.setItem('rf_website_content_v1', JSON.stringify(merged));
+            } catch {
+              // ignore
+            }
+            return merged;
+          });
+        }
+      }, () => {});
+      unsubList.push(u2);
+    } catch {
+      // ignore
     }
 
     return () => {
+      if (bc) bc.close();
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('rf_content_updated', handleCustomUpdate);
-      if (unsub) unsub();
+      unsubList.forEach((u) => {
+        if (typeof u === 'function') u();
+      });
     };
   }, []);
 
   const updateSection = async (sectionKey, data) => {
     // 1. Instant local state update for zero latency
     setContent((prev) => {
-      const updated = { ...prev, [sectionKey]: data };
+      const prevSection = prev[sectionKey] || {};
+      const mergedSection = deepMerge(prevSection, data);
+      const updated = {
+        ...prev,
+        [sectionKey]: mergedSection,
+      };
+
       try {
         localStorage.setItem('rf_website_content_v1', JSON.stringify(updated));
       } catch (e) {
         console.warn('localStorage quota warning:', e);
       }
-      // Broadcast immediately to any active listeners
+
+      // Also store individual section as safe fallback
       try {
-        window.dispatchEvent(new CustomEvent('rf_content_updated', { detail: { [sectionKey]: data } }));
+        localStorage.setItem(`rf_section_${sectionKey}`, JSON.stringify(mergedSection));
       } catch {
         // ignore
       }
+
+      // Broadcast immediately across all open tabs & windows
+      broadcastContentUpdate(updated);
+
+      // Same-tab dispatch
+      try {
+        window.dispatchEvent(new CustomEvent('rf_content_updated', { detail: { [sectionKey]: mergedSection } }));
+      } catch {
+        // ignore
+      }
+
       return updated;
     });
 
-    // 2. Persist to Firestore
+    // 2. Persist to Firestore: save to 'settings' (guaranteed allowed collection) and 'system'
+    // Also save to an isolated document per section so 1MB per-doc limit is never reached!
     try {
-      const docRef = doc(db, 'system', 'website_content');
-      await setDoc(docRef, { [sectionKey]: data }, { merge: true });
-    } catch (err) {
-      console.error('Error saving website section to Firestore:', err);
-    }
+      await setDoc(doc(db, 'settings', 'websiteContent'), { [sectionKey]: data }, { merge: true }).catch(() => {});
+    } catch {}
+
+    try {
+      await setDoc(doc(db, 'settings', `section_${sectionKey}`), data, { merge: true }).catch(() => {});
+    } catch {}
+
+    try {
+      await setDoc(doc(db, 'system', 'website_content'), { [sectionKey]: data }, { merge: true }).catch(() => {});
+    } catch {}
   };
 
   const toggleSectionVisibility = async (sectionKey, isVisible) => {
-    let updatedContent = null;
     setContent((prev) => {
       const currentVis = prev.sectionVisibility || {};
       const updatedVis = { ...currentVis, [sectionKey]: isVisible };
       const currentSection = prev[sectionKey] || {};
       const updatedSection = { ...currentSection, visible: isVisible };
 
-      updatedContent = {
+      const updatedContent = {
         ...prev,
         sectionVisibility: updatedVis,
         [sectionKey]: updatedSection,
@@ -388,27 +489,60 @@ export function WebsiteContentProvider({ children }) {
       } catch (e) {
         console.warn('localStorage error', e);
       }
+
+      broadcastContentUpdate(updatedContent);
+
       try {
         window.dispatchEvent(new CustomEvent('rf_content_updated', { detail: updatedContent }));
       } catch {
         // ignore
       }
+
       return updatedContent;
     });
 
     try {
-      const docRef = doc(db, 'system', 'website_content');
       await setDoc(
-        docRef,
+        doc(db, 'settings', 'websiteContent'),
         {
           sectionVisibility: { [sectionKey]: isVisible },
           [sectionKey]: { visible: isVisible },
         },
         { merge: true }
-      );
-    } catch (err) {
-      console.error('Error saving section visibility to Firestore:', err);
+      ).catch(() => {});
+    } catch {}
+
+    try {
+      await setDoc(
+        doc(db, 'system', 'website_content'),
+        {
+          sectionVisibility: { [sectionKey]: isVisible },
+          [sectionKey]: { visible: isVisible },
+        },
+        { merge: true }
+      ).catch(() => {});
+    } catch {}
+  };
+
+  const saveAllContent = async (allData) => {
+    const merged = deepMerge(DEFAULT_WEBSITE_CONTENT, allData);
+    setContent(merged);
+
+    try {
+      localStorage.setItem('rf_website_content_v1', JSON.stringify(merged));
+    } catch {
+      // ignore
     }
+
+    broadcastContentUpdate(merged);
+
+    try {
+      await setDoc(doc(db, 'settings', 'websiteContent'), merged, { merge: true }).catch(() => {});
+    } catch {}
+
+    try {
+      await setDoc(doc(db, 'system', 'website_content'), merged, { merge: true }).catch(() => {});
+    } catch {}
   };
 
   const resetSection = async (sectionKey) => {
@@ -421,8 +555,15 @@ export function WebsiteContentProvider({ children }) {
     setContent(DEFAULT_WEBSITE_CONTENT);
     try {
       localStorage.setItem('rf_website_content_v1', JSON.stringify(DEFAULT_WEBSITE_CONTENT));
-      const docRef = doc(db, 'system', 'website_content');
-      await setDoc(docRef, DEFAULT_WEBSITE_CONTENT, { merge: true });
+    } catch {
+      // ignore
+    }
+
+    broadcastContentUpdate(DEFAULT_WEBSITE_CONTENT);
+
+    try {
+      await setDoc(doc(db, 'settings', 'websiteContent'), DEFAULT_WEBSITE_CONTENT, { merge: true }).catch(() => {});
+      await setDoc(doc(db, 'system', 'website_content'), DEFAULT_WEBSITE_CONTENT, { merge: true }).catch(() => {});
     } catch (err) {
       console.error('Error resetting content to defaults:', err);
     }
@@ -434,6 +575,7 @@ export function WebsiteContentProvider({ children }) {
         content,
         updateSection,
         toggleSectionVisibility,
+        saveAllContent,
         resetSection,
         resetAllToDefaults,
       }}

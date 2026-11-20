@@ -10,10 +10,10 @@ export default function WhyChooseUs() {
     return null;
   }
 
-  const eyebrow = whyUsData.eyebrow || 'The Respire Standard';
-  const title = whyUsData.title || 'WHY CHOOSE RESPIRE FITNESS';
+  const eyebrow = whyUsData.eyebrow ?? 'The Respire Standard';
+  const title = whyUsData.title ?? 'WHY CHOOSE RESPIRE FITNESS';
   const subtitle =
-    whyUsData.subtitle ||
+    whyUsData.subtitle ??
     'A harmonious fusion of elite sports science, luxury recovery amenities, and the uncompromised trust of the Mahabal Group.';
 
   const defaultReasons = [
@@ -73,16 +73,22 @@ export default function WhyChooseUs() {
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
-            <Sparkles size={14} />
-            <span>{eyebrow}</span>
-          </div>
-          <h2 className="section-title">
-            {title}
-          </h2>
-          <p className="section-subtitle">
-            {subtitle}
-          </p>
+          {eyebrow ? (
+            <div className="section-eyebrow">
+              <Sparkles size={14} />
+              <span>{eyebrow}</span>
+            </div>
+          ) : null}
+          {title ? (
+            <h2 className="section-title">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="section-subtitle">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
 
         {/* 5 Reasons White Elevated Cards */}

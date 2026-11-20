@@ -11,10 +11,10 @@ export default function Services() {
     return null;
   }
 
-  const eyebrow = servicesData.eyebrow || 'World-Class Offerings';
-  const title = servicesData.title || 'OUR PREMIUM SERVICES';
+  const eyebrow = servicesData.eyebrow ?? 'World-Class Offerings';
+  const title = servicesData.title ?? 'OUR PREMIUM SERVICES';
   const subtitle =
-    servicesData.subtitle ||
+    servicesData.subtitle ??
     'From high-intensity personal training to restorative luxury thermal therapies, experience complete fitness and recovery under one roof at R City Mall, Sangli.';
 
   const baseServices = [
@@ -119,16 +119,22 @@ export default function Services() {
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
-            <Flame size={14} />
-            <span>{eyebrow}</span>
-          </div>
-          <h2 className="section-title">
-            {title}
-          </h2>
-          <p className="section-subtitle">
-            {subtitle}
-          </p>
+          {eyebrow ? (
+            <div className="section-eyebrow">
+              <Flame size={14} />
+              <span>{eyebrow}</span>
+            </div>
+          ) : null}
+          {title ? (
+            <h2 className="section-title">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="section-subtitle">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
 
         {/* 5 Premium White Service Cards */}

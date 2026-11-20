@@ -11,20 +11,20 @@ export default function Programs() {
     return null;
   }
 
-  const eyebrow = programsData.eyebrow || 'Structured Training Regimens';
-  const title = programsData.title || 'WORKOUT PROGRAMS BY CATEGORY';
+  const eyebrow = programsData.eyebrow ?? 'Structured Training Regimens';
+  const title = programsData.title ?? 'WORKOUT PROGRAMS BY CATEGORY';
   const subtitle =
-    programsData.subtitle ||
+    programsData.subtitle ??
     'Whether taking your first steps into strength training or chasing elite athletic milestones, our progressive curriculums guide your evolution with certified expertise.';
 
   const programs = {
     beginner: {
       category: 'Beginner',
-      subtitle: programsData.beginner?.subtitle || 'Foundation, Mobility & Proper Lifting Form',
-      description: programsData.beginner?.description || 'Ideal for newcomers or those returning to fitness after a hiatus. We focus on building neuromuscular mind-muscle connection, joint stability, core resilience, and safe movement mechanics under certified trainer supervision.',
+      subtitle: programsData.beginner?.subtitle ?? 'Foundation, Mobility & Proper Lifting Form',
+      description: programsData.beginner?.description ?? 'Ideal for newcomers or those returning to fitness after a hiatus. We focus on building neuromuscular mind-muscle connection, joint stability, core resilience, and safe movement mechanics under certified trainer supervision.',
       schedule: '3-4 Days / Week (45-60 Mins)',
       focus: ['Safe Movement Mechanics', 'Compound Lift Foundations', 'Core & Mobility Conditioning', 'Metabolic Aerobic Conditioning'],
-      image: programsData.beginner?.image || 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop',
+      image: programsData.beginner?.image ?? 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop',
       lectures: [
         { title: 'Foundational Squat & Deadlift Form Masterclass', duration: '18 min', trainer: 'Head Trainer Respire' },
         { title: 'Full Body Mobility & Warmup Protocol', duration: '14 min', trainer: 'Recovery Specialist' },
@@ -32,11 +32,11 @@ export default function Programs() {
     },
     intermediate: {
       category: 'Intermediate',
-      subtitle: programsData.intermediate?.subtitle || 'Hypertrophy, Strength & Progressive Overload',
-      description: programsData.intermediate?.description || 'Structured for members with at least 6 months of training experience. We utilize scientific periodization, push-pull-legs or upper-lower splits, time under tension, and progressive overload to sculpt lean muscle and maximize power output.',
+      subtitle: programsData.intermediate?.subtitle ?? 'Hypertrophy, Strength & Progressive Overload',
+      description: programsData.intermediate?.description ?? 'Structured for members with at least 6 months of training experience. We utilize scientific periodization, push-pull-legs or upper-lower splits, time under tension, and progressive overload to sculpt lean muscle and maximize power output.',
       schedule: '4-5 Days / Week (60-75 Mins)',
       focus: ['Progressive Overload Tracking', 'Hypertrophy Muscle Splits', 'Strength Plateau Breakers', 'Recovery & Nutrition Sync'],
-      image: programsData.intermediate?.image || 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1000&auto=format&fit=crop',
+      image: programsData.intermediate?.image ?? 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1000&auto=format&fit=crop',
       lectures: [
         { title: 'Hypertrophy Periodization & Overload Strategy', duration: '22 min', trainer: 'Strength Coach Respire' },
         { title: 'Upper-Lower Power Split Execution', duration: '20 min', trainer: 'Lead Bodybuilding Coach' },
@@ -44,11 +44,11 @@ export default function Programs() {
     },
     advanced: {
       category: 'Advanced',
-      subtitle: programsData.advanced?.subtitle || 'Elite Conditioning, Powerlifting & Athletic Output',
-      description: programsData.advanced?.description || 'Engineered for athletes, powerlifters, and high-performance fitness enthusiasts. Features complex compound training, high-intensity functional circuits, plyometrics, and periodized deload weeks to reach the pinnacle of human capability.',
+      subtitle: programsData.advanced?.subtitle ?? 'Elite Conditioning, Powerlifting & Athletic Output',
+      description: programsData.advanced?.description ?? 'Engineered for athletes, powerlifters, and high-performance fitness enthusiasts. Features complex compound training, high-intensity functional circuits, plyometrics, and periodized deload weeks to reach the pinnacle of human capability.',
       schedule: '5-6 Days / Week (75-90 Mins)',
       focus: ['Maximal Power & 1RM Periodization', 'Athletic Conditioning & Plyometrics', 'Neurological CNS Recovery', 'Bespoke Macro Cycling'],
-      image: programsData.advanced?.image || 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1000&auto=format&fit=crop',
+      image: programsData.advanced?.image ?? 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1000&auto=format&fit=crop',
       lectures: [
         { title: 'Elite Powerlifting CNS Priming & Mechanics', duration: '25 min', trainer: 'Elite Performance Director' },
         { title: 'Advanced Deload & Supercompensation Science', duration: '16 min', trainer: 'Sports Scientist' },
@@ -84,16 +84,22 @@ export default function Programs() {
       <div className="container" style={{ position: 'relative', zIndex: 2 }}>
         {/* Section Header */}
         <div className="section-header">
-          <div className="section-eyebrow">
-            <Layers size={14} />
-            <span>{eyebrow}</span>
-          </div>
-          <h2 className="section-title">
-            {title}
-          </h2>
-          <p className="section-subtitle">
-            {subtitle}
-          </p>
+          {eyebrow ? (
+            <div className="section-eyebrow">
+              <Layers size={14} />
+              <span>{eyebrow}</span>
+            </div>
+          ) : null}
+          {title ? (
+            <h2 className="section-title">
+              {title}
+            </h2>
+          ) : null}
+          {subtitle ? (
+            <p className="section-subtitle">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
 
         {/* Tab Controls */}
