@@ -97,7 +97,7 @@ export default function WhyChooseUs() {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '24px',
-            marginBottom: '56px',
+            marginBottom: '0',
           }}
         >
           {reasons.map((item, idx) => {
@@ -195,46 +195,6 @@ export default function WhyChooseUs() {
               </div>
             );
           })}
-        </div>
-
-        {/* Vibrant Emerald Green Gradient Brand Promise Banner */}
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #00C952 0%, #008A37 55%, #065F29 100%)',
-            borderRadius: '22px',
-            padding: '34px 36px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '24px',
-            boxShadow: '0 18px 40px rgba(0, 148, 59, 0.25)',
-          }}
-        >
-          <div style={{ maxWidth: '640px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#D1FAE5', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.08em' }}>
-              <Shield size={16} />
-              <span>Mahabal Group Commitment</span>
-            </div>
-            <h4 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#FFFFFF', marginBottom: '6px' }}>
-              Sangli's Most Trusted Fitness Institution
-            </h4>
-            <p style={{ fontSize: '0.94rem', color: 'rgba(255, 255, 255, 0.92)', lineHeight: 1.6 }}>
-              Every piece of equipment, every trainer onboarded, and every hygiene protocol is maintained according to strict corporate excellence standards.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '26px', alignItems: 'center' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#FFFFFF' }}>100%</div>
-              <div style={{ fontSize: '0.76rem', color: '#D1FAE5', fontWeight: 700, textTransform: 'uppercase' }}>Certified Staff</div>
-            </div>
-            <div style={{ width: '1px', height: '42px', backgroundColor: 'rgba(255,255,255,0.28)' }} />
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#FFFFFF' }}>2</div>
-              <div style={{ fontSize: '0.76rem', color: '#D1FAE5', fontWeight: 700, textTransform: 'uppercase' }}>Sangli Branches</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
