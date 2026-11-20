@@ -43,6 +43,10 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
   });
 
   const openAddModal = () => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can add trainers.');
+      return;
+    }
     setEditingTrainer(null);
     setForm({
       branchId: activeBranchId === 'all' ? 'vishrambag' : activeBranchId,
@@ -58,6 +62,10 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
   };
 
   const openEditModal = (t) => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can edit trainer profiles.');
+      return;
+    }
     setEditingTrainer(t);
     setForm({
       branchId: t.branchId || defaultBranch,
@@ -74,6 +82,10 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
 
   const handleSaveTrainer = async (e) => {
     e.preventDefault();
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can add or edit trainers.');
+      return;
+    }
     if (isSaving) return; // Prevent double submission
     setIsSaving(true);
 
@@ -140,6 +152,10 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
   };
 
   const handleDeleteTrainer = async (trainer) => {
+    if (!isSuperAdmin) {
+      if (showToast) showToast('Access denied: Only Super Admin can delete trainers.');
+      return;
+    }
     if (window.confirm(`Are you sure you want to permanently delete trainer ${trainer.name}?`)) {
       try {
         await deleteTrainerFromFirestore(trainer.id);
@@ -182,10 +198,12 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
             Add new trainers, assign members, manage profiles, and configure daily shift schedules.
           </p>
         </div>
-        <button onClick={openAddModal} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
-          <UserPlus size={16} />
-          <span>Add New Trainer</span>
-        </button>
+        {isSuperAdmin && (
+          <button onClick={openAddModal} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
+            <UserPlus size={16} />
+            <span>Add New Trainer</span>
+          </button>
+        )}
       </div>
 
       {/* Trainers Cards Grid */}
@@ -205,12 +223,16 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
             No Trainers Registered Yet
           </h3>
           <p style={{ fontSize: '0.86rem', color: '#64748B', marginBottom: '18px' }}>
-            Click the button below to add your certified gym trainers directly to Firebase.
+            {isSuperAdmin
+              ? 'Click the button below to add your certified gym trainers directly to Firebase.'
+              : 'Trainers assigned to this branch will appear here once added by Super Admin.'}
           </p>
-          <button onClick={openAddModal} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
-            <UserPlus size={16} />
-            <span>Add New Trainer</span>
-          </button>
+          {isSuperAdmin && (
+            <button onClick={openAddModal} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
+              <UserPlus size={16} />
+              <span>Add New Trainer</span>
+            </button>
+          )}
         </div>
       ) : (
         <div
@@ -371,41 +393,45 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                 >
                   <Calendar size={12} /> Schedule
                 </button>
-                <button
-                  onClick={() => openEditModal(t)}
-                  style={{
-                    padding: '8px 4px',
-                    borderRadius: '8px',
-                    backgroundColor: '#F1F5F9',
-                    color: '#334155',
-                    fontSize: '0.74rem',
-                    fontWeight: 800,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <Edit3 size={12} /> Profile
-                </button>
-                <button
-                  onClick={() => handleDeleteTrainer(t)}
-                  title="Delete Trainer from Firebase"
-                  style={{
-                    padding: '8px 9px',
-                    borderRadius: '8px',
-                    backgroundColor: '#FEF2F2',
-                    color: '#DC2626',
-                    border: '1px solid #FECACA',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Trash2 size={13} />
-                </button>
+                {isSuperAdmin && (
+                  <>
+                    <button
+                      onClick={() => openEditModal(t)}
+                      style={{
+                        padding: '8px 4px',
+                        borderRadius: '8px',
+                        backgroundColor: '#F1F5F9',
+                        color: '#334155',
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Edit3 size={12} /> Profile
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTrainer(t)}
+                      title="Delete Trainer from Firebase"
+                      style={{
+                        padding: '8px 9px',
+                        borderRadius: '8px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        border: '1px solid #FECACA',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           );
@@ -611,34 +637,42 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                         {s.time} ({s.slots})
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleRemoveShift(idx)}
-                      style={{ padding: '6px 8px', borderRadius: '8px', backgroundColor: '#FEF2F2', color: '#DC2626' }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {isSuperAdmin && (
+                      <button
+                        onClick={() => handleRemoveShift(idx)}
+                        style={{ padding: '6px 8px', borderRadius: '8px', backgroundColor: '#FEF2F2', color: '#DC2626' }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
 
-              <form onSubmit={handleAddShift} style={{ borderTop: '1px solid #E2E8F0', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#334155', textTransform: 'uppercase' }}>Add New Shift Slot</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <input value={newShift.day} onChange={(e) => setNewShift({ ...newShift, day: e.target.value })} placeholder="Mon – Sat" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
-                  <select value={newShift.shift} onChange={(e) => setNewShift({ ...newShift, shift: e.target.value })} style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem', backgroundColor: '#FFFFFF' }}>
-                    <option value="Morning">Morning</option>
-                    <option value="Midday">Midday</option>
-                    <option value="Evening">Evening</option>
-                  </select>
+              {isSuperAdmin ? (
+                <form onSubmit={handleAddShift} style={{ borderTop: '1px solid #E2E8F0', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#334155', textTransform: 'uppercase' }}>Add New Shift Slot</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <input value={newShift.day} onChange={(e) => setNewShift({ ...newShift, day: e.target.value })} placeholder="Mon – Sat" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
+                    <select value={newShift.shift} onChange={(e) => setNewShift({ ...newShift, shift: e.target.value })} style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem', backgroundColor: '#FFFFFF' }}>
+                      <option value="Morning">Morning</option>
+                      <option value="Midday">Midday</option>
+                      <option value="Evening">Evening</option>
+                    </select>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
+                    <input value={newShift.time} onChange={(e) => setNewShift({ ...newShift, time: e.target.value })} placeholder="05:00 PM – 09:00 PM" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
+                    <input value={newShift.slots} onChange={(e) => setNewShift({ ...newShift, slots: e.target.value })} placeholder="4 Open Slots" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm" style={{ width: '100%' }}>
+                    <Plus size={15} /> Add Shift to Schedule
+                  </button>
+                </form>
+              ) : (
+                <div style={{ padding: '12px 14px', borderRadius: '10px', backgroundColor: '#F8FAFC', border: '1px dashed #CBD5E1', fontSize: '0.82rem', color: '#64748B', textAlign: 'center' }}>
+                  Trainer schedule and shifts are managed centrally by Super Admin.
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '10px' }}>
-                  <input value={newShift.time} onChange={(e) => setNewShift({ ...newShift, time: e.target.value })} placeholder="05:00 PM – 09:00 PM" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
-                  <input value={newShift.slots} onChange={(e) => setNewShift({ ...newShift, slots: e.target.value })} placeholder="4 Open Slots" style={{ padding: '9px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }} />
-                </div>
-                <button type="submit" className="btn btn-primary btn-sm" style={{ width: '100%' }}>
-                  <Plus size={15} /> Add Shift to Schedule
-                </button>
-              </form>
+              )}
             </div>
           </div>
         </div>

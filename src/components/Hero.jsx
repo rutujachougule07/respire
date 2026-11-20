@@ -1,7 +1,11 @@
 import React from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function Hero() {
+  const { content } = useWebsiteContent();
+  const heroBg = content?.hero?.bgImage || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop';
+
   const scrollToNext = () => {
     const el = document.getElementById('about');
     if (el) {
@@ -39,7 +43,7 @@ export default function Hero() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: `url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop')`,
+          backgroundImage: `url('${heroBg}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center center',
           backgroundRepeat: 'no-repeat',

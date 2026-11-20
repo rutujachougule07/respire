@@ -45,6 +45,11 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
   const [selectedBranch, setSelectedBranch] = useState(
     isSuperAdmin ? 'all' : adminInfo?.branchId || 'vishrambag'
   );
+  const [activeTab, setActiveTab] = useState(isSuperAdmin ? 'branches' : 'members');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [toast, setToast] = useState('');
+  const [settingsSubTab, setSettingsSubTab] = useState('home');
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(true);
 
   // Keep branch locked to manager's branch or allow super admin to switch
   useEffect(() => {
@@ -56,11 +61,13 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       }
     }
   }, [adminInfo]);
-  const [activeTab, setActiveTab] = useState(isSuperAdmin ? 'branches' : 'members');
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [toast, setToast] = useState('');
-  const [settingsSubTab, setSettingsSubTab] = useState('home');
-  const [settingsMenuOpen, setSettingsMenuOpen] = useState(true);
+
+  // Prevent branch managers from accessing super-admin-only tabs
+  useEffect(() => {
+    if (!isSuperAdmin && (activeTab === 'settings' || activeTab === 'branches')) {
+      setActiveTab('members');
+    }
+  }, [isSuperAdmin, activeTab]);
 
   // Clean state - strictly direct from Firebase Firestore, ZERO localStorage
   const [members, setMembers] = useState([]);
@@ -193,7 +200,9 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       badge: newInquiriesCount > 0 ? `${newInquiriesCount} New` : null,
     },
     { id: 'analytics', label: 'Revenue & Analytics', icon: BarChart3, badge: null },
-    { id: 'settings', label: 'Website Settings', icon: Settings, badge: 'CMS' },
+    ...(isSuperAdmin
+      ? [{ id: 'settings', label: 'Website Settings', icon: Settings, badge: 'CMS' }]
+      : []),
   ];
 
   const handleInspectBranch = (branchId) => {
@@ -700,7 +709,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             />
           )}
 
-          {activeTab === 'settings' && (
+          {activeTab === 'settings' && isSuperAdmin && (
             <SettingsTab
               activeSubTab={settingsSubTab}
               onSubTabChange={setSettingsSubTab}

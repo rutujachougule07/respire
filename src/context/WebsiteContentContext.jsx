@@ -175,6 +175,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
       modulesCount: '8 Comprehensive Modules',
       duration: '4-6 Weeks Progression',
       coach: 'Certified Physical Coach',
+      image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop',
     },
     intermediate: {
       category: 'Intermediate',
@@ -187,6 +188,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
       modulesCount: '12 Intensive Modules',
       duration: '8-12 Weeks Progression',
       coach: 'Master Strength Specialist',
+      image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1000&auto=format&fit=crop',
     },
     advanced: {
       category: 'Advanced',
@@ -199,6 +201,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
       modulesCount: '16 Elite Masterclasses',
       duration: '12-16 Weeks Progression',
       coach: 'Elite Performance Director',
+      image: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1000&auto=format&fit=crop',
     },
   },
   tracking: {

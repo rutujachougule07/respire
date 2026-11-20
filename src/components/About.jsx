@@ -1,7 +1,10 @@
 import React from 'react';
 import { Building2, Award, ShieldCheck, HeartHandshake, CheckCircle2, Landmark } from 'lucide-react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function About() {
+  const { content } = useWebsiteContent();
+  const aboutImage = content?.about?.image || 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop';
   const companyPillars = [
     {
       icon: Award,
@@ -80,7 +83,7 @@ export default function About() {
               }}
             >
               <img
-                src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop"
+                src={aboutImage}
                 alt="Respire Fitness - A Part of Mahabal Group"
                 className="img-cover"
                 style={{ transition: 'transform 0.6s ease' }}

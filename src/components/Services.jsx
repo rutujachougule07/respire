@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Dumbbell, Sparkles, Flame, Music, Heart, ArrowUpRight, Check, Waves } from 'lucide-react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function Services() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
+  const { content } = useWebsiteContent();
 
-  const services = [
+  const baseServices = [
     {
       id: 'pt',
       title: 'Personal Training',
@@ -56,6 +58,17 @@ export default function Services() {
       accent: '#00B84A',
     },
   ];
+
+  const services = baseServices.map((srv) => {
+    const override = content?.services?.items?.find((item) => item.id === srv.id);
+    return {
+      ...srv,
+      ...(override || {}),
+      image: override?.image || srv.image,
+      icon: srv.icon,
+      accent: srv.accent,
+    };
+  });
 
   const scrollToContact = (serviceTitle) => {
     const el = document.getElementById('contact');
