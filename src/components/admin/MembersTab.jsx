@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Trash2,
 } from 'lucide-react';
-import { saveMemberToFirestore, updateMemberStatusInFirestore } , deleteMemberFromFirestore } from '../../services/firestoreService';
+import { saveMemberToFirestore, updateMemberStatusInFirestore, deleteMemberFromFirestore } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');

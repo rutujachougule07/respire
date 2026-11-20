@@ -1,4 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Users,
+  CreditCard,
+  Dumbbell,
+  BarChart3,
+  LogOut,
+  Menu,
+  X,
+  CheckCircle2,
+  ShieldCheck,
+  Bell,
+  ArrowLeft,
+  Building2,
+  MessageSquare,
+  Globe,
+  Settings,
+  ChevronDown,
+  Home,
+  Info,
+  Sparkles,
+  Layers,
+  Activity,
+  MapPin,
+  FileText,
+} from 'lucide-react';
+import {
+  BRANCHES,
+  INITIAL_PLANS,
+} from './initialData';
 import {
   seedInitialDataIfEmpty,
   purgeAllDummyDataFromFirestore,
@@ -12,8 +42,7 @@ import PlansRenewalsTab from './PlansRenewalsTab';
 import TrainersTab from './TrainersTab';
 import AnalyticsTab from './AnalyticsTab';
 import InquiriesTab from './InquiriesTab';
-
-}
+import SettingsTab from './SettingsTab';
 
 export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: propOnLogout, plans: propPlans, setPlans: propSetPlans }) {
   const { adminSession: contextAdminSession, logout } = useAuth();
@@ -25,9 +54,22 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
   const [selectedBranch, setSelectedBranch] = useState(
     isSuperAdmin ? 'all' : adminInfo?.branchId || 'vishrambag'
   );
+
+  // Keep branch locked to manager's branch or allow super admin to switch
+  useEffect(() => {
+    if (adminInfo) {
+      if (adminInfo.role === 'Super Admin') {
+        setSelectedBranch((prev) => (prev ? prev : 'all'));
+      } else if (adminInfo.branchId) {
+        setSelectedBranch(adminInfo.branchId);
+      }
+    }
+  }, [adminInfo]);
   const [activeTab, setActiveTab] = useState(isSuperAdmin ? 'branches' : 'members');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toast, setToast] = useState('');
+  const [settingsSubTab, setSettingsSubTab] = useState('home');
+  const [settingsMenuOpen, setSettingsMenuOpen] = useState(true);
 
   // Clean state - strictly direct from Firebase Firestore, ZERO localStorage
   const [members, setMembers] = useState([]);

@@ -146,6 +146,12 @@ export function AuthProvider({ children }) {
     }
 
     try {
+      try {
+        await setPersistence(auth, browserSessionPersistence);
+      } catch {
+        // ignore
+      }
+
       const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, cleanPass);
       const user = userCredential.user;
       const session = {
@@ -153,6 +159,13 @@ export function AuthProvider({ children }) {
         uid: user.uid,
         firebaseEmail: user.email,
       };
+
+      try {
+        sessionStorage.setItem('rf_tab_admin_session', JSON.stringify(session));
+        localStorage.removeItem('rf_admin_session_auth');
+      } catch {
+        // ignore
+      }
 
       try {
         await setDoc(
@@ -180,6 +193,12 @@ export function AuthProvider({ children }) {
             uid: newCredential.user.uid,
             firebaseEmail: newCredential.user.email,
           };
+          try {
+            sessionStorage.setItem('rf_tab_admin_session', JSON.stringify(session));
+            localStorage.removeItem('rf_admin_session_auth');
+          } catch {
+            // ignore
+          }
           setAdminSession(session);
           setCurrentUser(newCredential.user);
           return { success: true, user: newCredential.user, session };
@@ -189,6 +208,12 @@ export function AuthProvider({ children }) {
             ...matchedAccount,
             uid: `auth-${matchedAccount.email.replace(/[^a-zA-Z0-9]/g, '_')}`,
           };
+          try {
+            sessionStorage.setItem('rf_tab_admin_session', JSON.stringify(session));
+            localStorage.removeItem('rf_admin_session_auth');
+          } catch {
+            // ignore
+          }
           setAdminSession(session);
           return { success: true, session };
         }
@@ -206,7 +231,12 @@ export function AuthProvider({ children }) {
     }
     setAdminSession(null);
     setCurrentUser(null);
-    localStorage.removeItem('rf_admin_session_auth');
+    try {
+      sessionStorage.removeItem('rf_tab_admin_session');
+      localStorage.removeItem('rf_admin_session_auth');
+    } catch {
+      // ignore
+    }
   };
 
   return (
