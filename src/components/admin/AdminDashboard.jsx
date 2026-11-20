@@ -255,8 +255,8 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           </button>
         </div>
 
-        {/* Role Pill & Live Status Badge */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
+        {/* Role Pill */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
           <div
             style={{
               display: 'inline-flex',
@@ -280,31 +280,6 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             <ShieldCheck size={12} />
             <span>{isSuperAdmin ? 'Super Admin' : 'Branch Manager'}</span>
           </div>
-
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '5px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              color: '#34D399',
-              backgroundColor: 'rgba(16, 185, 129, 0.12)',
-              padding: '3px 8px',
-              borderRadius: '999px',
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#10B981',
-                boxShadow: '0 0 8px #10B981',
-              }}
-            />
-            Live Cloud
-          </span>
         </div>
 
         {/* Active Branch Display */}
@@ -467,131 +442,39 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           background: 'linear-gradient(180deg, rgba(11, 17, 32, 0.95) 0%, rgba(8, 13, 24, 1) 100%)',
         }}
       >
-        {/* Quick Public Website Switcher */}
+        {/* Logout Option Only */}
         <button
-          onClick={() => navigate('/')}
+          onClick={handleLogout}
           style={{
             width: '100%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '9px 12px',
-            borderRadius: '9px',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            color: '#CBD5E1',
-            fontSize: '0.78rem',
-            fontWeight: 600,
+            justifyContent: 'center',
+            gap: '8px',
+            padding: '11px 16px',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.28)',
+            color: '#F87171',
+            fontSize: '0.86rem',
+            fontWeight: 800,
             cursor: 'pointer',
-            marginBottom: '10px',
             transition: 'all 0.18s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.22)';
             e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.borderColor = 'rgba(0, 210, 86, 0.3)';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.04)';
-            e.currentTarget.style.color = '#CBD5E1';
-            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)';
+            e.currentTarget.style.color = '#F87171';
+            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.28)';
           }}
         >
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <Globe size={14} color="#00E676" />
-            <span>Public Website</span>
-          </span>
-          <span style={{ fontSize: '0.72rem', color: '#64748B' }}>↗</span>
+          <LogOut size={16} />
+          <span>Logout</span>
         </button>
-
-        {/* User Card with Avatar & Sign Out */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '8px',
-            padding: '9px 10px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '9px', minWidth: 0 }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #00D256 0%, #172C83 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#FFFFFF',
-                fontWeight: 800,
-                fontSize: '0.78rem',
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(0, 210, 86, 0.25)',
-              }}
-            >
-              {(adminInfo?.name || 'M').charAt(0).toUpperCase()}
-            </div>
-            <div style={{ minWidth: 0, overflow: 'hidden' }}>
-              <div
-                style={{
-                  fontSize: '0.8rem',
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {adminInfo?.name || 'Mahabal Owner'}
-              </div>
-              <div
-                style={{
-                  fontSize: '0.68rem',
-                  color: '#94A3B8',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-                {adminInfo?.email || 'admin@gmail.com'}
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={handleLogout}
-            title="Sign Out"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
-              color: '#F87171',
-              cursor: 'pointer',
-              flexShrink: 0,
-              transition: 'all 0.18s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.22)';
-              e.currentTarget.style.color = '#FFFFFF';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-              e.currentTarget.style.color = '#F87171';
-            }}
-          >
-            <LogOut size={14} />
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -741,26 +624,6 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
                 })}
               </div>
             )}
-
-            <button
-              onClick={() => navigate('/')}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '8px 12px',
-                borderRadius: '10px',
-                backgroundColor: '#F1F5F9',
-                color: '#475569',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                border: '1px solid #E2E8F0',
-                cursor: 'pointer',
-              }}
-            >
-              <Globe size={14} color="#008A38" />
-              <span>Public Website</span>
-            </button>
 
             <button
               onClick={handleLogout}
