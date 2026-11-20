@@ -203,8 +203,8 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: '#0B1120',
-        color: '#FFFFFF',
+        backgroundColor: '#FFFFFF',
+        color: '#0F172A',
         userSelect: 'none',
       }}
     >
@@ -212,14 +212,14 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       <div
         style={{
           flexShrink: 0,
-          padding: '22px 18px 16px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(11, 17, 32, 0.98) 100%)',
+          padding: '20px 18px 16px',
+          borderBottom: '1px solid #F1F5F9',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <img
-            src="/respire_logo_transparent.png"
+            src="/respire_logo_web.png"
             alt="Respire Fitness"
             style={{
               height: '42px',
@@ -227,11 +227,10 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
               maxWidth: '185px',
               objectFit: 'contain',
               display: 'block',
-              filter: 'drop-shadow(0 2px 10px rgba(0, 210, 86, 0.25))',
             }}
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/respire_logo_web.png';
+              e.target.src = '/respire_logo_transparent.png';
             }}
           />
           {/* Mobile drawer close button */}
@@ -240,10 +239,10 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             className="admin-mobile-toggle"
             aria-label="Close sidebar"
             style={{
-              background: 'rgba(255, 255, 255, 0.08)',
+              background: '#F1F5F9',
               border: 'none',
               borderRadius: '8px',
-              color: '#94A3B8',
+              color: '#64748B',
               cursor: 'pointer',
               padding: '6px',
               display: 'flex',
@@ -265,14 +264,14 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
               padding: '4px 10px',
               borderRadius: '999px',
               backgroundColor: isSuperAdmin
-                ? 'rgba(99, 102, 241, 0.14)'
-                : 'rgba(0, 210, 86, 0.14)',
+                ? 'rgba(23, 44, 131, 0.08)'
+                : 'rgba(0, 184, 74, 0.08)',
               border: isSuperAdmin
-                ? '1px solid rgba(129, 140, 248, 0.35)'
-                : '1px solid rgba(0, 210, 86, 0.35)',
+                ? '1px solid rgba(23, 44, 131, 0.25)'
+                : '1px solid rgba(0, 184, 74, 0.25)',
               fontSize: '0.7rem',
               fontWeight: 800,
-              color: isSuperAdmin ? '#A5B4FC' : '#4ADE80',
+              color: isSuperAdmin ? '#172C83' : '#008A38',
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
             }}
@@ -288,16 +287,16 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '7px 10px',
+            padding: '8px 10px',
             borderRadius: '8px',
-            backgroundColor: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.07)',
+            backgroundColor: '#F8FAFC',
+            border: '1px solid #E2E8F0',
             fontSize: '0.74rem',
-            color: '#CBD5E1',
-            fontWeight: 600,
+            color: '#334155',
+            fontWeight: 700,
           }}
         >
-          <Building2 size={13} color="#00D256" style={{ flexShrink: 0 }} />
+          <Building2 size={13} color="#008A38" style={{ flexShrink: 0 }} />
           <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {isSuperAdmin && selectedBranch === 'all'
               ? 'All Branches (Vishrambag & Vijaynagar)'
@@ -313,6 +312,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           flex: 1,
           overflowY: 'auto',
           padding: '16px 12px',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <div
@@ -320,7 +320,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             fontSize: '0.65rem',
             fontWeight: 800,
             letterSpacing: '0.08em',
-            color: '#64748B',
+            color: '#94A3B8',
             textTransform: 'uppercase',
             padding: '0 8px 10px',
           }}
@@ -328,7 +328,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           Navigation
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = activeTab === item.id;
@@ -350,40 +350,35 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
                   padding: '10px 12px',
                   borderRadius: '10px',
                   background: active
-                    ? 'linear-gradient(90deg, rgba(0, 210, 86, 0.16) 0%, rgba(0, 184, 74, 0.06) 100%)'
+                    ? 'linear-gradient(135deg, #00D256 0%, #008A38 100%)'
                     : 'transparent',
-                  color: active ? '#FFFFFF' : '#94A3B8',
-                  fontWeight: active ? 700 : 500,
-                  fontSize: '0.84rem',
+                  color: active ? '#FFFFFF' : '#475569',
+                  fontWeight: active ? 800 : 600,
+                  fontSize: '0.86rem',
                   textAlign: 'left',
-                  border: active
-                    ? '1px solid rgba(0, 210, 86, 0.35)'
-                    : '1px solid transparent',
-                  boxShadow: active ? '0 4px 14px rgba(0, 210, 86, 0.12)' : 'none',
+                  border: 'none',
+                  boxShadow: active ? '0 4px 14px rgba(0, 184, 74, 0.28)' : 'none',
                   cursor: 'pointer',
                   transition: 'all 0.18s ease',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                    e.currentTarget.style.color = '#FFFFFF';
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                    e.currentTarget.style.color = '#0F172A';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!active) {
                     e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#94A3B8';
+                    e.currentTarget.style.color = '#475569';
                   }
                 }}
               >
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                   <Icon
                     size={17}
-                    color={active ? '#00E676' : '#64748B'}
-                    style={{
-                      flexShrink: 0,
-                      filter: active ? 'drop-shadow(0 0 6px rgba(0, 230, 118, 0.4))' : 'none',
-                    }}
+                    color={active ? '#FFFFFF' : '#64748B'}
+                    style={{ flexShrink: 0 }}
                   />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.label}
@@ -401,26 +396,26 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
                       letterSpacing: '0.02em',
                       ...(isDueBadge
                         ? {
-                            backgroundColor: 'rgba(245, 158, 11, 0.18)',
-                            border: '1px solid rgba(245, 158, 11, 0.35)',
-                            color: '#FBBF24',
+                            backgroundColor: '#FEF3C7',
+                            border: '1px solid #FDE68A',
+                            color: '#B45309',
                           }
                         : isNewBadge
                         ? {
-                            backgroundColor: 'rgba(59, 130, 246, 0.18)',
-                            border: '1px solid rgba(59, 130, 246, 0.35)',
-                            color: '#60A5FA',
+                            backgroundColor: '#EFF6FF',
+                            border: '1px solid #BFDBFE',
+                            color: '#1D4ED8',
                           }
                         : active
                         ? {
-                            backgroundColor: 'rgba(0, 210, 86, 0.22)',
-                            border: '1px solid rgba(0, 210, 86, 0.4)',
-                            color: '#00E676',
+                            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                            border: '1px solid rgba(255, 255, 255, 0.4)',
+                            color: '#FFFFFF',
                           }
                         : {
-                            backgroundColor: 'rgba(255, 255, 255, 0.07)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: '#CBD5E1',
+                            backgroundColor: '#F1F5F9',
+                            border: '1px solid #E2E8F0',
+                            color: '#64748B',
                           }),
                     }}
                   >
@@ -438,8 +433,8 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
         style={{
           flexShrink: 0,
           padding: '14px 14px 18px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          background: 'linear-gradient(180deg, rgba(11, 17, 32, 0.95) 0%, rgba(8, 13, 24, 1) 100%)',
+          borderTop: '1px solid #F1F5F9',
+          backgroundColor: '#FFFFFF',
         }}
       >
         {/* Logout Option Only */}
@@ -453,23 +448,23 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             gap: '8px',
             padding: '11px 16px',
             borderRadius: '10px',
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.28)',
-            color: '#F87171',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FECACA',
+            color: '#DC2626',
             fontSize: '0.86rem',
             fontWeight: 800,
             cursor: 'pointer',
             transition: 'all 0.18s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.22)';
+            e.currentTarget.style.backgroundColor = '#DC2626';
             e.currentTarget.style.color = '#FFFFFF';
-            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+            e.currentTarget.style.borderColor = '#DC2626';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.12)';
-            e.currentTarget.style.color = '#F87171';
-            e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.28)';
+            e.currentTarget.style.backgroundColor = '#FEF2F2';
+            e.currentTarget.style.color = '#DC2626';
+            e.currentTarget.style.borderColor = '#FECACA';
           }}
         >
           <LogOut size={16} />
@@ -481,18 +476,18 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8FAFC' }}>
-      {/* Desktop Persistent Dark Sidebar */}
+      {/* Desktop Persistent White Executive Sidebar */}
       <aside
         style={{
           width: '264px',
-          backgroundColor: '#0B1120',
-          color: '#FFFFFF',
+          backgroundColor: '#FFFFFF',
+          color: '#0F172A',
           flexShrink: 0,
           position: 'sticky',
           top: 0,
           height: '100vh',
           display: 'none',
-          borderRight: '1px solid rgba(255, 255, 255, 0.07)',
+          borderRight: '1px solid #E2E8F0',
           zIndex: 90,
         }}
         className="admin-desktop-sidebar"
@@ -507,8 +502,8 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
             position: 'fixed',
             inset: 0,
             zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(3px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(4px)',
             display: 'flex',
           }}
           onClick={() => setMobileSidebarOpen(false)}
@@ -516,9 +511,9 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           <div
             style={{
               width: '280px',
-              backgroundColor: '#0B1120',
+              backgroundColor: '#FFFFFF',
               height: '100%',
-              boxShadow: '6px 0 28px rgba(0,0,0,0.6)',
+              boxShadow: '4px 0 28px rgba(15, 23, 42, 0.15)',
               display: 'flex',
               flexDirection: 'column',
             }}
@@ -763,11 +758,11 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           background: transparent;
         }
         .admin-sidebar-scroll::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.12);
+          background: rgba(0, 0, 0, 0.08);
           border-radius: 4px;
         }
         .admin-sidebar-scroll::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.25);
+          background: rgba(0, 0, 0, 0.16);
         }
       `}</style>
     </div>
