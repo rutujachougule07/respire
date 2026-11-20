@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { normalizeDuration } from './SessionScheduleTab';
 import {
   FileText,
   Plus,
@@ -42,7 +43,7 @@ export default function SessionNotesTab({
     date: new Date().toISOString().split('T')[0],
     workoutFocus: 'Full Body Conditioning',
     intensity: 'High',
-    duration: '60 mins',
+    duration: '1 Hour',
     exercises: [
       { name: 'Barbell Squats', sets: '4', reps: '10', weight: '60 kg' },
       { name: 'Dumbbell Bench Press', sets: '3', reps: '12', weight: '20 kg' },
@@ -63,7 +64,7 @@ export default function SessionNotesTab({
       date: prefill.date || new Date().toISOString().split('T')[0],
       workoutFocus: 'Full Body Conditioning',
       intensity: 'High',
-      duration: '60 mins',
+      duration: prefill.duration ? normalizeDuration(prefill.duration) : '1 Hour',
       exercises: [
         { name: 'Barbell Bench Press', sets: '4', reps: '10', weight: '50 kg' },
       ],
@@ -85,7 +86,7 @@ export default function SessionNotesTab({
       date: note.date || new Date().toISOString().split('T')[0],
       workoutFocus: note.workoutFocus || 'Full Body Conditioning',
       intensity: note.intensity || 'High',
-      duration: note.duration || '60 mins',
+      duration: normalizeDuration(note.duration),
       exercises: Array.isArray(note.exercises) && note.exercises.length > 0
         ? note.exercises
         : [{ name: '', sets: '', reps: '', weight: '' }],
@@ -370,7 +371,7 @@ export default function SessionNotesTab({
                 )}
                 {note.duration && (
                   <span style={{ padding: '3px 8px', borderRadius: '6px', backgroundColor: '#F1F5F9', color: '#475569', fontSize: '0.7rem', fontWeight: 800 }}>
-                    Duration: {note.duration}
+                    Duration: {normalizeDuration(note.duration)}
                   </span>
                 )}
               </div>

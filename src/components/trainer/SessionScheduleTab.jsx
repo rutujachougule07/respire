@@ -34,6 +34,19 @@ const WORKOUT_TYPES = [
   'Rehabilitation & Recovery',
 ];
 
+export const DURATION_OPTIONS = ['1 Hour', '2 Hours', '3 Hours', '4 Hours'];
+
+export const normalizeDuration = (dur) => {
+  if (!dur) return '1 Hour';
+  const lower = String(dur).toLowerCase().trim();
+  if (lower === '60 mins' || lower === '60 min' || lower === '1 hour' || lower === '1 hr' || lower === '1 hours') return '1 Hour';
+  if (lower === '120 mins' || lower === '120 min' || lower === '2 hours' || lower === '2 hrs' || lower === '2 hour') return '2 Hours';
+  if (lower === '180 mins' || lower === '180 min' || lower === '3 hours' || lower === '3 hrs' || lower === '3 hour') return '3 Hours';
+  if (lower === '240 mins' || lower === '240 min' || lower === '4 hours' || lower === '4 hrs' || lower === '4 hour') return '4 Hours';
+  if (lower === '30 mins' || lower === '45 mins' || lower === '90 mins') return '1 Hour';
+  return dur;
+};
+
 const STANDARD_TIME_SLOTS = [
   '06:00 AM', '06:30 AM', '07:00 AM', '07:30 AM', '08:00 AM', '08:30 AM',
   '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
@@ -64,7 +77,7 @@ export default function SessionScheduleTab({
     date: new Date().toISOString().split('T')[0],
     time: '08:00 AM',
     type: 'Strength & Hypertrophy',
-    duration: '60 mins',
+    duration: '1 Hour',
     status: 'Scheduled',
     notes: '',
   });
@@ -78,7 +91,7 @@ export default function SessionScheduleTab({
       date: prefill.date || selectedDate || new Date().toISOString().split('T')[0],
       time: prefill.time || '08:00 AM',
       type: 'Strength & Hypertrophy',
-      duration: '60 mins',
+      duration: '1 Hour',
       status: 'Scheduled',
       notes: '',
     });
@@ -94,7 +107,7 @@ export default function SessionScheduleTab({
       date: session.date,
       time: session.time,
       type: session.type || 'Strength & Hypertrophy',
-      duration: session.duration || '60 mins',
+      duration: normalizeDuration(session.duration),
       status: session.status || 'Scheduled',
       notes: session.notes || '',
     });
@@ -360,7 +373,7 @@ export default function SessionScheduleTab({
                           </div>
                         )}
                       </td>
-                      <td style={{ padding: '14px 18px', color: '#475569' }}>{session.duration || '60 mins'}</td>
+                      <td style={{ padding: '14px 18px', color: '#475569' }}>{normalizeDuration(session.duration)}</td>
                       <td style={{ padding: '14px 18px' }}>
                         <span
                           style={{
@@ -580,7 +593,7 @@ export default function SessionScheduleTab({
                       <div>
                         <div style={{ fontWeight: 800, fontSize: '0.96rem', color: '#0F172A' }}>{s.memberName}</div>
                         <div style={{ fontSize: '0.76rem', color: '#64748B' }}>
-                          {s.type} • {s.duration}
+                          {s.type} • {normalizeDuration(s.duration)}
                         </div>
                       </div>
                     </div>
@@ -896,14 +909,24 @@ export default function SessionScheduleTab({
                     Duration
                   </label>
                   <select
-                    value={form.duration}
+                    value={normalizeDuration(form.duration)}
                     onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem', outline: 'none' }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '10px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '0.84rem',
+                      outline: 'none',
+                      backgroundColor: '#FFFFFF',
+                      fontWeight: 600,
+                    }}
                   >
-                    <option value="30 mins">30 mins</option>
-                    <option value="45 mins">45 mins</option>
-                    <option value="60 mins">60 mins</option>
-                    <option value="90 mins">90 mins</option>
+                    {DURATION_OPTIONS.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

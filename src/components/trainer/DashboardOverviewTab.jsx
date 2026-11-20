@@ -1,4 +1,5 @@
 import React from 'react';
+import { normalizeDuration } from './SessionScheduleTab';
 import {
   Users,
   Calendar,
@@ -445,7 +446,7 @@ export default function DashboardOverviewTab({
                         {session.memberName || 'Client'}
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                        {session.type || 'Personal Training'} • {session.duration || '60 mins'}
+                        {session.type || 'Personal Training'} • {normalizeDuration(session.duration)}
                       </div>
                     </div>
                   </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { normalizeDuration } from './SessionScheduleTab';
 import {
   CheckCircle2,
   Search,
@@ -434,7 +435,7 @@ export default function CompletedSessionsTab({
                 <div style={{ padding: '12px', backgroundColor: '#F8FAFC', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
                   <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase' }}>Session Time & Duration</div>
                   <div style={{ fontWeight: 800, color: '#008A38', fontSize: '0.92rem' }}>
-                    {viewingSession.time} ({viewingSession.duration || '60 mins'})
+                    {viewingSession.time} ({normalizeDuration(viewingSession.duration)})
                   </div>
                 </div>
               </div>
