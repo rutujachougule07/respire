@@ -1,8 +1,22 @@
 import React from 'react';
 import { UserCheck, Award, Target, Activity, Sparkles, Building2, Shield } from 'lucide-react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function WhyChooseUs() {
-  const reasons = [
+  const { content } = useWebsiteContent();
+  const whyUsData = content?.whyUs || {};
+
+  if (whyUsData?.visible === false || content?.sectionVisibility?.whyUs === false) {
+    return null;
+  }
+
+  const eyebrow = whyUsData.eyebrow || 'The Respire Standard';
+  const title = whyUsData.title || 'WHY CHOOSE RESPIRE FITNESS';
+  const subtitle =
+    whyUsData.subtitle ||
+    'A harmonious fusion of elite sports science, luxury recovery amenities, and the uncompromised trust of the Mahabal Group.';
+
+  const defaultReasons = [
     {
       icon: UserCheck,
       title: 'Dedicated Trainer Support',
@@ -35,6 +49,17 @@ export default function WhyChooseUs() {
     },
   ];
 
+  const reasonIcons = [UserCheck, Target, Activity, Award, Building2];
+  const rawReasons = (whyUsData.reasons && Array.isArray(whyUsData.reasons))
+    ? whyUsData.reasons
+    : defaultReasons;
+
+  const reasons = rawReasons.map((r, i) => ({
+    ...r,
+    icon: reasonIcons[i % reasonIcons.length] || Sparkles,
+    badge: r.badge || 'Respire Standard',
+  }));
+
   return (
     <section
       id="why-us"
@@ -50,13 +75,13 @@ export default function WhyChooseUs() {
         <div className="section-header">
           <div className="section-eyebrow">
             <Sparkles size={14} />
-            <span>The Respire Standard</span>
+            <span>{eyebrow}</span>
           </div>
           <h2 className="section-title">
-            WHY CHOOSE <span className="text-green">RESPIRE FITNESS</span>
+            {title}
           </h2>
           <p className="section-subtitle">
-            A harmonious fusion of elite sports science, luxury recovery amenities, and the uncompromised trust of the Mahabal Group.
+            {subtitle}
           </p>
         </div>
 

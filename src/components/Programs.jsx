@@ -7,6 +7,16 @@ export default function Programs() {
   const { content } = useWebsiteContent();
   const programsData = content?.programs || {};
 
+  if (programsData?.visible === false || content?.sectionVisibility?.programs === false) {
+    return null;
+  }
+
+  const eyebrow = programsData.eyebrow || 'Structured Training Regimens';
+  const title = programsData.title || 'WORKOUT PROGRAMS BY CATEGORY';
+  const subtitle =
+    programsData.subtitle ||
+    'Whether taking your first steps into strength training or chasing elite athletic milestones, our progressive curriculums guide your evolution with certified expertise.';
+
   const programs = {
     beginner: {
       category: 'Beginner',
@@ -76,13 +86,13 @@ export default function Programs() {
         <div className="section-header">
           <div className="section-eyebrow">
             <Layers size={14} />
-            <span>Structured Training Regimens</span>
+            <span>{eyebrow}</span>
           </div>
           <h2 className="section-title">
-            WORKOUT PROGRAMS <span className="text-green">BY CATEGORY</span>
+            {title}
           </h2>
           <p className="section-subtitle">
-            Whether taking your first steps into strength training or chasing elite athletic milestones, our progressive curriculums guide your evolution with certified expertise.
+            {subtitle}
           </p>
         </div>
 

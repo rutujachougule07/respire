@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck,
   Clock,
@@ -28,9 +28,27 @@ import {
   VIJAYNAGAR_MANAGEMENT,
   PERSONAL_TRAINING_RATES,
 } from './admin/initialData';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
+import { db } from '../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function Membership({ plans = [] }) {
+  const { content } = useWebsiteContent();
   const [selectedBranch, setSelectedBranch] = useState('vishrambag');
+  const [livePTRates, setLivePTRates] = useState(null);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'ptFeeStructure'), (snap) => {
+      if (snap.exists()) {
+        setLivePTRates(snap.data());
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  if (content?.membership?.visible === false || content?.sectionVisibility?.membership === false) {
+    return null;
+  }
 
   const scrollToContact = (branchId = 'vishrambag') => {
     const el = document.getElementById('contact');
@@ -580,7 +598,25 @@ export default function Membership({ plans = [] }) {
         {(() => {
           const ptBranchKey =
             selectedBranch === 'branch2' || selectedBranch === 'vijaynagar' ? 'branch2' : 'vishrambag';
-          const ptData = PERSONAL_TRAINING_RATES[ptBranchKey] || PERSONAL_TRAINING_RATES.vishrambag;
+          const defaultPtData = PERSONAL_TRAINING_RATES[ptBranchKey] || PERSONAL_TRAINING_RATES.vishrambag;
+          const liveBranch = livePTRates?.[ptBranchKey];
+          const rawCategories = liveBranch?.categories || defaultPtData.categories || [];
+          const categories = rawCategories.map((c) => {
+            const altP = Number(c.alternatePrice) || 0;
+            const dayP = Number(c.dailyPrice) || 0;
+            const pricing = c.pricing && c.pricing.length > 0 ? c.pricing : [
+              { planName: 'Alternate Days', price: altP, priceDisplay: `₹${altP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+              { planName: 'Daily Personal Training', price: dayP, priceDisplay: `₹${dayP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+            ];
+            return {
+              ...c,
+              pricing,
+            };
+          });
+          const ptData = {
+            ...defaultPtData,
+            categories,
+          };
           const isVjn = ptBranchKey === 'branch2';
 
           return (

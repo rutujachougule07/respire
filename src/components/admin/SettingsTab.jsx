@@ -15,8 +15,16 @@ import {
   Globe,
   Trash2,
   ExternalLink,
+  Dumbbell,
+  Plus,
+  Edit3,
+  X,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useWebsiteContent, DEFAULT_WEBSITE_CONTENT } from '../../context/WebsiteContentContext';
+import { db } from '../../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 /**
  * Universal Drag-and-Drop Image Uploader Component
@@ -52,7 +60,7 @@ function ImageDropzone({
       // Client-side canvas compression: keeps images crisp & fast, prevents oversized payload
       const img = new Image();
       img.onload = () => {
-        const MAX_DIM = 1400;
+        const MAX_DIM = 1200;
         let w = img.width;
         let h = img.height;
         if (w > MAX_DIM || h > MAX_DIM) {
@@ -69,7 +77,7 @@ function ImageDropzone({
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        const compressed = canvas.toDataURL('image/jpeg', 0.84);
+        const compressed = canvas.toDataURL('image/jpeg', 0.76);
         setIsProcessing(false);
         onChange(compressed);
       };
@@ -331,32 +339,15 @@ function ImageDropzone({
   );
 }
 
-export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, showToast }) {
-  const { content, updateSection, resetSection, resetAllToDefaults } = useWebsiteContent();
+export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, showToast }) {
+  const { content, updateSection, toggleSectionVisibility, resetSection, resetAllToDefaults } = useWebsiteContent();
 
-  const [currentSubTab, setCurrentSubTab] = useState(activeSubTab || 'media');
+  const [currentSubTab, setCurrentSubTab] = useState(activeSubTab || 'home');
   const [formData, setFormData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    if (activeSubTab && activeSubTab !== currentSubTab) {
-      setCurrentSubTab(activeSubTab);
-    }
-  }, [activeSubTab]);
-
-  useEffect(() => {
-    if (content) {
-      const sectionKey = getSectionKey(currentSubTab);
-      if (content[sectionKey]) {
-        setFormData(JSON.parse(JSON.stringify(content[sectionKey])));
-      }
-    }
-  }, [currentSubTab, content]);
-
-  function getSectionKey(subTab) {
+  const getSectionKey = (subTab) => {
     switch (subTab) {
-      case 'media':
-        return 'hero'; // handled individually
       case 'home':
         return 'hero';
       case 'about':
@@ -374,7 +365,121 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
       default:
         return 'hero';
     }
-  }
+  };
+
+  const isSectionVisible = (sectionKey) => {
+    if (content?.sectionVisibility?.[sectionKey] === false) return false;
+    if (content?.[sectionKey]?.visible === false) return false;
+    return true;
+  };
+
+  const handleToggleCurrentSection = async () => {
+    const sectionKey = getSectionKey(currentSubTab);
+    const currentVis = isSectionVisible(sectionKey);
+    const newVis = !currentVis;
+    await toggleSectionVisibility(sectionKey, newVis);
+    notify(newVis ? `✓ ${sectionKey.toUpperCase()} section is now LIVE on website!` : `✓ ${sectionKey.toUpperCase()} section is now HIDDEN / REMOVED from website!`);
+  };
+
+  // PT Fee Structure state
+  const DEFAULT_PT_RATES = {
+    vishrambag: {
+      categories: [
+        { id: 'pt-vb-general', title: 'GENERAL PERSONAL TRAINING', badge: 'Certified Coach', alternatePrice: 7000, dailyPrice: 10000 },
+        { id: 'pt-vb-premium', title: 'PREMIUM PERSONAL TRAINING', badge: 'Elite Transformation Specialist', alternatePrice: 9000, dailyPrice: 13000 },
+      ],
+    },
+    branch2: {
+      categories: [
+        { id: 'pt-vjn-junior', title: 'JUNIOR PERSONAL TRAINER', badge: 'Junior Fitness Coach', alternatePrice: 4500, dailyPrice: 8000 },
+        { id: 'pt-vjn-senior', title: 'SENIOR PERSONAL TRAINER', badge: 'Senior Master Coach (Since 2012)', alternatePrice: 5500, dailyPrice: 10000 },
+      ],
+    },
+  };
+  const [ptRates, setPtRates] = useState(DEFAULT_PT_RATES);
+  const [ptLoaded, setPtLoaded] = useState(false);
+  const [isSavingPT, setIsSavingPT] = useState(false);
+  const [editingPTBranch, setEditingPTBranch] = useState('vishrambag');
+  const [showAddPTForm, setShowAddPTForm] = useState(false);
+  const [newPTCategory, setNewPTCategory] = useState({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
+  const [editingPTIdx, setEditingPTIdx] = useState(null);
+
+  // Load PT rates from Firestore on mount
+  useEffect(() => {
+    const loadPTRates = async () => {
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'ptFeeStructure'));
+        if (snap.exists()) {
+          setPtRates(snap.data());
+        }
+      } catch (e) {
+        console.error('Could not load PT rates from Firestore', e);
+      } finally {
+        setPtLoaded(true);
+      }
+    };
+    loadPTRates();
+  }, []);
+
+  const savePTRatesToFirestore = async (updatedRates) => {
+    setIsSavingPT(true);
+    try {
+      await setDoc(doc(db, 'settings', 'ptFeeStructure'), updatedRates);
+      setPtRates(updatedRates);
+      notify('✓ PT Fee Structure saved successfully!');
+    } catch (e) {
+      console.error(e);
+      notify('Error saving PT rates. Please retry.');
+    } finally {
+      setIsSavingPT(false);
+    }
+  };
+
+  const handlePTCategoryChange = (branch, idx, field, value) => {
+    const updated = JSON.parse(JSON.stringify(ptRates));
+    updated[branch].categories[idx][field] = field.includes('Price') ? Number(value) : value;
+    setPtRates(updated);
+  };
+
+  const handleDeletePTCategory = (branch, idx) => {
+    if (!window.confirm('Delete this PT plan?')) return;
+    const updated = JSON.parse(JSON.stringify(ptRates));
+    updated[branch].categories.splice(idx, 1);
+    savePTRatesToFirestore(updated);
+  };
+
+  const handleAddPTCategory = () => {
+    const { title, badge, alternatePrice, dailyPrice } = newPTCategory;
+    if (!title.trim()) { notify('Please enter a plan title.'); return; }
+    const updated = JSON.parse(JSON.stringify(ptRates));
+    updated[editingPTBranch].categories.push({
+      id: `pt-custom-${Date.now()}`,
+      title: title.trim(),
+      badge: badge.trim(),
+      alternatePrice: Number(alternatePrice) || 0,
+      dailyPrice: Number(dailyPrice) || 0,
+    });
+    setNewPTCategory({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
+    setShowAddPTForm(false);
+    savePTRatesToFirestore(updated);
+  };
+
+  useEffect(() => {
+    if (activeSubTab && activeSubTab !== currentSubTab) {
+      setCurrentSubTab(activeSubTab);
+    }
+  }, [activeSubTab]);
+
+  useEffect(() => {
+    if (content) {
+      const sectionKey = getSectionKey(currentSubTab);
+      if (content[sectionKey]) {
+        setFormData(JSON.parse(JSON.stringify(content[sectionKey])));
+      }
+    }
+  }, [currentSubTab, content]);
+
+
 
   const handleSubTabClick = (tabId) => {
     setCurrentSubTab(tabId);
@@ -385,6 +490,12 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
 
   const notify = (msg) => {
     if (showToast) showToast(msg);
+  };
+
+  const autoSaveSection = (updatedData) => {
+    setFormData(updatedData);
+    const sectionKey = getSectionKey(currentSubTab);
+    updateSection(sectionKey, updatedData);
   };
 
   const handleSaveSection = async (e) => {
@@ -410,21 +521,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
     }
   };
 
-  // Helper for 1-click live image update from the dedicated Media Tab
-  const handleMediaImageUpdate = async (sectionKey, updateFn, labelName) => {
-    try {
-      const currentSection = content[sectionKey] ? JSON.parse(JSON.stringify(content[sectionKey])) : {};
-      const updatedSection = updateFn(currentSection);
-      await updateSection(sectionKey, updatedSection);
-      notify(`✓ Updated ${labelName} image live!`);
-    } catch (err) {
-      console.error(err);
-      notify(`Failed to update ${labelName} image.`);
-    }
-  };
-
   const tabs = [
-    { id: 'media', label: '🖼️ Website Images & Media', icon: ImageIcon, desc: 'Drag & Drop all gym images' },
     { id: 'home', label: 'Home / Hero', icon: Home, desc: 'Visual banner & cue' },
     { id: 'about', label: 'About Us', icon: Info, desc: 'Heritage story & photo' },
     { id: 'services', label: 'Services', icon: Sparkles, desc: 'PT, Massage, Steam & images' },
@@ -432,6 +529,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
     { id: 'why_us', label: 'Why Choose Us', icon: Layers, desc: '5 Core Value Props' },
     { id: 'tracking', label: 'Tracking', icon: Activity, desc: 'Body composition metrics' },
     { id: 'contact', label: 'Contact & Branches', icon: MapPin, desc: 'Phone, hours & policy' },
+    { id: 'pt_fees', label: 'PT Fee Structure', icon: Dumbbell, desc: 'Edit branch PT rates' },
   ];
 
   const inputStyle = {
@@ -504,10 +602,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
             <span>Website Control Room</span>
           </div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#FFFFFF', margin: 0, letterSpacing: '-0.02em' }}>
-            Website Content & Media Settings
+            Website Content & Section Settings
           </h1>
           <p style={{ color: '#94A3B8', fontSize: '0.84rem', margin: '4px 0 0', maxWidth: '600px' }}>
-            Drag and drop images, update texts, and customize services. All changes synchronize instantly to the live site.
+            Edit content and upload images directly in each section tab below. All changes synchronize instantly to the live site.
           </p>
         </div>
 
@@ -591,331 +689,102 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
           boxShadow: '0 8px 30px rgba(15, 23, 42, 0.05)',
         }}
       >
-        {/* ============================================================ */}
-        {/* TAB: ALL WEBSITE IMAGES & MEDIA (DRAG & DROP HUB)             */}
-        {/* ============================================================ */}
-        {currentSubTab === 'media' && (
-          <div>
-            <div style={{ marginBottom: '22px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#008A38', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
-                <ImageIcon size={14} />
-                <span>Media & Visual Assets</span>
+        {/* Universal Section Visibility & Live Control Banner */}
+        {currentSubTab !== 'pt_fees' && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px 20px',
+              borderRadius: '14px',
+              backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#ECFDF3' : '#FEF2F2',
+              border: isSectionVisible(getSectionKey(currentSubTab)) ? '1.5px solid #00B84A' : '1.5px solid #EF4444',
+              marginBottom: '26px',
+              flexWrap: 'wrap',
+              gap: '14px',
+              boxShadow: isSectionVisible(getSectionKey(currentSubTab))
+                ? '0 4px 14px rgba(0, 184, 74, 0.08)'
+                : '0 4px 14px rgba(239, 68, 68, 0.08)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '12px',
+                  backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#00B84A' : '#EF4444',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                  flexShrink: 0,
+                  boxShadow: isSectionVisible(getSectionKey(currentSubTab))
+                    ? '0 4px 12px rgba(0, 184, 74, 0.25)'
+                    : '0 4px 12px rgba(239, 68, 68, 0.25)',
+                }}
+              >
+                {isSectionVisible(getSectionKey(currentSubTab)) ? <Eye size={22} /> : <EyeOff size={22} />}
               </div>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#0F172A', margin: '0 0 4px' }}>
-                All Website Images (Drag & Drop Uploader)
-              </h2>
-              <p style={{ color: '#64748B', fontSize: '0.86rem', margin: 0 }}>
-                Drag and drop any image from your computer to replace photos across the website. Changes update immediately live!
-              </p>
+              <div>
+                <div
+                  style={{
+                    fontWeight: 900,
+                    fontSize: '0.98rem',
+                    color: isSectionVisible(getSectionKey(currentSubTab)) ? '#008A38' : '#DC2626',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <span>
+                    {isSectionVisible(getSectionKey(currentSubTab))
+                      ? '● SECTION IS LIVE ON WEBSITE'
+                      : '○ SECTION IS HIDDEN / REMOVED'}
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px' }}>
+                  {isSectionVisible(getSectionKey(currentSubTab))
+                    ? 'This section is currently visible to all visitors on the landing page.'
+                    : 'This section is removed and completely hidden from the public website.'}
+                </div>
+              </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-              {/* 1. Hero Background */}
-              <ImageDropzone
-                label="1. Hero Fullscreen Background"
-                helperText="Main full-screen background photo seen when landing on the website."
-                aspectLabel="16:9 Landscape"
-                value={content?.hero?.bgImage || DEFAULT_WEBSITE_CONTENT.hero.bgImage}
-                defaultImage={DEFAULT_WEBSITE_CONTENT.hero.bgImage}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate('hero', (prev) => ({ ...prev, bgImage: newImg }), 'Hero Background');
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate('hero', (prev) => ({ ...prev, bgImage: DEFAULT_WEBSITE_CONTENT.hero.bgImage }), 'Hero Background');
-                }}
-              />
-
-              {/* 2. About Us Image */}
-              <ImageDropzone
-                label="2. About Us Featured Gym Photo"
-                helperText="Gym facility & corporate heritage photo in About Mahabal Group section."
-                aspectLabel="4:3 Facility Photo"
-                value={content?.about?.image || DEFAULT_WEBSITE_CONTENT.about.image}
-                defaultImage={DEFAULT_WEBSITE_CONTENT.about.image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate('about', (prev) => ({ ...prev, image: newImg }), 'About Us');
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate('about', (prev) => ({ ...prev, image: DEFAULT_WEBSITE_CONTENT.about.image }), 'About Us');
-                }}
-              />
-
-              {/* 3. Personal Training Image */}
-              <ImageDropzone
-                label="3. Personal Training (PT) Service Image"
-                helperText="Card image for 1-on-1 Dedicated Coaching."
-                aspectLabel="16:10 Service Card"
-                value={
-                  content?.services?.items?.find((i) => i.id === 'pt')?.image ||
-                  DEFAULT_WEBSITE_CONTENT.services.items[0].image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.services.items[0].image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'pt');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: newImg };
-                      return { ...prev, items };
-                    },
-                    'Personal Training'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'pt');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: DEFAULT_WEBSITE_CONTENT.services.items[0].image };
-                      return { ...prev, items };
-                    },
-                    'Personal Training'
-                  );
-                }}
-              />
-
-              {/* 4. Massage Service Image */}
-              <ImageDropzone
-                label="4. Massage Therapy Service Image"
-                helperText="Card image for Sports & Recovery Deep Tissue Massage."
-                aspectLabel="16:10 Service Card"
-                value={
-                  content?.services?.items?.find((i) => i.id === 'massage')?.image ||
-                  DEFAULT_WEBSITE_CONTENT.services.items[1].image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.services.items[1].image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'massage');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: newImg };
-                      return { ...prev, items };
-                    },
-                    'Massage Therapy'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'massage');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: DEFAULT_WEBSITE_CONTENT.services.items[1].image };
-                      return { ...prev, items };
-                    },
-                    'Massage Therapy'
-                  );
-                }}
-              />
-
-              {/* 5. Steam Bath Service Image */}
-              <ImageDropzone
-                label="5. Steam Bath Sanctuary Image"
-                helperText="Card image for Luxury Thermal Steam Bath Detox."
-                aspectLabel="16:10 Service Card"
-                value={
-                  content?.services?.items?.find((i) => i.id === 'steam')?.image ||
-                  DEFAULT_WEBSITE_CONTENT.services.items[2].image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.services.items[2].image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'steam');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: newImg };
-                      return { ...prev, items };
-                    },
-                    'Steam Bath'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'steam');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: DEFAULT_WEBSITE_CONTENT.services.items[2].image };
-                      return { ...prev, items };
-                    },
-                    'Steam Bath'
-                  );
-                }}
-              />
-
-              {/* 6. Zumba Service Image */}
-              <ImageDropzone
-                label="6. Zumba Cardio Dance Image"
-                helperText="Card image for High-Energy Latin Zumba Dance."
-                aspectLabel="16:10 Service Card"
-                value={
-                  content?.services?.items?.find((i) => i.id === 'zumba')?.image ||
-                  DEFAULT_WEBSITE_CONTENT.services.items[3].image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.services.items[3].image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'zumba');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: newImg };
-                      return { ...prev, items };
-                    },
-                    'Zumba'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'zumba');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: DEFAULT_WEBSITE_CONTENT.services.items[3].image };
-                      return { ...prev, items };
-                    },
-                    'Zumba'
-                  );
-                }}
-              />
-
-              {/* 7. Yoga Service Image */}
-              <ImageDropzone
-                label="7. Yoga & Flexibility Image"
-                helperText="Card image for Mind, Body & Flexibility Yoga."
-                aspectLabel="16:10 Service Card"
-                value={
-                  content?.services?.items?.find((i) => i.id === 'yoga')?.image ||
-                  DEFAULT_WEBSITE_CONTENT.services.items[4].image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.services.items[4].image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'yoga');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: newImg };
-                      return { ...prev, items };
-                    },
-                    'Yoga'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'services',
-                    (prev) => {
-                      const items = [...(prev.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                      const idx = items.findIndex((i) => i.id === 'yoga');
-                      if (idx >= 0) items[idx] = { ...items[idx], image: DEFAULT_WEBSITE_CONTENT.services.items[4].image };
-                      return { ...prev, items };
-                    },
-                    'Yoga'
-                  );
-                }}
-              />
-
-              {/* 8. Beginner Program Image */}
-              <ImageDropzone
-                label="8. Beginner Program Image"
-                helperText="Workout curriculum visual for Level 1 Newcomers."
-                aspectLabel="16:9 Landscape"
-                value={
-                  content?.programs?.beginner?.image ||
-                  DEFAULT_WEBSITE_CONTENT.programs.beginner.image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.programs.beginner.image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      beginner: { ...(prev.beginner || {}), image: newImg },
-                    }),
-                    'Beginner Program'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      beginner: { ...(prev.beginner || {}), image: DEFAULT_WEBSITE_CONTENT.programs.beginner.image },
-                    }),
-                    'Beginner Program'
-                  );
-                }}
-              />
-
-              {/* 9. Intermediate Program Image */}
-              <ImageDropzone
-                label="9. Intermediate Program Image"
-                helperText="Workout curriculum visual for Level 2 Hypertrophy."
-                aspectLabel="16:9 Landscape"
-                value={
-                  content?.programs?.intermediate?.image ||
-                  DEFAULT_WEBSITE_CONTENT.programs.intermediate.image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.programs.intermediate.image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      intermediate: { ...(prev.intermediate || {}), image: newImg },
-                    }),
-                    'Intermediate Program'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      intermediate: { ...(prev.intermediate || {}), image: DEFAULT_WEBSITE_CONTENT.programs.intermediate.image },
-                    }),
-                    'Intermediate Program'
-                  );
-                }}
-              />
-
-              {/* 10. Advanced Program Image */}
-              <ImageDropzone
-                label="10. Advanced Program Image"
-                helperText="Workout curriculum visual for Level 3 Athletic Powerlifting."
-                aspectLabel="16:9 Landscape"
-                value={
-                  content?.programs?.advanced?.image ||
-                  DEFAULT_WEBSITE_CONTENT.programs.advanced.image
-                }
-                defaultImage={DEFAULT_WEBSITE_CONTENT.programs.advanced.image}
-                onChange={(newImg) => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      advanced: { ...(prev.advanced || {}), image: newImg },
-                    }),
-                    'Advanced Program'
-                  );
-                }}
-                onReset={() => {
-                  handleMediaImageUpdate(
-                    'programs',
-                    (prev) => ({
-                      ...prev,
-                      advanced: { ...(prev.advanced || {}), image: DEFAULT_WEBSITE_CONTENT.programs.advanced.image },
-                    }),
-                    'Advanced Program'
-                  );
-                }}
-              />
-            </div>
+            <button
+              type="button"
+              onClick={handleToggleCurrentSection}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 20px',
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '0.86rem',
+                cursor: 'pointer',
+                border: 'none',
+                backgroundColor: isSectionVisible(getSectionKey(currentSubTab)) ? '#FEE2E2' : '#00B84A',
+                color: isSectionVisible(getSectionKey(currentSubTab)) ? '#991B1B' : '#FFFFFF',
+                boxShadow: isSectionVisible(getSectionKey(currentSubTab))
+                  ? '0 2px 8px rgba(239, 68, 68, 0.15)'
+                  : '0 4px 14px rgba(0, 184, 74, 0.25)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {isSectionVisible(getSectionKey(currentSubTab)) ? (
+                <>
+                  <Trash2 size={16} />
+                  <span>Remove / Hide Section from Website</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={16} />
+                  <span>Restore & Show Section Live</span>
+                </>
+              )}
+            </button>
           </div>
         )}
 
@@ -1035,7 +904,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.eyebrow || ''}
-                  onChange={(e) => setFormData({ ...formData, eyebrow: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, eyebrow: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
@@ -1044,7 +916,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.title || ''}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, title: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
@@ -1055,7 +930,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
               <textarea
                 rows={3}
                 value={formData.leadParagraph || ''}
-                onChange={(e) => setFormData({ ...formData, leadParagraph: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  autoSaveSection({ ...formData, leadParagraph: val });
+                }}
                 style={textareaStyle}
               />
             </div>
@@ -1065,9 +943,113 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
               <textarea
                 rows={3}
                 value={formData.secondaryParagraph || ''}
-                onChange={(e) => setFormData({ ...formData, secondaryParagraph: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  autoSaveSection({ ...formData, secondaryParagraph: val });
+                }}
                 style={textareaStyle}
               />
+            </div>
+
+            {/* Corporate Heritage Pillars */}
+            <div style={{ marginTop: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>Institutional Pillars (4 Core Blocks)</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentPillars = [...(formData.pillars || DEFAULT_WEBSITE_CONTENT.about.pillars)];
+                    currentPillars.push({
+                      title: 'New Institutional Pillar',
+                      desc: 'Corporate commitment to transparency, governance, and health excellence.',
+                    });
+                    autoSaveSection({ ...formData, pillars: currentPillars });
+                    notify('✓ Added new pillar!');
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: '#ECFDF3',
+                    color: '#008A38',
+                    border: '1px solid #A7F3D0',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={13} />
+                  <span>Add Pillar</span>
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {(formData.pillars || DEFAULT_WEBSITE_CONTENT.about.pillars).map((p, pIdx) => (
+                  <div
+                    key={pIdx}
+                    style={{
+                      padding: '14px',
+                      borderRadius: '10px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#008A38' }}>Pillar #{pIdx + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPillars = [...(formData.pillars || DEFAULT_WEBSITE_CONTENT.about.pillars)];
+                          currentPillars.splice(pIdx, 1);
+                          autoSaveSection({ ...formData, pillars: currentPillars });
+                          notify('✓ Pillar removed from website!');
+                        }}
+                        style={{
+                          backgroundColor: '#FEF2F2',
+                          color: '#DC2626',
+                          border: 'none',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                        }}
+                      >
+                        <Trash2 size={12} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={p.title || ''}
+                      onChange={(e) => {
+                        const currentPillars = [...(formData.pillars || DEFAULT_WEBSITE_CONTENT.about.pillars)];
+                        currentPillars[pIdx] = { ...currentPillars[pIdx], title: e.target.value };
+                        autoSaveSection({ ...formData, pillars: currentPillars });
+                      }}
+                      placeholder="Pillar Title"
+                      style={{ ...inputStyle, marginBottom: '8px' }}
+                    />
+                    <textarea
+                      rows={2}
+                      value={p.desc || ''}
+                      onChange={(e) => {
+                        const currentPillars = [...(formData.pillars || DEFAULT_WEBSITE_CONTENT.about.pillars)];
+                        currentPillars[pIdx] = { ...currentPillars[pIdx], desc: e.target.value };
+                        autoSaveSection({ ...formData, pillars: currentPillars });
+                      }}
+                      placeholder="Pillar Description"
+                      style={textareaStyle}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
@@ -1139,13 +1121,43 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                     backgroundColor: '#F8FCFA',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-                    <span style={{ fontWeight: 800, color: '#008A38', fontSize: '0.94rem' }}>
-                      #{idx + 1} — {service.title}
-                    </span>
-                    <span style={{ fontSize: '0.74rem', backgroundColor: '#E2E8F0', padding: '3px 8px', borderRadius: '6px', fontWeight: 700 }}>
-                      ID: {service.id}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontWeight: 800, color: '#008A38', fontSize: '0.94rem' }}>
+                        #{idx + 1} — {service.title}
+                      </span>
+                      <span style={{ fontSize: '0.74rem', backgroundColor: '#E2E8F0', padding: '3px 8px', borderRadius: '6px', fontWeight: 700 }}>
+                        ID: {service.id}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!window.confirm(`Delete "${service.title}" service card from the website?`)) return;
+                        const currentItems = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
+                        currentItems.splice(idx, 1);
+                        const updated = { ...formData, items: currentItems };
+                        autoSaveSection(updated);
+                        notify(`✓ Removed ${service.title} from website!`);
+                      }}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        border: '1px solid #FCA5A5',
+                        padding: '4px 10px',
+                        borderRadius: '8px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Trash2 size={13} />
+                      <span>Delete Service</span>
+                    </button>
                   </div>
 
                   {/* Drag & Drop for this specific service */}
@@ -1181,8 +1193,8 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                         value={service.title || ''}
                         onChange={(e) => {
                           const updated = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                          updated[idx].title = e.target.value;
-                          setFormData({ ...formData, items: updated });
+                          updated[idx] = { ...updated[idx], title: e.target.value };
+                          autoSaveSection({ ...formData, items: updated });
                         }}
                         style={inputStyle}
                       />
@@ -1194,8 +1206,8 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                         value={service.tag || ''}
                         onChange={(e) => {
                           const updated = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                          updated[idx].tag = e.target.value;
-                          setFormData({ ...formData, items: updated });
+                          updated[idx] = { ...updated[idx], tag: e.target.value };
+                          autoSaveSection({ ...formData, items: updated });
                         }}
                         style={inputStyle}
                       />
@@ -1209,8 +1221,8 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                       value={service.description || ''}
                       onChange={(e) => {
                         const updated = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
-                        updated[idx].description = e.target.value;
-                        setFormData({ ...formData, items: updated });
+                        updated[idx] = { ...updated[idx], description: e.target.value };
+                        autoSaveSection({ ...formData, items: updated });
                       }}
                       style={textareaStyle}
                     />
@@ -1218,6 +1230,44 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 </div>
               ))}
             </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                const currentItems = [...(formData.items || DEFAULT_WEBSITE_CONTENT.services.items)];
+                currentItems.push({
+                  id: `service-${Date.now()}`,
+                  title: 'New Service',
+                  tag: 'Special Offering',
+                  description: 'Experience customized training protocols designed for your physiology and goals.',
+                  features: ['Body assessment & posture analysis', 'Custom workout plan', 'Certified coaching'],
+                  image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000&auto=format&fit=crop',
+                  accent: '#00B84A',
+                });
+                const updated = { ...formData, items: currentItems };
+                autoSaveSection(updated);
+                notify('✓ New service card added live to website!');
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 20px',
+                borderRadius: '12px',
+                border: '1.5px dashed #00B84A',
+                backgroundColor: '#ECFDF3',
+                color: '#008A38',
+                fontWeight: 800,
+                fontSize: '0.86rem',
+                cursor: 'pointer',
+                marginTop: '16px',
+                justifyContent: 'center',
+                width: '100%',
+              }}
+            >
+              <Plus size={16} />
+              <span>Add Another Service Card</span>
+            </button>
 
             <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
               <button
@@ -1311,7 +1361,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                             ...formData,
                             [lvl]: { ...prog, subtitle: e.target.value },
                           };
-                          setFormData(updated);
+                          autoSaveSection(updated);
                         }}
                         style={inputStyle}
                       />
@@ -1327,7 +1377,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                             ...formData,
                             [lvl]: { ...prog, description: e.target.value },
                           };
-                          setFormData(updated);
+                          autoSaveSection(updated);
                         }}
                         style={textareaStyle}
                       />
@@ -1372,7 +1422,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
               Why Choose Us Section
             </h3>
             <p style={{ color: '#64748B', fontSize: '0.86rem', marginBottom: '22px' }}>
-              Edit headlines and 4 core value proposition cards.
+              Edit headlines and core value proposition cards. Add or remove cards freely.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
@@ -1381,7 +1431,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.eyebrow || ''}
-                  onChange={(e) => setFormData({ ...formData, eyebrow: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, eyebrow: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
@@ -1390,13 +1443,138 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.title || ''}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, title: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
             </div>
 
-            <div style={{ marginTop: '20px' }}>
+            {/* Reasons List */}
+            <div style={{ marginTop: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>Core Reasons / Value Cards</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
+                    currentReasons.push({
+                      title: 'New Value Proposition',
+                      badge: 'Certified Experts',
+                      desc: 'Customized training protocol and verified results tailored to each member.',
+                    });
+                    autoSaveSection({ ...formData, reasons: currentReasons });
+                    notify('✓ Added new Reason card!');
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: '#ECFDF3',
+                    color: '#008A38',
+                    border: '1px solid #A7F3D0',
+                    padding: '5px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>Add Reason Card</span>
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gap: '14px' }}>
+                {(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons).map((reason, rIdx) => (
+                  <div
+                    key={rIdx}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>Card #{rIdx + 1} — {reason.title}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
+                          currentReasons.splice(rIdx, 1);
+                          autoSaveSection({ ...formData, reasons: currentReasons });
+                          notify('✓ Reason card removed from website!');
+                        }}
+                        style={{
+                          backgroundColor: '#FEF2F2',
+                          color: '#DC2626',
+                          border: 'none',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete Card</span>
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Title</label>
+                        <input
+                          type="text"
+                          value={reason.title || ''}
+                          onChange={(e) => {
+                            const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
+                            currentReasons[rIdx] = { ...currentReasons[rIdx], title: e.target.value };
+                            autoSaveSection({ ...formData, reasons: currentReasons });
+                          }}
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Badge Tag</label>
+                        <input
+                          type="text"
+                          value={reason.badge || ''}
+                          onChange={(e) => {
+                            const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
+                            currentReasons[rIdx] = { ...currentReasons[rIdx], badge: e.target.value };
+                            autoSaveSection({ ...formData, reasons: currentReasons });
+                          }}
+                          style={inputStyle}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Description</label>
+                      <textarea
+                        rows={2}
+                        value={reason.desc || ''}
+                        onChange={(e) => {
+                          const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
+                          currentReasons[rIdx] = { ...currentReasons[rIdx], desc: e.target.value };
+                          autoSaveSection({ ...formData, reasons: currentReasons });
+                        }}
+                        style={textareaStyle}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
               <button
                 type="button"
                 onClick={handleSaveSection}
@@ -1418,6 +1596,26 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <Save size={15} />
                 <span>Save Section</span>
               </button>
+              <button
+                type="button"
+                onClick={handleResetSection}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#64748B',
+                  padding: '10px 16px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  border: '1px solid #CBD5E1',
+                  cursor: 'pointer',
+                }}
+              >
+                <RotateCcw size={14} />
+                <span>Reset to Default</span>
+              </button>
             </div>
           </div>
         )}
@@ -1431,7 +1629,7 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
               Smart Fitness Tracking Section
             </h3>
             <p style={{ color: '#64748B', fontSize: '0.86rem', marginBottom: '22px' }}>
-              Update tracking headlines and biometric monitoring highlights.
+              Update tracking headlines and biometric monitoring highlights. Add or remove feature cards.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '16px' }}>
@@ -1440,7 +1638,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.eyebrow || ''}
-                  onChange={(e) => setFormData({ ...formData, eyebrow: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, eyebrow: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
@@ -1449,13 +1650,138 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.title || ''}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, title: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
             </div>
 
-            <div style={{ marginTop: '20px' }}>
+            {/* Features List */}
+            <div style={{ marginTop: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#0F172A' }}>Tracking Metric Cards</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
+                    currentFeatures.push({
+                      title: 'New Tracking Metric',
+                      badge: 'Biometric Analytics',
+                      desc: 'Continuous real-time progress validation and personal milestone celebration.',
+                    });
+                    autoSaveSection({ ...formData, features: currentFeatures });
+                    notify('✓ Added new tracking card!');
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: '#ECFDF3',
+                    color: '#008A38',
+                    border: '1px solid #A7F3D0',
+                    padding: '5px 12px',
+                    borderRadius: '8px',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>Add Metric Card</span>
+                </button>
+              </div>
+
+              <div style={{ display: 'grid', gap: '14px' }}>
+                {(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features).map((feat, fIdx) => (
+                  <div
+                    key={fIdx}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>Metric #{fIdx + 1} — {feat.title}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
+                          currentFeatures.splice(fIdx, 1);
+                          autoSaveSection({ ...formData, features: currentFeatures });
+                          notify('✓ Metric card removed from website!');
+                        }}
+                        style={{
+                          backgroundColor: '#FEF2F2',
+                          color: '#DC2626',
+                          border: 'none',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete Metric</span>
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '8px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Title</label>
+                        <input
+                          type="text"
+                          value={feat.title || ''}
+                          onChange={(e) => {
+                            const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
+                            currentFeatures[fIdx] = { ...currentFeatures[fIdx], title: e.target.value };
+                            autoSaveSection({ ...formData, features: currentFeatures });
+                          }}
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Badge Tag</label>
+                        <input
+                          type="text"
+                          value={feat.badge || ''}
+                          onChange={(e) => {
+                            const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
+                            currentFeatures[fIdx] = { ...currentFeatures[fIdx], badge: e.target.value };
+                            autoSaveSection({ ...formData, features: currentFeatures });
+                          }}
+                          style={inputStyle}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Description</label>
+                      <textarea
+                        rows={2}
+                        value={feat.desc || ''}
+                        onChange={(e) => {
+                          const currentFeatures = [...(formData.features || DEFAULT_WEBSITE_CONTENT.tracking.features)];
+                          currentFeatures[fIdx] = { ...currentFeatures[fIdx], desc: e.target.value };
+                          autoSaveSection({ ...formData, features: currentFeatures });
+                        }}
+                        style={textareaStyle}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
               <button
                 type="button"
                 onClick={handleSaveSection}
@@ -1476,6 +1802,26 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
               >
                 <Save size={15} />
                 <span>Save Section</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleResetSection}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#64748B',
+                  padding: '10px 16px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  border: '1px solid #CBD5E1',
+                  cursor: 'pointer',
+                }}
+              >
+                <RotateCcw size={14} />
+                <span>Reset to Default</span>
               </button>
             </div>
           </div>
@@ -1499,7 +1845,10 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.vishrambagPhone || '+91 7798001777'}
-                  onChange={(e) => setFormData({ ...formData, vishrambagPhone: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, vishrambagPhone: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
@@ -1508,13 +1857,16 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <input
                   type="text"
                   value={formData.vijaynagarPhone || '+91 9172848777'}
-                  onChange={(e) => setFormData({ ...formData, vijaynagarPhone: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    autoSaveSection({ ...formData, vijaynagarPhone: val });
+                  }}
                   style={inputStyle}
                 />
               </div>
             </div>
 
-            <div style={{ marginTop: '20px' }}>
+            <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
               <button
                 type="button"
                 onClick={handleSaveSection}
@@ -1536,9 +1888,238 @@ export default function SettingsTab({ activeSubTab = 'media', onSubTabChange, sh
                 <Save size={15} />
                 <span>Save Contact Settings</span>
               </button>
+              <button
+                type="button"
+                onClick={handleResetSection}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#64748B',
+                  padding: '10px 16px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  border: '1px solid #CBD5E1',
+                  cursor: 'pointer',
+                }}
+              >
+                <RotateCcw size={14} />
+                <span>Reset to Default</span>
+              </button>
             </div>
           </div>
         )}
+        {/* TAB: PT FEE STRUCTURE */}
+        {currentSubTab === 'pt_fees' && (
+          <div style={{ padding: '24px' }}>
+            <div style={{ marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: '#0F172A', marginBottom: '4px' }}>Personal Training Fee Structure</h3>
+                <p style={{ fontSize: '0.82rem', color: '#64748B' }}>Edit Alternate Days & Daily Training prices for each branch. Changes save to Firestore instantly.</p>
+              </div>
+              {/* Branch toggle */}
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[{ id: 'vishrambag', label: 'Vishrambag' }, { id: 'branch2', label: 'Vijaynagar' }].map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => { setEditingPTBranch(b.id); setShowAddPTForm(false); setEditingPTIdx(null); }}
+                    style={{
+                      padding: '7px 16px',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: editingPTBranch === b.id ? 'linear-gradient(135deg,#00D256,#008A37)' : '#F1F5F9',
+                      color: editingPTBranch === b.id ? '#fff' : '#475569',
+                    }}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {!ptLoaded ? (
+              <p style={{ color: '#64748B' }}>Loading PT rates...</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {(ptRates[editingPTBranch]?.categories || []).map((cat, idx) => (
+                  <div
+                    key={cat.id}
+                    style={{ backgroundColor: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: '12px', padding: '16px' }}
+                  >
+                    {editingPTIdx === idx ? (
+                      /* Edit mode */
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                          <div>
+                            <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>PLAN TITLE</label>
+                            <input
+                              value={cat.title}
+                              onChange={(e) => handlePTCategoryChange(editingPTBranch, idx, 'title', e.target.value)}
+                              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>BADGE / LABEL</label>
+                            <input
+                              value={cat.badge}
+                              onChange={(e) => handlePTCategoryChange(editingPTBranch, idx, 'badge', e.target.value)}
+                              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                          <div>
+                            <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>ALTERNATE DAYS PRICE (₹)</label>
+                            <input
+                              type="number"
+                              value={cat.alternatePrice}
+                              onChange={(e) => handlePTCategoryChange(editingPTBranch, idx, 'alternatePrice', e.target.value)}
+                              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>DAILY TRAINING PRICE (₹)</label>
+                            <input
+                              type="number"
+                              value={cat.dailyPrice}
+                              onChange={(e) => handlePTCategoryChange(editingPTBranch, idx, 'dailyPrice', e.target.value)}
+                              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                            />
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => { savePTRatesToFirestore(ptRates); setEditingPTIdx(null); }}
+                            disabled={isSavingPT}
+                            style={{ padding: '8px 18px', borderRadius: '8px', backgroundColor: '#00B84A', color: '#fff', border: 'none', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer' }}
+                          >
+                            {isSavingPT ? 'Saving...' : '✓ Save'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingPTIdx(null)}
+                            style={{ padding: '8px 14px', borderRadius: '8px', backgroundColor: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* View mode */
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: '0.92rem', color: '#0F172A' }}>{cat.title}</div>
+                          <div style={{ fontSize: '0.78rem', color: '#64748B', marginTop: '2px' }}>{cat.badge}</div>
+                          <div style={{ marginTop: '6px', fontSize: '0.82rem', color: '#334155', fontWeight: 600 }}>
+                            Alternate Days: <strong style={{ color: '#008A38' }}>₹{(cat.alternatePrice || 0).toLocaleString('en-IN')}/-</strong>
+                            &nbsp;&nbsp;•&nbsp;&nbsp;
+                            Daily Training: <strong style={{ color: '#008A38' }}>₹{(cat.dailyPrice || 0).toLocaleString('en-IN')}/-</strong>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setEditingPTIdx(idx)}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#ECFDF3', color: '#008A38', border: '1px solid #A7F3D0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePTCategory(editingPTBranch, idx)}
+                            style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#FEF2F2', color: '#DC2626', border: '1px solid #FECACA', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Add new PT category */}
+                {!showAddPTForm ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddPTForm(true)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', borderRadius: '12px', border: '2px dashed #CBD5E1', backgroundColor: '#F8FAFC', color: '#008A38', fontWeight: 800, fontSize: '0.86rem', cursor: 'pointer', width: '100%', justifyContent: 'center' }}
+                  >
+                    <Plus size={16} /> Add New PT Plan
+                  </button>
+                ) : (
+                  <div style={{ backgroundColor: '#F0FDF4', border: '1.5px solid #86EFAC', borderRadius: '12px', padding: '16px' }}>
+                    <div style={{ fontWeight: 800, fontSize: '0.86rem', color: '#166534', marginBottom: '12px' }}>➕ New PT Plan</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>PLAN TITLE *</label>
+                        <input
+                          placeholder="e.g. ELITE PERSONAL TRAINER"
+                          value={newPTCategory.title}
+                          onChange={(e) => setNewPTCategory((p) => ({ ...p, title: e.target.value }))}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>BADGE / LABEL</label>
+                        <input
+                          placeholder="e.g. Master Coach"
+                          value={newPTCategory.badge}
+                          onChange={(e) => setNewPTCategory((p) => ({ ...p, badge: e.target.value }))}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>ALTERNATE DAYS (₹)</label>
+                        <input
+                          type="number"
+                          placeholder="e.g. 7000"
+                          value={newPTCategory.alternatePrice}
+                          onChange={(e) => setNewPTCategory((p) => ({ ...p, alternatePrice: e.target.value }))}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', display: 'block', marginBottom: '4px' }}>DAILY TRAINING (₹)</label>
+                        <input
+                          type="number"
+                          placeholder="e.g. 10000"
+                          value={newPTCategory.dailyPrice}
+                          onChange={(e) => setNewPTCategory((p) => ({ ...p, dailyPrice: e.target.value }))}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={handleAddPTCategory}
+                        disabled={isSavingPT}
+                        style={{ padding: '9px 20px', borderRadius: '8px', backgroundColor: '#00B84A', color: '#fff', border: 'none', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer' }}
+                      >
+                        {isSavingPT ? 'Saving...' : '✓ Add Plan'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowAddPTForm(false); setNewPTCategory({ title: '', badge: '', alternatePrice: '', dailyPrice: '' }); }}
+                        style={{ padding: '9px 14px', borderRadius: '8px', backgroundColor: '#F1F5F9', color: '#475569', border: 'none', fontWeight: 700, fontSize: '0.84rem', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );

@@ -1,8 +1,22 @@
 import React from 'react';
 import { Activity, TrendingUp, Camera, Calendar, LineChart, UserCheck } from 'lucide-react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function FitnessTracking() {
-  const trackingFeatures = [
+  const { content } = useWebsiteContent();
+  const trackingData = content?.tracking || {};
+
+  if (trackingData?.visible === false || content?.sectionVisibility?.tracking === false) {
+    return null;
+  }
+
+  const eyebrow = trackingData.eyebrow || 'Digital Fitness Ecosystem';
+  const title = trackingData.title || 'SMART FITNESS TRACKING';
+  const subtitle =
+    trackingData.subtitle ||
+    'Say goodbye to guesswork. Respire Fitness leverages structured body composition analysis, biometric integration, and milestone tracking to validate every drop of sweat.';
+
+  const defaultFeatures = [
     {
       icon: Activity,
       title: 'Body Composition History',
@@ -35,6 +49,17 @@ export default function FitnessTracking() {
     },
   ];
 
+  const featureIcons = [Activity, TrendingUp, Camera, Calendar, UserCheck];
+  const rawFeatures = (trackingData.features && Array.isArray(trackingData.features))
+    ? trackingData.features
+    : defaultFeatures;
+
+  const trackingFeatures = rawFeatures.map((f, i) => ({
+    ...f,
+    icon: featureIcons[i % featureIcons.length] || LineChart,
+    badge: f.badge || 'Scientific Metrics',
+  }));
+
   return (
     <section
       id="features"
@@ -50,13 +75,13 @@ export default function FitnessTracking() {
         <div className="section-header">
           <div className="section-eyebrow">
             <LineChart size={14} />
-            <span>Digital Fitness Ecosystem</span>
+            <span>{eyebrow}</span>
           </div>
           <h2 className="section-title">
-            SMART FITNESS <span className="text-green">TRACKING</span>
+            {title}
           </h2>
           <p className="section-subtitle">
-            Say goodbye to guesswork. Respire Fitness leverages structured body composition analysis, biometric integration, and milestone tracking to validate every drop of sweat.
+            {subtitle}
           </p>
         </div>
 

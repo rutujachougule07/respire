@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   UserPlus,
   Search,
@@ -122,6 +122,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       expiryDate: addMonths(new Date().toISOString().split('T')[0], defaultPlan?.durationMonths || 1),
       joinDate: new Date().toISOString().split('T')[0],
     });
+    setIsAddonDropdownOpen(false);
+    setIsAddingCustom(false);
     setIsFormOpen(true);
   };
 
@@ -146,6 +148,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       bodyFat: m.bodyMetrics?.bodyFat || '',
       bmi: m.bodyMetrics?.bmi || '',
     });
+    setIsAddonDropdownOpen(false);
+    setIsAddingCustom(false);
     setIsFormOpen(true);
   };
 
@@ -345,6 +349,25 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     'Yoga',
   ]);
   const [newAddonName, setNewAddonName] = useState('');
+  const [isAddonDropdownOpen, setIsAddonDropdownOpen] = useState(false);
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const addonDropdownRef = useRef(null);
+
+  // Close dropdown whenever user clicks anywhere outside of it
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (addonDropdownRef.current && !addonDropdownRef.current.contains(event.target)) {
+        setIsAddonDropdownOpen(false);
+        setIsAddingCustom(false);
+      }
+    }
+    if (isAddonDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAddonDropdownOpen]);
 
   const handleAddCustomAddon = () => {
     const trimmed = newAddonName.trim();
@@ -360,6 +383,18 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     }
     setNewAddonName('');
     showToast(`Added '${trimmed}' to Add-on Services`);
+  };
+
+  const handleDeleteAddonOption = (optionName, e) => {
+    if (e) e.stopPropagation();
+    setAddonOptions((prev) => prev.filter((o) => o !== optionName));
+    if (form.addOns.includes(optionName)) {
+      setForm((prev) => ({
+        ...prev,
+        addOns: prev.addOns.filter((a) => a !== optionName),
+      }));
+    }
+    showToast(`Removed '${optionName}' from Services`);
   };
 
   return (
@@ -943,39 +978,218 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 </div>
               </div>
 
-              {/* Add-on Services - Structured Dropdown & Add Service Input */}
-              <div>
+              {/* Add-on Services - Custom Dropdown with Clean Neutral Styling matching Image 2 */}
+              <div ref={addonDropdownRef} style={{ position: 'relative' }}>
                 <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
                   ADD-ON SERVICES
                 </label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <select
-                    value=""
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        handleToggleAddon(e.target.value);
-                      }
-                    }}
+
+                {/* Dropdown Header Trigger - Compact Native Height */}
+                <button
+                  type="button"
+                  onClick={() => setIsAddonDropdownOpen(!isAddonDropdownOpen)}
+                  style={{
+                    width: '100%',
+                    padding: '7px 12px',
+                    borderRadius: '8px',
+                    border: '1.5px solid #CBD5E1',
+                    fontSize: '0.84rem',
+                    backgroundColor: '#FFFFFF',
+                    color: '#0F172A',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    boxSizing: 'border-box',
+                    minHeight: '36px',
+                  }}
+                >
+                  <span style={{ fontWeight: 500 }}>-- Select Add-on Service to Enroll / Remove --</span>
+                  <span style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                    {isAddonDropdownOpen ? '▲' : '▼'}
+                  </span>
+                </button>
+
+                {/* Dropdown Panel - Tight Compact Spacing matching Image 2 */}
+                {isAddonDropdownOpen && (
+                  <div
                     style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: '9px',
+                      marginTop: '2px',
                       border: '1.5px solid #CBD5E1',
-                      fontSize: '0.88rem',
+                      borderRadius: '8px',
                       backgroundColor: '#FFFFFF',
-                      color: '#0F172A',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
                     }}
                   >
-                    <option value="">-- Select Add-on Service to Enroll / Remove --</option>
-                    {addonOptions.map((ao) => (
-                      <option key={ao} value={ao}>
-                        {form.addOns.includes(ao) ? `✓ ${ao} (Enrolled - click to remove)` : `+ ${ao}`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    {addonOptions.map((ao) => {
+                      const isEnrolled = form.addOns.includes(ao);
+                      return (
+                        <div
+                          key={ao}
+                          onClick={() => {
+                            handleToggleAddon(ao);
+                            setIsAddonDropdownOpen(false);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '6px 12px',
+                            borderBottom: '1px solid #F1F5F9',
+                            cursor: 'pointer',
+                            backgroundColor: isEnrolled ? '#F8FAFC' : '#FFFFFF',
+                            color: '#0F172A',
+                            fontWeight: isEnrolled ? 700 : 500,
+                            fontSize: '0.83rem',
+                            lineHeight: 1.35,
+                            transition: 'background 0.12s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#F1F5F9';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isEnrolled ? '#F8FAFC' : '#FFFFFF';
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ color: '#0F172A', fontWeight: 800, width: '12px', fontSize: '0.82rem' }}>
+                              {isEnrolled ? '✓' : '+'}
+                            </span>
+                            <span>{ao}</span>
+                          </div>
 
-                {/* Show Enrolled Services Badges */}
+                          {/* Compact Subtle Delete icon button */}
+                          <button
+                            type="button"
+                            onClick={(e) => handleDeleteAddonOption(ao, e)}
+                            title={`Remove ${ao} from list`}
+                            style={{
+                              width: '18px',
+                              height: '18px',
+                              borderRadius: '50%',
+                              backgroundColor: '#F1F5F9',
+                              border: 'none',
+                              color: '#64748B',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.65rem',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                              lineHeight: 1,
+                              padding: 0,
+                              transition: 'all 0.15s',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#FEE2E2';
+                              e.currentTarget.style.color = '#DC2626';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = '#F1F5F9';
+                              e.currentTarget.style.color = '#64748B';
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {/* Bottom Add Custom Service Row - Compact */}
+                    <div
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: '#FFFFFF',
+                      }}
+                    >
+                      {isAddingCustom ? (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <input
+                            type="text"
+                            placeholder="Type service name..."
+                            value={newAddonName}
+                            onChange={(e) => setNewAddonName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddCustomAddon();
+                                setIsAddingCustom(false);
+                              }
+                            }}
+                            autoFocus
+                            style={{
+                              flex: 1,
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              border: '1.5px solid #CBD5E1',
+                              fontSize: '0.8rem',
+                              backgroundColor: '#FFFFFF',
+                              color: '#0F172A',
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleAddCustomAddon();
+                              setIsAddingCustom(false);
+                            }}
+                            style={{
+                              padding: '5px 10px',
+                              borderRadius: '6px',
+                              backgroundColor: '#0F172A',
+                              color: '#FFFFFF',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              border: 'none',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsAddingCustom(false)}
+                            style={{
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              backgroundColor: '#F1F5F9',
+                              color: '#64748B',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              border: '1px solid #CBD5E1',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingCustom(true)}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: '2px 0',
+                            color: '#334155',
+                            fontSize: '0.82rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                          }}
+                        >
+                          <span>+ Add Custom Service</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Show Enrolled Services Badges - Clean Neutral Colors */}
                 {form.addOns && form.addOns.length > 0 && (
                   <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {form.addOns.map((ao) => (
@@ -987,11 +1201,11 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                           gap: '6px',
                           padding: '4px 10px',
                           borderRadius: '6px',
-                          backgroundColor: '#DCFCE7',
-                          color: '#15803D',
+                          backgroundColor: '#F8FAFC',
+                          color: '#0F172A',
                           fontSize: '0.78rem',
                           fontWeight: 700,
-                          border: '1px solid #86EFAC',
+                          border: '1px solid #CBD5E1',
                         }}
                       >
                         <span>✓ {ao}</span>
@@ -1002,10 +1216,10 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                           style={{
                             background: 'none',
                             border: 'none',
-                            color: '#DC2626',
+                            color: '#64748B',
                             cursor: 'pointer',
-                            fontWeight: 900,
-                            fontSize: '0.88rem',
+                            fontWeight: 800,
+                            fontSize: '0.84rem',
                             padding: '0 2px',
                             lineHeight: 1,
                           }}
@@ -1016,47 +1230,6 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                     ))}
                   </div>
                 )}
-
-                {/* Inline New Service Creation Input */}
-                <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
-                  <input
-                    type="text"
-                    placeholder="Type new service name (e.g. Diet Plan, CrossFit)..."
-                    value={newAddonName}
-                    onChange={(e) => setNewAddonName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddCustomAddon();
-                      }
-                    }}
-                    style={{
-                      flex: 1,
-                      padding: '9px 12px',
-                      borderRadius: '9px',
-                      border: '1.5px solid #CBD5E1',
-                      fontSize: '0.84rem',
-                      backgroundColor: '#FFFFFF',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCustomAddon}
-                    style={{
-                      padding: '9px 15px',
-                      borderRadius: '9px',
-                      backgroundColor: '#00B84A',
-                      color: '#FFFFFF',
-                      fontSize: '0.8rem',
-                      fontWeight: 800,
-                      border: 'none',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    + Add New Service
-                  </button>
-                </div>
 
                 {form.addOns.includes('Personal Training') && (
                   <div

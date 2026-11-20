@@ -674,6 +674,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
               members={scopedMembers}
               setMembers={setMembers}
               showToast={showToast}
+              isSuperAdmin={isSuperAdmin}
             />
           )}
 

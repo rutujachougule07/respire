@@ -3,11 +3,23 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export const DEFAULT_WEBSITE_CONTENT = {
+  sectionVisibility: {
+    hero: true,
+    about: true,
+    services: true,
+    membership: true,
+    programs: true,
+    tracking: true,
+    whyUs: true,
+    contact: true,
+  },
   hero: {
+    visible: true,
     bgImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop',
     showCue: true,
   },
   about: {
+    visible: true,
     eyebrow: '• A PART OF MAHABAL GROUP •',
     title: 'ABOUT MAHABAL GROUP & RESPIRE',
     leadParagraph:
@@ -44,6 +56,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     ],
   },
   services: {
+    visible: true,
     eyebrow: 'World-Class Offerings',
     title: 'OUR PREMIUM SERVICES',
     subtitle:
@@ -127,6 +140,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     ],
   },
   whyUs: {
+    visible: true,
     eyebrow: 'The Respire Standard',
     title: 'WHY CHOOSE RESPIRE FITNESS',
     subtitle:
@@ -160,6 +174,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     ],
   },
   programs: {
+    visible: true,
     eyebrow: 'Structured Training Regimens',
     title: 'WORKOUT PROGRAMS BY CATEGORY',
     subtitle:
@@ -205,6 +220,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     },
   },
   tracking: {
+    visible: true,
     eyebrow: 'Digital Fitness Ecosystem',
     title: 'SMART FITNESS TRACKING',
     subtitle:
@@ -238,6 +254,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     ],
   },
   contact: {
+    visible: true,
     eyebrow: 'Visit Our 2 Branches in Sangli',
     title: 'CONNECT WITH RESPIRE FITNESS',
     subtitle:
@@ -248,6 +265,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
 const WebsiteContentContext = createContext({
   content: DEFAULT_WEBSITE_CONTENT,
   updateSection: async () => {},
+  toggleSectionVisibility: async () => {},
   saveAllContent: async () => {},
   resetSection: async () => {},
   resetAllToDefaults: async () => {},
@@ -270,11 +288,33 @@ export function WebsiteContentProvider({ children }) {
     return DEFAULT_WEBSITE_CONTENT;
   });
 
-  // Sync from Firestore live doc
+  // Listen for storage events across browser tabs and in-page custom events for 0ms instant sync
   useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'rf_website_content_v1' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          setContent((prev) => ({ ...prev, ...parsed }));
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    const handleCustomUpdate = (e) => {
+      if (e.detail) {
+        setContent((prev) => ({ ...prev, ...e.detail }));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('rf_content_updated', handleCustomUpdate);
+
+    // Sync from Firestore live doc in real-time
+    let unsub = null;
     try {
       const docRef = doc(db, 'system', 'website_content');
-      const unsub = onSnapshot(docRef, (snap) => {
+      unsub = onSnapshot(docRef, (snap) => {
         if (snap.exists()) {
           const remoteData = snap.data();
           setContent((prev) => {
@@ -291,28 +331,83 @@ export function WebsiteContentProvider({ children }) {
           });
         }
       });
-      return () => unsub();
     } catch (e) {
-      console.warn('WebsiteContent live sync fallback to default:', e);
+      console.warn('WebsiteContent live sync fallback to local cache:', e);
     }
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('rf_content_updated', handleCustomUpdate);
+      if (unsub) unsub();
+    };
   }, []);
 
   const updateSection = async (sectionKey, data) => {
+    // 1. Instant local state update for zero latency
     setContent((prev) => {
       const updated = { ...prev, [sectionKey]: data };
       try {
         localStorage.setItem('rf_website_content_v1', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('localStorage quota warning:', e);
+      }
+      // Broadcast immediately to any active listeners
+      try {
+        window.dispatchEvent(new CustomEvent('rf_content_updated', { detail: { [sectionKey]: data } }));
       } catch {
         // ignore
       }
       return updated;
     });
 
+    // 2. Persist to Firestore
     try {
       const docRef = doc(db, 'system', 'website_content');
       await setDoc(docRef, { [sectionKey]: data }, { merge: true });
     } catch (err) {
       console.error('Error saving website section to Firestore:', err);
+    }
+  };
+
+  const toggleSectionVisibility = async (sectionKey, isVisible) => {
+    let updatedContent = null;
+    setContent((prev) => {
+      const currentVis = prev.sectionVisibility || {};
+      const updatedVis = { ...currentVis, [sectionKey]: isVisible };
+      const currentSection = prev[sectionKey] || {};
+      const updatedSection = { ...currentSection, visible: isVisible };
+
+      updatedContent = {
+        ...prev,
+        sectionVisibility: updatedVis,
+        [sectionKey]: updatedSection,
+      };
+
+      try {
+        localStorage.setItem('rf_website_content_v1', JSON.stringify(updatedContent));
+      } catch (e) {
+        console.warn('localStorage error', e);
+      }
+      try {
+        window.dispatchEvent(new CustomEvent('rf_content_updated', { detail: updatedContent }));
+      } catch {
+        // ignore
+      }
+      return updatedContent;
+    });
+
+    try {
+      const docRef = doc(db, 'system', 'website_content');
+      await setDoc(
+        docRef,
+        {
+          sectionVisibility: { [sectionKey]: isVisible },
+          [sectionKey]: { visible: isVisible },
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error('Error saving section visibility to Firestore:', err);
     }
   };
 
@@ -338,6 +433,7 @@ export function WebsiteContentProvider({ children }) {
       value={{
         content,
         updateSection,
+        toggleSectionVisibility,
         resetSection,
         resetAllToDefaults,
       }}
@@ -353,6 +449,7 @@ export function useWebsiteContent() {
     context || {
       content: DEFAULT_WEBSITE_CONTENT,
       updateSection: async () => {},
+      toggleSectionVisibility: async () => {},
       resetSection: async () => {},
       resetAllToDefaults: async () => {},
     }

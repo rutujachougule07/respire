@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Plus,
   Edit3,
@@ -12,9 +12,69 @@ import {
   Info,
   Dumbbell,
   Award,
+  Save,
 } from 'lucide-react';
 import { OFFICIAL_FEE_RULES, PERSONAL_TRAINING_RATES } from './initialData';
 import { savePlanToFirestore, deletePlanFromFirestore, saveMemberToFirestore } from '../../services/firestoreService';
+import { db } from '../../firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+
+const DEFAULT_PT_RATES = {
+  vishrambag: {
+    categories: [
+      {
+        id: 'pt-vb-general',
+        title: 'GENERAL PERSONAL TRAINING',
+        badge: 'Certified Coach',
+        alternatePrice: 7000,
+        dailyPrice: 10000,
+        pricing: [
+          { planName: 'Alternate Days', price: 7000, priceDisplay: '₹7,000/-', duration: '1 Month' },
+          { planName: 'Daily Personal Training', price: 10000, priceDisplay: '₹10,000/-', duration: '1 Month' },
+        ],
+      },
+      {
+        id: 'pt-vb-premium',
+        title: 'PREMIUM PERSONAL TRAINING',
+        badge: 'Elite Specialist',
+        alternatePrice: 9000,
+        dailyPrice: 13000,
+        isPremium: true,
+        pricing: [
+          { planName: 'Alternate Days', price: 9000, priceDisplay: '₹9,000/-', duration: '1 Month' },
+          { planName: 'Daily Personal Training', price: 13000, priceDisplay: '₹13,000/-', duration: '1 Month' },
+        ],
+      },
+    ],
+  },
+  branch2: {
+    categories: [
+      {
+        id: 'pt-vjn-junior',
+        title: 'JUNIOR PERSONAL TRAINER',
+        badge: 'Junior Coach',
+        alternatePrice: 4500,
+        dailyPrice: 8000,
+        pricing: [
+          { planName: 'Alternate Days', price: 4500, priceDisplay: '₹4,500/-', duration: '1 Month' },
+          { planName: 'Daily Personal Training', price: 8000, priceDisplay: '₹8,000/-', duration: '1 Month' },
+        ],
+      },
+      {
+        id: 'pt-vjn-senior',
+        title: 'SENIOR PERSONAL TRAINER',
+        badge: 'Senior Coach',
+        alternatePrice: 5500,
+        dailyPrice: 10000,
+        isPremium: true,
+        pricing: [
+          { planName: 'Alternate Days', price: 5500, priceDisplay: '₹5,500/-', duration: '1 Month' },
+          { planName: 'Daily Personal Training', price: 10000, priceDisplay: '₹10,000/-', duration: '1 Month' },
+        ],
+      },
+    ],
+  },
+};
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');
@@ -30,12 +90,115 @@ function addMonths(dateStr, months) {
   return start.toISOString().split('T')[0];
 }
 
-export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast }) {
+export default function PlansRenewalsTab({ plans, setPlans, members, setMembers, showToast, isSuperAdmin }) {
   const [renewalFilter, setRenewalFilter] = useState('Expiring');
   const [planBranchFilter, setPlanBranchFilter] = useState('all');
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [isSavingPlan, setIsSavingPlan] = useState(false);
+
+  // PT Fee Structure states
+  const [ptRates, setPtRates] = useState(DEFAULT_PT_RATES);
+  const [isPTRatesModalOpen, setIsPTRatesModalOpen] = useState(false);
+  const [ptModalBranch, setPtModalBranch] = useState('vishrambag');
+  const [tempPtRates, setTempPtRates] = useState(DEFAULT_PT_RATES);
+  const [isSavingPTRates, setIsSavingPTRates] = useState(false);
+  const [showAddPlanForm, setShowAddPlanForm] = useState(false);
+  const [newPlanData, setNewPlanData] = useState({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
+
+  // Sync PT rates live with Firestore
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'ptFeeStructure'), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data?.vishrambag?.categories && data?.branch2?.categories) {
+          setPtRates(data);
+          setTempPtRates(data);
+        }
+      }
+    });
+    return () => unsub();
+  }, []);
+
+  const openPTRatesModal = () => {
+    setTempPtRates(JSON.parse(JSON.stringify(ptRates)));
+    setShowAddPlanForm(false);
+    setNewPlanData({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
+    setIsPTRatesModalOpen(true);
+  };
+
+  const handleTempPTChange = (branch, idx, field, value) => {
+    const updated = JSON.parse(JSON.stringify(tempPtRates));
+    updated[branch].categories[idx][field] = field.includes('Price') ? Number(value) : value;
+    setTempPtRates(updated);
+  };
+
+  const handleTempPTDelete = (branch, idx) => {
+    if (!window.confirm('Are you sure you want to delete this PT plan?')) return;
+    const updated = JSON.parse(JSON.stringify(tempPtRates));
+    updated[branch].categories.splice(idx, 1);
+    setTempPtRates(updated);
+  };
+
+  const handleTempPTAdd = () => {
+    if (!newPlanData.title.trim()) {
+      showToast?.('Please enter a plan title');
+      return;
+    }
+    const altP = Number(newPlanData.alternatePrice) || 0;
+    const dayP = Number(newPlanData.dailyPrice) || 0;
+    const updated = JSON.parse(JSON.stringify(tempPtRates));
+    updated[ptModalBranch].categories.push({
+      id: `pt-custom-${Date.now()}`,
+      title: newPlanData.title.trim(),
+      badge: newPlanData.badge.trim() || 'Certified Coach',
+      alternatePrice: altP,
+      dailyPrice: dayP,
+      pricing: [
+        { planName: 'Alternate Days', price: altP, priceDisplay: `₹${altP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+        { planName: 'Daily Personal Training', price: dayP, priceDisplay: `₹${dayP.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+      ],
+      isPremium: false,
+    });
+    setTempPtRates(updated);
+    setNewPlanData({ title: '', badge: '', alternatePrice: '', dailyPrice: '' });
+    setShowAddPlanForm(false);
+    showToast?.('✓ Plan added to list. Click "Save to Cloud" to publish live.');
+  };
+
+  const savePTRatesCloud = async () => {
+    setIsSavingPTRates(true);
+    try {
+      const prepared = JSON.parse(JSON.stringify(tempPtRates));
+      ['vishrambag', 'branch2'].forEach((bKey) => {
+        if (prepared[bKey]?.categories) {
+          prepared[bKey].categories = prepared[bKey].categories.map((cat) => {
+            const alt = Number(cat.alternatePrice) || 0;
+            const day = Number(cat.dailyPrice) || 0;
+            return {
+              ...cat,
+              alternatePrice: alt,
+              dailyPrice: day,
+              pricing: [
+                { planName: 'Alternate Days', price: alt, priceDisplay: `₹${alt.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+                { planName: 'Daily Personal Training', price: day, priceDisplay: `₹${day.toLocaleString('en-IN')}/-`, duration: '1 Month' },
+              ],
+            };
+          });
+        }
+      });
+
+      await setDoc(doc(db, 'settings', 'ptFeeStructure'), prepared);
+      setPtRates(prepared);
+      setIsPTRatesModalOpen(false);
+      showToast?.('✓ Official PT Fee Structure saved & published live!');
+    } catch (e) {
+      console.error(e);
+      showToast?.('Error saving PT Fee Structure. Please retry.');
+    } finally {
+      setIsSavingPTRates(false);
+    }
+  };
 
   const [planForm, setPlanForm] = useState({
     branchId: 'vishrambag',
@@ -541,7 +704,7 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
             alignItems: 'center',
             justifyContent: 'space-between',
             flexWrap: 'wrap',
-            gap: '10px',
+            gap: '12px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -568,6 +731,31 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               </div>
             </div>
           </div>
+
+          {isSuperAdmin && (
+            <button
+              type="button"
+              onClick={openPTRatesModal}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                backgroundColor: '#00D256',
+                color: '#0F172A',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(0, 210, 86, 0.3)',
+                transition: 'all 0.2s',
+              }}
+            >
+              <Edit3 size={15} />
+              <span>Edit / Add PT Plans</span>
+            </button>
+          )}
         </div>
 
         <div
@@ -597,27 +785,37 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1px solid #D1FAE5' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>GENERAL PERSONAL TRAINING</span>
-                  <span style={{ fontSize: '0.72rem', color: '#008A38', fontWeight: 700 }}>Certified Coach</span>
+              {(ptRates.vishrambag?.categories || []).map((cat) => (
+                <div
+                  key={cat.id}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    backgroundColor: '#FFFFFF',
+                    border: cat.isPremium ? '1.5px solid #00C952' : '1px solid #D1FAE5',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>{cat.title}</span>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        color: '#008A38',
+                        fontWeight: cat.isPremium ? 800 : 700,
+                        backgroundColor: cat.isPremium ? '#ECFDF3' : 'transparent',
+                        padding: cat.isPremium ? '2px 6px' : '0',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      {cat.badge}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                    <span>• Alternate Days: <strong>₹{(cat.alternatePrice || 0).toLocaleString('en-IN')}/-</strong></span>
+                    <span>• Daily Training: <strong>₹{(cat.dailyPrice || 0).toLocaleString('en-IN')}/-</strong></span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
-                  <span>• Alternate Days: <strong>₹7,000/-</strong></span>
-                  <span>• Daily Training: <strong>₹10,000/-</strong></span>
-                </div>
-              </div>
-
-              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1.5px solid #00C952' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>PREMIUM PERSONAL TRAINING</span>
-                  <span style={{ fontSize: '0.72rem', color: '#008A38', fontWeight: 800, backgroundColor: '#ECFDF3', padding: '2px 6px', borderRadius: '4px' }}>Elite Specialist</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
-                  <span>• Alternate Days: <strong>₹9,000/-</strong></span>
-                  <span>• Daily Training: <strong>₹13,000/-</strong></span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -640,27 +838,37 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1px solid #E0E7FF' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>JUNIOR PERSONAL TRAINER</span>
-                  <span style={{ fontSize: '0.72rem', color: '#172C83', fontWeight: 700 }}>Junior Coach</span>
+              {(ptRates.branch2?.categories || []).map((cat) => (
+                <div
+                  key={cat.id}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    backgroundColor: '#FFFFFF',
+                    border: cat.isPremium ? '1.5px solid #172C83' : '1px solid #E0E7FF',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>{cat.title}</span>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        color: '#172C83',
+                        fontWeight: cat.isPremium ? 800 : 700,
+                        backgroundColor: cat.isPremium ? '#EEF2FF' : 'transparent',
+                        padding: cat.isPremium ? '2px 6px' : '0',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      {cat.badge}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
+                    <span>• Alternate Days: <strong>₹{(cat.alternatePrice || 0).toLocaleString('en-IN')}/-</strong></span>
+                    <span>• Daily Training: <strong>₹{(cat.dailyPrice || 0).toLocaleString('en-IN')}/-</strong></span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
-                  <span>• Alternate Days: <strong>₹4,500/-</strong></span>
-                  <span>• Daily Training: <strong>₹8,000/-</strong></span>
-                </div>
-              </div>
-
-              <div style={{ padding: '12px 14px', borderRadius: '12px', backgroundColor: '#FFFFFF', border: '1.5px solid #172C83' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0F172A' }}>SENIOR PERSONAL TRAINER</span>
-                  <span style={{ fontSize: '0.72rem', color: '#172C83', fontWeight: 800, backgroundColor: '#EEF2FF', padding: '2px 6px', borderRadius: '4px' }}>Senior Coach</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: '#334155', fontWeight: 600 }}>
-                  <span>• Alternate Days: <strong>₹5,500/-</strong></span>
-                  <span>• Daily Training: <strong>₹10,000/-</strong></span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1009,6 +1217,339 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* PT FEE STRUCTURE EDIT / ADD MODAL */}
+      {isPTRatesModalOpen && (
+        <div
+          onClick={() => setIsPTRatesModalOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 2600,
+            backgroundColor: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '620px',
+              maxHeight: '90vh',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '22px',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.35)',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '20px 24px',
+                borderBottom: '1px solid #E2E8F0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
+                color: '#FFFFFF',
+                flexShrink: 0,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(0, 210, 86, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#00D256',
+                  }}
+                >
+                  <Dumbbell size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 900, margin: 0 }}>
+                    Manage PT Fee Structure
+                  </h3>
+                  <p style={{ fontSize: '0.74rem', color: '#94A3B8', margin: 0 }}>
+                    Add, edit, or remove branch personal training plans
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsPTRatesModalOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Branch Selector Tabs */}
+              <div style={{ display: 'flex', gap: '8px', padding: '4px', backgroundColor: '#F1F5F9', borderRadius: '12px' }}>
+                {[
+                  { id: 'vishrambag', label: 'Vishrambag Branch' },
+                  { id: 'branch2', label: 'Vijaynagar Branch' },
+                ].map((b) => (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => { setPtModalBranch(b.id); setShowAddPlanForm(false); }}
+                    style={{
+                      flex: 1,
+                      padding: '9px 14px',
+                      borderRadius: '9px',
+                      fontSize: '0.84rem',
+                      fontWeight: 800,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: ptModalBranch === b.id ? '#FFFFFF' : 'transparent',
+                      color: ptModalBranch === b.id ? (b.id === 'vishrambag' ? '#008A38' : '#172C83') : '#64748B',
+                      boxShadow: ptModalBranch === b.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Plans for current selected branch */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {(tempPtRates[ptModalBranch]?.categories || []).map((cat, idx) => (
+                  <div
+                    key={cat.id || idx}
+                    style={{
+                      padding: '14px 16px',
+                      borderRadius: '14px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1.5px solid #E2E8F0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                      <span style={{ fontSize: '0.74rem', fontWeight: 900, color: '#008A38', letterSpacing: '0.04em' }}>
+                        PLAN #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleTempPTDelete(ptModalBranch, idx)}
+                        title="Delete this plan"
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '8px',
+                          backgroundColor: '#FEE2E2',
+                          color: '#DC2626',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '10px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>
+                          PLAN TITLE *
+                        </label>
+                        <input
+                          value={cat.title}
+                          onChange={(e) => handleTempPTChange(ptModalBranch, idx, 'title', e.target.value)}
+                          placeholder="e.g. GENERAL PERSONAL TRAINING"
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>
+                          BADGE / SUBTITLE
+                        </label>
+                        <input
+                          value={cat.badge}
+                          onChange={(e) => handleTempPTChange(ptModalBranch, idx, 'badge', e.target.value)}
+                          placeholder="e.g. Certified Coach"
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>
+                          ALTERNATE DAYS PRICE (₹)
+                        </label>
+                        <input
+                          type="number"
+                          value={cat.alternatePrice}
+                          onChange={(e) => handleTempPTChange(ptModalBranch, idx, 'alternatePrice', e.target.value)}
+                          placeholder="7000"
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>
+                          DAILY TRAINING PRICE (₹)
+                        </label>
+                        <input
+                          type="number"
+                          value={cat.dailyPrice}
+                          onChange={(e) => handleTempPTChange(ptModalBranch, idx, 'dailyPrice', e.target.value)}
+                          placeholder="10000"
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Plan Form or Button */}
+              {!showAddPlanForm ? (
+                <button
+                  type="button"
+                  onClick={() => setShowAddPlanForm(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    padding: '12px',
+                    borderRadius: '12px',
+                    border: '2px dashed #86EFAC',
+                    backgroundColor: '#F0FDF4',
+                    color: '#15803D',
+                    fontWeight: 800,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <Plus size={16} />
+                  <span>+ Add New PT Plan for {ptModalBranch === 'vishrambag' ? 'Vishrambag' : 'Vijaynagar'}</span>
+                </button>
+              ) : (
+                <div style={{ padding: '16px', borderRadius: '14px', backgroundColor: '#F0FDF4', border: '1.5px solid #86EFAC', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ fontWeight: 800, fontSize: '0.84rem', color: '#166534' }}>
+                    ➕ Add New PT Plan
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>PLAN TITLE *</label>
+                      <input
+                        placeholder="e.g. VIP TRANSFORMATION"
+                        value={newPlanData.title}
+                        onChange={(e) => setNewPlanData((p) => ({ ...p, title: e.target.value }))}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>BADGE / LABEL</label>
+                      <input
+                        placeholder="e.g. Elite Coach"
+                        value={newPlanData.badge}
+                        onChange={(e) => setNewPlanData((p) => ({ ...p, badge: e.target.value }))}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>ALTERNATE DAYS (₹)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 8000"
+                        value={newPlanData.alternatePrice}
+                        onChange={(e) => setNewPlanData((p) => ({ ...p, alternatePrice: e.target.value }))}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.7rem', fontWeight: 800, color: '#475569', marginBottom: '3px' }}>DAILY TRAINING (₹)</label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 12000"
+                        value={newPlanData.dailyPrice}
+                        onChange={(e) => setNewPlanData((p) => ({ ...p, dailyPrice: e.target.value }))}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                    <button
+                      type="button"
+                      onClick={handleTempPTAdd}
+                      style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: '#00B84A', color: '#fff', border: 'none', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer' }}
+                    >
+                      ✓ Add to List
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowAddPlanForm(false); setNewPlanData({ title: '', badge: '', alternatePrice: '', dailyPrice: '' }); }}
+                      style={{ padding: '8px 14px', borderRadius: '8px', backgroundColor: '#E2E8F0', color: '#475569', border: 'none', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                padding: '16px 24px',
+                borderTop: '1px solid #E2E8F0',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
+                gap: '10px',
+                backgroundColor: '#F8FAFC',
+                flexShrink: 0,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setIsPTRatesModalOpen(false)}
+                className="btn btn-secondary btn-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={savePTRatesCloud}
+                disabled={isSavingPTRates}
+                className="btn btn-primary btn-sm"
+                style={{ opacity: isSavingPTRates ? 0.75 : 1, display: 'inline-flex', alignItems: 'center', gap: '7px' }}
+              >
+                <CheckCircle2 size={16} />
+                <span>{isSavingPTRates ? 'Saving to Cloud...' : 'Save to Cloud'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

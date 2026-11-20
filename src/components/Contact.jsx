@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
 import { MapPin, Clock, Send, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { submitInquiryToFirestore } from '../services/firestoreService';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function Contact() {
+  const { content } = useWebsiteContent();
+  const contactData = content?.contact || {};
+
+  if (contactData?.visible === false || content?.sectionVisibility?.contact === false) {
+    return null;
+  }
+
+  const eyebrow = contactData.eyebrow || 'Visit Our 2 Branches in Sangli';
+  const title = contactData.title || 'CONNECT WITH RESPIRE FITNESS';
+  const subtitle =
+    contactData.subtitle ||
+    'Visit either of our premium Sangli branches — Vishrambag or Vijaynagar — or submit an inquiry below.';
+  const vishrambagPhone = contactData.vishrambagPhone || '+91 7798001777';
+  const vijaynagarPhone = contactData.vijaynagarPhone || '+91 9172848777';
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -49,13 +64,13 @@ export default function Contact() {
         <div className="section-header">
           <div className="section-eyebrow">
             <MapPin size={14} />
-            <span>Visit Our 2 Branches in Sangli</span>
+            <span>{eyebrow}</span>
           </div>
           <h2 className="section-title">
-            CONNECT WITH <span className="text-green">RESPIRE FITNESS</span>
+            {title}
           </h2>
           <p className="section-subtitle">
-            Visit either of our premium Sangli branches — <strong>Vishrambag</strong> or <strong>Vijaynagar</strong> — or submit an inquiry below.
+            {subtitle}
           </p>
         </div>
 
@@ -165,8 +180,12 @@ export default function Contact() {
               <div style={{ color: '#008A38', fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: '6px' }}>
                 • A MAHABAL GROUP VENTURE •
               </div>
-              <div>Vishrambag Desk: <a href="tel:+917798001777" style={{ color: '#008A38' }}>+91 7798001777</a></div>
-              <div>Vijaynagar Desk: <a href="tel:+919172848777" style={{ color: '#172C83' }}>+91 9172848777</a></div>
+              <div>
+                Vishrambag Desk: <a href={`tel:${vishrambagPhone.replace(/\s+/g, '')}`} style={{ color: '#008A38' }}>{vishrambagPhone}</a>
+              </div>
+              <div>
+                Vijaynagar Desk: <a href={`tel:${vijaynagarPhone.replace(/\s+/g, '')}`} style={{ color: '#172C83' }}>{vijaynagarPhone}</a>
+              </div>
             </div>
           </div>
 

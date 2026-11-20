@@ -4,6 +4,9 @@ import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function Hero() {
   const { content } = useWebsiteContent();
+  if (content?.hero?.visible === false || content?.sectionVisibility?.hero === false) {
+    return null;
+  }
   const heroBg = content?.hero?.bgImage || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop';
 
   const scrollToNext = () => {

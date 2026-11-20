@@ -5,6 +5,17 @@ import { useWebsiteContent } from '../context/WebsiteContentContext';
 export default function Services() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
   const { content } = useWebsiteContent();
+  const servicesData = content?.services || {};
+
+  if (servicesData?.visible === false || content?.sectionVisibility?.services === false) {
+    return null;
+  }
+
+  const eyebrow = servicesData.eyebrow || 'World-Class Offerings';
+  const title = servicesData.title || 'OUR PREMIUM SERVICES';
+  const subtitle =
+    servicesData.subtitle ||
+    'From high-intensity personal training to restorative luxury thermal therapies, experience complete fitness and recovery under one roof at R City Mall, Sangli.';
 
   const baseServices = [
     {
@@ -59,16 +70,24 @@ export default function Services() {
     },
   ];
 
-  const services = baseServices.map((srv) => {
-    const override = content?.services?.items?.find((item) => item.id === srv.id);
-    return {
-      ...srv,
-      ...(override || {}),
-      image: override?.image || srv.image,
-      icon: srv.icon,
-      accent: srv.accent,
-    };
-  });
+  const iconMap = {
+    pt: Dumbbell,
+    massage: Sparkles,
+    steam: Waves,
+    zumba: Music,
+    yoga: Heart,
+  };
+
+  const rawServices = (servicesData.items && Array.isArray(servicesData.items))
+    ? servicesData.items
+    : baseServices;
+
+  const services = rawServices.map((srv, idx) => ({
+    ...srv,
+    icon: iconMap[srv.id] || Dumbbell,
+    accent: srv.accent || (idx % 2 === 0 ? '#00B84A' : '#172C83'),
+    features: srv.features || [],
+  }));
 
   const scrollToContact = (serviceTitle) => {
     const el = document.getElementById('contact');
@@ -102,13 +121,13 @@ export default function Services() {
         <div className="section-header">
           <div className="section-eyebrow">
             <Flame size={14} />
-            <span>World-Class Offerings</span>
+            <span>{eyebrow}</span>
           </div>
           <h2 className="section-title">
-            OUR PREMIUM <span className="text-green">SERVICES</span>
+            {title}
           </h2>
           <p className="section-subtitle">
-            From high-intensity personal training to restorative luxury thermal therapies, experience complete fitness and recovery under one roof at R City Mall, Sangli.
+            {subtitle}
           </p>
         </div>
 

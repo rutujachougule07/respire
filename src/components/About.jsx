@@ -4,8 +4,25 @@ import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function About() {
   const { content } = useWebsiteContent();
-  const aboutImage = content?.about?.image || 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop';
-  const companyPillars = [
+  const aboutData = content?.about || {};
+
+  if (aboutData?.visible === false || content?.sectionVisibility?.about === false) {
+    return null;
+  }
+
+  const aboutImage =
+    aboutData.image ||
+    'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop';
+  const eyebrow = aboutData.eyebrow || '• A PART OF MAHABAL GROUP •';
+  const title = aboutData.title || 'ABOUT MAHABAL GROUP & RESPIRE';
+  const leadParagraph =
+    aboutData.leadParagraph ||
+    'Respire Fitness is proudly founded and steered under the esteemed banner of the Mahabal Group—a distinguished corporate enterprise that has earned high standing and widespread public trust across Sangli and Western Maharashtra.';
+  const secondaryParagraph =
+    aboutData.secondaryParagraph ||
+    'Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand, Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern sports science with transparent, professional management, the Mahabal Group ensures that every member benefits from corporate reliability, safety, and long-term commitment.';
+
+  const defaultPillars = [
     {
       icon: Award,
       title: 'Decades of Trusted Heritage',
@@ -27,6 +44,14 @@ export default function About() {
       desc: 'Serving members across two premier branches: Vishrambag (R City Mall) & Vijaynagar (Krishna Heights).',
     },
   ];
+
+  const pillarIcons = [Award, Landmark, ShieldCheck, HeartHandshake];
+  const companyPillars = (aboutData.pillars && Array.isArray(aboutData.pillars))
+    ? aboutData.pillars.map((p, idx) => ({
+        ...p,
+        icon: pillarIcons[idx % pillarIcons.length] || Award,
+      }))
+    : defaultPillars;
 
   return (
     <section
@@ -180,11 +205,11 @@ export default function About() {
           <div>
             <div className="section-eyebrow">
               <Building2 size={14} />
-              <span>• A PART OF MAHABAL GROUP •</span>
+              <span>{eyebrow}</span>
             </div>
 
             <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>
-              ABOUT <span className="text-green">MAHABAL GROUP & RESPIRE</span>
+              {title}
             </h2>
 
             <p
@@ -196,16 +221,11 @@ export default function About() {
                 fontWeight: 500,
               }}
             >
-              <strong>Respire Fitness</strong> is proudly founded and steered under the esteemed banner of the{' '}
-              <strong>Mahabal Group</strong>—a distinguished corporate enterprise that has earned high standing and
-              widespread public trust across Sangli and Western Maharashtra.
+              {leadParagraph}
             </p>
 
             <p style={{ fontSize: '0.92rem', color: '#475569', marginBottom: '22px', lineHeight: 1.65 }}>
-              Rooted in the group’s foundational philosophy that economic growth and societal health go hand-in-hand,
-              Respire Fitness was conceptualized to provide Sangli with a world-class health sanctuary. Combining modern
-              sports science with transparent, professional management, the Mahabal Group ensures that every member benefits
-              from corporate reliability, safety, and long-term commitment.
+              {secondaryParagraph}
             </p>
 
             {/* Company Credentials Strip */}
