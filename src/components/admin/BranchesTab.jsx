@@ -14,7 +14,7 @@ export default function BranchesTab({ members, trainers, plans, onSelectBranch }
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '22px' }}>
+      <div className="branches-cards-grid">
         {BRANCHES.map((branch) => {
           const branchMembers = members.filter((m) => m.branchId === branch.id);
           const activeMembers = branchMembers.filter((m) => m.status === 'Active');
@@ -137,6 +137,20 @@ export default function BranchesTab({ members, trainers, plans, onSelectBranch }
           );
         })}
       </div>
+
+      <style>{`
+        .branches-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 22px;
+        }
+        @media (max-width: 860px) {
+          .branches-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

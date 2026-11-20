@@ -235,13 +235,7 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
           )}
         </div>
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 380px))',
-            gap: '20px',
-          }}
-        >
+        <div className="trainers-cards-grid">
           {trainers.map((t) => {
           const assignedMembers = members.filter((m) => m.trainerId === t.id && m.status === 'Active');
 
@@ -677,6 +671,26 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
           </div>
         </div>
       )}
+
+      <style>{`
+        .trainers-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 20px;
+        }
+        @media (max-width: 1240px) {
+          .trainers-cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+          }
+        }
+        @media (max-width: 720px) {
+          .trainers-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

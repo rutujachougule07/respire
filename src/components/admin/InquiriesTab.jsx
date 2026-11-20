@@ -170,7 +170,7 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
           </p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '18px' }}>
+        <div className="inquiries-cards-grid">
           {filtered.map((inq) => {
             const isNew = inq.status === 'New';
             return (
@@ -183,17 +183,18 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
                   boxShadow: isNew
                     ? '0 10px 24px rgba(0, 201, 82, 0.12)'
                     : '0 4px 14px rgba(15, 23, 42, 0.04)',
-                  padding: '22px',
+                  padding: '20px 22px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
+                  minHeight: '260px',
                 }}
               >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                     <span
                       style={{
-                        fontSize: '0.74rem',
+                        fontSize: '0.72rem',
                         fontWeight: 800,
                         padding: '4px 10px',
                         borderRadius: '999px',
@@ -228,23 +229,23 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
                     </span>
                   </div>
 
-                  <h3 style={{ fontSize: '1.18rem', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
                     {inq.name || 'Prospective Member'}
                   </h3>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '14px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.86rem', color: '#334155', fontWeight: 600 }}>
                       <Phone size={14} color="#008A38" />
-                      <a href={`tel:${inq.phone}`} style={{ color: '#008A38', textDecoration: 'none' }}>
+                      <a href={`tel:${inq.phone}`} style={{ color: '#008A38', textDecoration: 'none', fontWeight: 700 }}>
                         {inq.phone}
                       </a>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#64748B' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: '#64748B' }}>
                       <MapPin size={14} color="#94A3B8" />
                       <span>{inq.branch || 'Respire Sangli'}</span>
                     </div>
-                    <div style={{ fontSize: '0.82rem', color: '#475569', fontWeight: 700 }}>
-                      Interested in: <span style={{ color: '#008A38' }}>{inq.service}</span> • Program: {inq.program}
+                    <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 700 }}>
+                      Interested in: <span style={{ color: '#008A38' }}>{inq.service || 'Fitness'}</span> • Program: {inq.program || 'Standard'}
                     </div>
                   </div>
 
@@ -254,11 +255,12 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
                         padding: '10px 12px',
                         backgroundColor: '#F8FAFC',
                         borderRadius: '8px',
-                        fontSize: '0.8rem',
+                        fontSize: '0.82rem',
                         color: '#475569',
                         fontStyle: 'italic',
-                        marginBottom: '16px',
+                        marginBottom: '14px',
                         borderLeft: '3px solid #00C952',
+                        wordBreak: 'break-word',
                       }}
                     >
                       "{inq.notes}"
@@ -272,18 +274,19 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
                     onClick={() => openWhatsApp(inq)}
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
+                      padding: '9px 12px',
                       borderRadius: '8px',
                       backgroundColor: '#25D366',
                       color: '#FFFFFF',
                       border: 'none',
-                      fontSize: '0.8rem',
+                      fontSize: '0.82rem',
                       fontWeight: 800,
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '6px',
+                      boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
                     }}
                   >
                     <ExternalLink size={13} />
@@ -314,6 +317,26 @@ export default function InquiriesTab({ inquiries = [], setInquiries, activeBranc
           })}
         </div>
       )}
+
+      <style>{`
+        .inquiries-cards-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 20px;
+        }
+        @media (max-width: 1240px) {
+          .inquiries-cards-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+          }
+        }
+        @media (max-width: 720px) {
+          .inquiries-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
