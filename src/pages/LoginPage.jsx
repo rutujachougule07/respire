@@ -295,7 +295,7 @@ export default function LoginPage() {
                   }}
                 />
                 <input
-                  type="email"
+                  type="text"
                   name="respire_mgmt_usr"
                   id="respire_mgmt_usr"
                   autoComplete="off"
@@ -313,7 +313,7 @@ export default function LoginPage() {
                   onMouseDown={() => setIsEditing(true)}
                   onTouchStart={() => setIsEditing(true)}
                   onBlur={() => setFocusedField('')}
-                  placeholder="Enter your email"
+                  placeholder="admin@gmail.com / manager1 / manager2"
                   style={{
                     width: '100%',
                     padding: '12px 14px 12px 42px',
@@ -482,6 +482,90 @@ export default function LoginPage() {
                 </>
               )}
             </button>
+
+            {/* Authorized Roles Badges */}
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                textAlign: 'center',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  color: '#64748B',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  marginBottom: '8px',
+                }}
+              >
+                Authorized Portal Accounts
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@gmail.com');
+                    setError('');
+                  }}
+                  style={{
+                    border: '1px solid rgba(0, 184, 74, 0.3)',
+                    backgroundColor: '#ECFDF3',
+                    color: '#008A38',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Admin (All Branches)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('manager1@gmail.com');
+                    setError('');
+                  }}
+                  style={{
+                    border: '1px solid #CBD5E1',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Manager 1 (Vishrambag)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('manager2@gmail.com');
+                    setError('');
+                  }}
+                  style={{
+                    border: '1px solid #CBD5E1',
+                    backgroundColor: '#FFFFFF',
+                    color: '#334155',
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Manager 2 (Vijaynagar)
+                </button>
+              </div>
+            </div>
           </form>
         </div>
       </div>

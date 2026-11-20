@@ -570,11 +570,11 @@ export default function Footer({ onAdminLogin }) {
                       style={{ position: 'absolute', left: '13px', pointerEvents: 'none', transition: 'color 0.2s' }}
                     />
                     <input
-                      type="email"
+                      type="text"
                       name="respire_portal_email_desk"
                       autoComplete="off"
                       required
-                      placeholder="Enter your email address"
+                      placeholder="admin@gmail.com / manager1 / manager2"
                       value={adminUser}
                       onChange={(e) => {
                         setAdminUser(e.target.value);
