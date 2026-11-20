@@ -11,7 +11,6 @@ import { LOGIN_ACCOUNTS } from '../components/admin/initialData';
 
 const AuthContext = createContext(null);
 
-// Normalize input username or email into the canonical email address
 export const normalizeAdminEmail = (input) => {
   const clean = (input || '').trim().toLowerCase();
   if (clean === 'admin') return 'admin@gmail.com';
@@ -20,7 +19,6 @@ export const normalizeAdminEmail = (input) => {
   return clean;
 };
 
-// Check if an email matches one of the 3 authorized admin accounts
 export const findAuthorizedAccount = (email) => {
   const normalized = normalizeAdminEmail(email);
   return LOGIN_ACCOUNTS.find(
@@ -35,7 +33,6 @@ export function AuthProvider({ children }) {
       const stored = localStorage.getItem('rf_admin_session_auth');
       if (!stored) return null;
       const parsed = JSON.parse(stored);
-      // Strictly verify stored session belongs to one of the 3 authorized accounts
       const matched = findAuthorizedAccount(parsed?.email);
       return matched ? { ...matched, ...parsed } : null;
     } catch {
@@ -53,7 +50,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('rf_admin_session_auth');
       }
     } catch {
-      // ignore storage errors
+      // ignore
     }
   }, [adminSession]);
 
@@ -73,8 +70,6 @@ export function AuthProvider({ children }) {
           };
           setAdminSession(session);
         } else {
-          // ANY account not strictly in authorized list is signed out and rejected immediately!
-          console.warn('Unauthorized user attempted portal access:', emailLower);
           await signOut(auth);
           setCurrentUser(null);
           setAdminSession(null);
@@ -82,7 +77,6 @@ export function AuthProvider({ children }) {
         }
       } else {
         setCurrentUser(null);
-        // Clear active session if not authenticated
         if (!localStorage.getItem('rf_admin_session_auth')) {
           setAdminSession(null);
         }
@@ -93,24 +87,19 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
-  /**
-   * Log in strictly as Admin (admin@gmail.com), Manager 1 (manager1@gmail.com), or Manager 2 (manager2@gmail.com)
-   */
   const login = async (rawEmail, rawPassword) => {
     const normalizedEmail = normalizeAdminEmail(rawEmail);
     const cleanPass = (rawPassword || '').trim();
 
     if (!normalizedEmail || !cleanPass) {
-      throw new Error('Please enter both email/username and password.');
+      throw new Error('Invalid email or password.');
     }
 
-    // STRICT CHECK: ONLY admin@gmail.com, manager1@gmail.com, manager2@gmail.com are allowed!
     const matchedAccount = findAuthorizedAccount(normalizedEmail);
     if (!matchedAccount) {
-      throw new Error('Access denied. Only authorized Admin, Manager 1, and Manager 2 accounts can log in.');
+      throw new Error('Invalid email or password.');
     }
 
-    // 1. Authenticate with Firebase Authentication
     try {
       const userCredential = await signInWithEmailAndPassword(auth, normalizedEmail, cleanPass);
       const user = userCredential.user;
@@ -120,7 +109,6 @@ export function AuthProvider({ children }) {
         firebaseEmail: user.email,
       };
 
-      // Record admin audit in Firestore
       try {
         await setDoc(
           doc(db, 'admins', user.uid),
@@ -131,22 +119,20 @@ export function AuthProvider({ children }) {
           { merge: true }
         );
       } catch {
-        // Continue even if Firestore offline
+        // offline ignore
       }
 
       setAdminSession(session);
       setCurrentUser(user);
       return { success: true, user, session };
     } catch (fbError) {
-      // 2. Handle invalid credentials / wrong password strictly - NO BYPASS!
       if (
         fbError.code === 'auth/wrong-password' ||
         fbError.code === 'auth/invalid-credential'
       ) {
-        throw new Error('Incorrect password. Please verify and try again.');
+        throw new Error('Invalid email or password.');
       }
 
-      // 3. If user doesn't exist yet in Firebase Console, but password matches default pre-configured password:
       if (fbError.code === 'auth/user-not-found') {
         if (cleanPass === matchedAccount.password) {
           try {
@@ -160,42 +146,15 @@ export function AuthProvider({ children }) {
             setCurrentUser(newCredential.user);
             return { success: true, user: newCredential.user, session };
           } catch {
-            throw new Error('Account not found in Firebase Authentication or incorrect password.');
+            throw new Error('Invalid email or password.');
           }
-        } else {
-          throw new Error('Account not found in Firebase Authentication or incorrect password.');
         }
       }
 
-      if (fbError.code === 'auth/too-many-requests') {
-        throw new Error('Too many failed login attempts. Please wait a few moments.');
-      }
-
-      if (fbError.code === 'auth/invalid-email') {
-        throw new Error('Invalid email format. Use admin@gmail.com, manager1@gmail.com, or manager2@gmail.com');
-      }
-
-      // If Firebase network is unreachable, allow strictly if password matches configured account password
-      if (fbError.code === 'auth/network-request-failed') {
-        if (cleanPass === matchedAccount.password) {
-          const session = {
-            ...matchedAccount,
-            uid: `local-${matchedAccount.role}`,
-          };
-          setAdminSession(session);
-          return { success: true, session };
-        } else {
-          throw new Error('Incorrect password.');
-        }
-      }
-
-      throw new Error(fbError.message || 'Login failed. Please verify your credentials.');
+      throw new Error('Invalid email or password.');
     }
   };
 
-  /**
-   * Log out completely of Firebase and wipe stored session.
-   */
   const logout = async () => {
     try {
       await signOut(auth);
