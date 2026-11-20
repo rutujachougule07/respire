@@ -213,7 +213,13 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '20px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 330px), 380px))',
+            gap: '20px',
+          }}
+        >
           {trainers.map((t) => {
           const assignedMembers = members.filter((m) => m.trainerId === t.id && m.status === 'Active');
 
@@ -224,11 +230,13 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                 backgroundColor: '#FFFFFF',
                 border: '1.5px solid rgba(0, 184, 74, 0.16)',
                 borderRadius: '20px',
-                padding: '22px',
+                padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 boxShadow: '0 8px 24px rgba(15, 23, 42, 0.05)',
+                width: '100%',
+                maxWidth: '400px',
               }}
             >
               <div>
@@ -285,21 +293,21 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '10px',
-                    fontSize: '0.76rem',
+                    gap: '8px',
+                    fontSize: '0.74rem',
                     color: '#334155',
                     fontWeight: 600,
                     marginBottom: '14px',
                   }}
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#F8FAFC', padding: '5px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#F8FAFC', padding: '4px 9px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                     <Dumbbell size={12} color="#00B84A" /> {t.experience}
                   </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#F8FAFC', padding: '5px 10px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#F8FAFC', padding: '4px 9px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
                     <Phone size={12} color="#172C83" /> {t.phone}
                   </span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#ECFDF3', color: '#008A38', padding: '5px 10px', borderRadius: '8px' }}>
-                    <Users size={12} /> {assignedMembers.length} Assigned Members
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#ECFDF3', color: '#008A38', padding: '4px 9px', borderRadius: '8px' }}>
+                    <Users size={12} /> {assignedMembers.length} Assigned
                   </span>
                 </div>
 
@@ -328,15 +336,15 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '8px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '6px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
                 <button
                   onClick={() => setAssignModalTrainer(t)}
                   style={{
-                    padding: '8px 6px',
+                    padding: '8px 4px',
                     borderRadius: '8px',
                     background: 'linear-gradient(135deg, #00D256 0%, #008A37 100%)',
                     color: '#FFFFFF',
-                    fontSize: '0.75rem',
+                    fontSize: '0.74rem',
                     fontWeight: 800,
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -344,16 +352,16 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                     gap: '4px',
                   }}
                 >
-                  <Users size={13} /> Assign
+                  <Users size={12} /> Assign
                 </button>
                 <button
                   onClick={() => setScheduleModalTrainer(t)}
                   style={{
-                    padding: '8px 6px',
+                    padding: '8px 4px',
                     borderRadius: '8px',
                     backgroundColor: '#EEF2FF',
                     color: '#172C83',
-                    fontSize: '0.75rem',
+                    fontSize: '0.74rem',
                     fontWeight: 800,
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -361,16 +369,16 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                     gap: '4px',
                   }}
                 >
-                  <Calendar size={13} /> Schedule
+                  <Calendar size={12} /> Schedule
                 </button>
                 <button
                   onClick={() => openEditModal(t)}
                   style={{
-                    padding: '8px 6px',
+                    padding: '8px 4px',
                     borderRadius: '8px',
                     backgroundColor: '#F1F5F9',
                     color: '#334155',
-                    fontSize: '0.75rem',
+                    fontSize: '0.74rem',
                     fontWeight: 800,
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -378,13 +386,13 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                     gap: '4px',
                   }}
                 >
-                  <Edit3 size={13} /> Profile
+                  <Edit3 size={12} /> Profile
                 </button>
                 <button
                   onClick={() => handleDeleteTrainer(t)}
                   title="Delete Trainer from Firebase"
                   style={{
-                    padding: '8px 10px',
+                    padding: '8px 9px',
                     borderRadius: '8px',
                     backgroundColor: '#FEF2F2',
                     color: '#DC2626',
