@@ -838,31 +838,6 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
               </div>
             </div>
           </div>
-
-          {isSuperAdmin && (
-            <button
-              type="button"
-              onClick={openPTRatesModal}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                borderRadius: '10px',
-                backgroundColor: '#00D256',
-                color: '#0F172A',
-                fontWeight: 800,
-                fontSize: '0.82rem',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(0, 210, 86, 0.3)',
-                transition: 'all 0.2s',
-              }}
-            >
-              <Edit3 size={15} />
-              <span>Edit / Add PT Plans</span>
-            </button>
-          )}
         </div>
 
         <div

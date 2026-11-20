@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Check,
   Sparkles,
+  Building2,
 } from 'lucide-react';
 import { useTrainerAuth } from '../context/TrainerAuthContext';
 import {
@@ -220,6 +221,304 @@ export default function TrainerDashboardPage() {
     },
   ];
 
+  const SidebarContent = () => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        backgroundColor: '#FFFFFF',
+        color: '#0F172A',
+        userSelect: 'none',
+      }}
+    >
+      {/* 1. FIXED BRAND HEADER */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '20px 18px 16px',
+          borderBottom: '1px solid #F1F5F9',
+          backgroundColor: '#FFFFFF',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+          <img
+            src="/respire_logo_web.png"
+            alt="Respire Fitness"
+            style={{
+              height: '42px',
+              width: 'auto',
+              maxWidth: '185px',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/respire_logo_transparent.png';
+            }}
+          />
+          {/* Mobile drawer close button */}
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(false)}
+            className="trainer-mobile-toggle"
+            aria-label="Close sidebar"
+            style={{
+              background: '#F1F5F9',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#64748B',
+              cursor: 'pointer',
+              padding: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Role Pill */}
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '4px 10px',
+              borderRadius: '999px',
+              backgroundColor: 'rgba(0, 184, 74, 0.08)',
+              border: '1px solid rgba(0, 184, 74, 0.25)',
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              color: '#008A38',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+            }}
+          >
+            <ShieldCheck size={12} />
+            <span>Trainer Dashboard</span>
+          </div>
+        </div>
+
+        {/* Active Branch Display */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 10px',
+            borderRadius: '8px',
+            backgroundColor: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            fontSize: '0.74rem',
+            color: '#334155',
+            fontWeight: 700,
+          }}
+        >
+          <Building2 size={13} color="#008A38" style={{ flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {trainerProfile?.branchId === 'branch2' ? 'Respire Vijaynagar Branch' : 'Respire Vishrambag Branch'}
+          </span>
+        </div>
+      </div>
+
+      {/* Coach Info Snapshot */}
+      <div
+        style={{
+          padding: '12px 18px',
+          borderBottom: '1px solid #F1F5F9',
+          backgroundColor: '#FAFAFA',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+        }}
+      >
+        <div
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: '#00B84A',
+            color: '#FFFFFF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.95rem',
+            fontWeight: 900,
+            flexShrink: 0,
+            overflow: 'hidden',
+          }}
+        >
+          {trainerProfile?.photo ? (
+            <img src={trainerProfile.photo} alt={trainerProfile.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            (trainerProfile?.name || 'T')[0].toUpperCase()
+          )}
+        </div>
+        <div style={{ overflow: 'hidden', flex: 1 }}>
+          <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            {trainerProfile?.name || 'Trainer Coach'}
+          </div>
+          <div style={{ fontSize: '0.7rem', color: '#64748B', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            {trainerProfile?.specialty || 'Personal Trainer'}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. SCROLLABLE NAVIGATION LINKS */}
+      <div
+        className="trainer-sidebar-scroll"
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '16px 12px',
+          backgroundColor: '#FFFFFF',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            color: '#94A3B8',
+            textTransform: 'uppercase',
+            padding: '0 8px 10px',
+          }}
+        >
+          Navigation
+        </div>
+
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = activeTab === item.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setMobileSidebarOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  borderRadius: '10px',
+                  background: active
+                    ? 'linear-gradient(135deg, #00D256 0%, #008A38 100%)'
+                    : 'transparent',
+                  color: active ? '#FFFFFF' : '#475569',
+                  fontWeight: active ? 800 : 600,
+                  fontSize: '0.86rem',
+                  textAlign: 'left',
+                  border: 'none',
+                  boxShadow: active ? '0 4px 14px rgba(0, 184, 74, 0.28)' : 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.18s ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                    e.currentTarget.style.color = '#0F172A';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.color = '#475569';
+                  }
+                }}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                  <Icon
+                    size={17}
+                    color={active ? '#FFFFFF' : '#64748B'}
+                    style={{ flexShrink: 0 }}
+                  />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {item.label}
+                  </span>
+                </span>
+
+                {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
+                  <span
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: '999px',
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      flexShrink: 0,
+                      letterSpacing: '0.02em',
+                      backgroundColor: active
+                        ? 'rgba(255, 255, 255, 0.25)'
+                        : '#F1F5F9',
+                      border: active
+                        ? '1px solid rgba(255, 255, 255, 0.4)'
+                        : '1px solid #E2E8F0',
+                      color: active ? '#FFFFFF' : '#64748B',
+                    }}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* 3. PINNED BOTTOM FOOTER */}
+      <div
+        style={{
+          flexShrink: 0,
+          padding: '14px 14px 18px',
+          borderTop: '1px solid #F1F5F9',
+          backgroundColor: '#FFFFFF',
+        }}
+      >
+        <button
+          type="button"
+          onClick={handleLogout}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            padding: '11px 16px',
+            borderRadius: '10px',
+            backgroundColor: '#FEF2F2',
+            border: '1px solid #FECACA',
+            color: '#DC2626',
+            fontSize: '0.86rem',
+            fontWeight: 800,
+            cursor: 'pointer',
+            transition: 'all 0.18s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#DC2626';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.borderColor = '#DC2626';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#FEF2F2';
+            e.currentTarget.style.color = '#DC2626';
+            e.currentTarget.style.borderColor = '#FECACA';
+          }}
+        >
+          <LogOut size={16} />
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -258,246 +557,53 @@ export default function TrainerDashboardPage() {
       )}
 
       {/* ==================================================================== */}
-      {/* SIDEBAR NAVIGATION                                                   */}
+      {/* DESKTOP PERSISTENT WHITE EXECUTIVE SIDEBAR (Matches Admin Dashboard) */}
       {/* ==================================================================== */}
       <aside
         style={{
-          width: '280px',
-          backgroundColor: '#0F172A',
-          color: '#FFFFFF',
+          width: '264px',
+          backgroundColor: '#FFFFFF',
+          color: '#0F172A',
           display: 'flex',
           flexDirection: 'column',
           flexShrink: 0,
-          borderRight: '1px solid rgba(255,255,255,0.08)',
+          borderRight: '1px solid #E2E8F0',
           position: 'sticky',
           top: 0,
           height: '100vh',
-          zIndex: 100,
+          zIndex: 40,
         }}
-        className="respire-trainer-sidebar"
+        className="trainer-desktop-sidebar"
       >
-        {/* Brand Header */}
-        <div
-          style={{
-            padding: '24px 22px 20px',
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <img
-            src="/respire_logo_perfect_hd.png"
-            alt="Respire Fitness"
-            style={{
-              height: '40px',
-              width: 'auto',
-              maxWidth: '190px',
-              objectFit: 'contain',
-              marginBottom: '10px',
-            }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = '/respire_spin_logo_transparent.png';
-            }}
-          />
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: 'rgba(0, 184, 74, 0.15)',
-              border: '1px solid rgba(0, 184, 74, 0.4)',
-              color: '#00D256',
-              padding: '3px 10px',
-              borderRadius: '20px',
-              fontSize: '0.68rem',
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            <Dumbbell size={12} />
-            <span>Trainer Dashboard</span>
-          </div>
-        </div>
-
-        {/* Logged-In Coach Profile Badge */}
-        <div
-          style={{
-            padding: '16px 20px',
-            backgroundColor: 'rgba(255,255,255,0.03)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-          }}
-        >
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '50%',
-              backgroundColor: '#00B84A',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.05rem',
-              fontWeight: 900,
-              flexShrink: 0,
-              overflow: 'hidden',
-              border: '2px solid rgba(255,255,255,0.2)',
-            }}
-          >
-            {trainerProfile?.photo ? (
-              <img
-                src={trainerProfile.photo}
-                alt={trainerProfile.name}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            ) : (
-              (trainerProfile?.name || 'C')[0].toUpperCase()
-            )}
-          </div>
-          <div style={{ overflow: 'hidden', flex: 1 }}>
-            <div
-              style={{
-                fontSize: '0.86rem',
-                fontWeight: 800,
-                color: '#FFFFFF',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-              }}
-            >
-              {trainerProfile?.name || 'Coach'}
-            </div>
-            <div
-              style={{
-                fontSize: '0.72rem',
-                color: '#94A3B8',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-              }}
-            >
-              {trainerProfile?.specialty || 'Personal Trainer'}
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Menu */}
-        <nav
-          style={{
-            padding: '16px 12px',
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '4px',
-            overflowY: 'auto',
-          }}
-        >
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setMobileSidebarOpen(false);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '11px 14px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  backgroundColor: isActive ? '#00B84A' : 'transparent',
-                  color: isActive ? '#FFFFFF' : '#94A3B8',
-                  fontSize: '0.84rem',
-                  fontWeight: isActive ? 800 : 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  textAlign: 'left',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
-                    e.currentTarget.style.color = '#FFFFFF';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.color = '#94A3B8';
-                  }
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Icon size={17} color={isActive ? '#FFFFFF' : '#94A3B8'} />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge !== undefined && item.badge > 0 && (
-                  <span
-                    style={{
-                      fontSize: '0.68rem',
-                      fontWeight: 800,
-                      padding: '2px 7px',
-                      borderRadius: '999px',
-                      backgroundColor: isActive ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.12)',
-                      color: isActive ? '#FFFFFF' : '#CBD5E1',
-                    }}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Sidebar Footer / Sign Out */}
-        <div
-          style={{
-            padding: '16px 14px',
-            borderTop: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <button
-            type="button"
-            onClick={handleLogout}
-            style={{
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '10px 14px',
-              borderRadius: '10px',
-              border: '1px solid rgba(220, 38, 38, 0.4)',
-              backgroundColor: 'rgba(220, 38, 38, 0.1)',
-              color: '#F87171',
-              fontSize: '0.82rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#DC2626';
-              e.currentTarget.style.color = '#FFFFFF';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)';
-              e.currentTarget.style.color = '#F87171';
-            }}
-          >
-            <LogOut size={15} />
-            <span>Sign Out</span>
-          </button>
-        </div>
+        <SidebarContent />
       </aside>
+
+      {/* Mobile Drawer Sidebar */}
+      {mobileSidebarOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1000,
+            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backdropFilter: 'blur(3px)',
+            display: 'flex',
+          }}
+          onClick={() => setMobileSidebarOpen(false)}
+        >
+          <div
+            style={{
+              width: '280px',
+              backgroundColor: '#FFFFFF',
+              height: '100%',
+              boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SidebarContent />
+          </div>
+        </div>
+      )}
 
       {/* ==================================================================== */}
       {/* MAIN CONTENT AREA                                                    */}
@@ -515,7 +621,7 @@ export default function TrainerDashboardPage() {
             padding: '0 28px',
             position: 'sticky',
             top: 0,
-            zIndex: 90,
+            zIndex: 30,
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
           }}
         >
@@ -523,16 +629,15 @@ export default function TrainerDashboardPage() {
             {/* Mobile Hamburger */}
             <button
               type="button"
-              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              onClick={() => setMobileSidebarOpen(true)}
               style={{
-                display: 'none',
                 padding: '8px',
                 border: '1px solid #CBD5E1',
                 borderRadius: '8px',
                 backgroundColor: '#FFFFFF',
                 cursor: 'pointer',
               }}
-              className="respire-mobile-toggle"
+              className="trainer-mobile-toggle"
             >
               <Menu size={18} />
             </button>
@@ -704,17 +809,36 @@ export default function TrainerDashboardPage() {
       </div>
 
       <style>{`
-        @media (max-width: 900px) {
-          .respire-trainer-sidebar {
-            display: ${mobileSidebarOpen ? 'flex' : 'none'} !important;
-            position: fixed !important;
-            inset: 0 !important;
-            z-index: 1000 !important;
-            width: 280px !important;
+        @media (min-width: 992px) {
+          .trainer-desktop-sidebar {
+            display: block !important;
           }
-          .respire-mobile-toggle {
+          .trainer-mobile-toggle {
+            display: none !important;
+          }
+        }
+        @media (max-width: 991px) {
+          .trainer-desktop-sidebar {
+            display: none !important;
+          }
+          .trainer-mobile-toggle {
             display: flex !important;
+            align-items: center;
+            justify-content: center;
           }
+        }
+        .trainer-sidebar-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .trainer-sidebar-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .trainer-sidebar-scroll::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.08);
+          border-radius: 4px;
+        }
+        .trainer-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 0, 0, 0.16);
         }
       `}</style>
     </div>
