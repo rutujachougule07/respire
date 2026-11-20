@@ -17,6 +17,39 @@ import {
   Building2,
 } from 'lucide-react';
 
+function formatSchedule(val) {
+  if (!val) return 'Morning (Mon – Sat) • 06:00 AM – 11:00 AM';
+  if (typeof val === 'string') return val;
+  if (Array.isArray(val)) {
+    if (val.length === 0) return 'Morning (Mon – Sat) • 06:00 AM – 11:00 AM';
+    return val
+      .map((s) => {
+        if (!s) return '';
+        if (typeof s === 'string') return s;
+        if (typeof s === 'object') {
+          const parts = [];
+          if (s.shift) parts.push(s.shift);
+          if (s.day) parts.push(`(${s.day})`);
+          if (s.time) parts.push(`• ${s.time}`);
+          if (s.slots) parts.push(`[${s.slots}]`);
+          return parts.join(' ');
+        }
+        return String(s);
+      })
+      .filter(Boolean)
+      .join(', ');
+  }
+  if (typeof val === 'object') {
+    const parts = [];
+    if (val.shift) parts.push(val.shift);
+    if (val.day) parts.push(`(${val.day})`);
+    if (val.time) parts.push(`• ${val.time}`);
+    if (val.slots) parts.push(`[${val.slots}]`);
+    return parts.join(' ') || 'Morning (Mon – Sat) • 06:00 AM – 11:00 AM';
+  }
+  return String(val);
+}
+
 export default function TrainerProfileTab({
   trainerProfile,
   myMembers = [],
@@ -34,10 +67,44 @@ export default function TrainerProfileTab({
       ? '3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road, Vijaynagar, Sangli'
       : '7th Floor, R City Mall, Opp. Safa Bakery, Vishrambag, Sangli';
 
-  const shiftTime =
-    trainerProfile?.shifts ||
-    trainerProfile?.schedule ||
-    'Morning (Mon – Sat) • 06:00 AM – 11:00 AM';
+  const shiftTime = formatSchedule(
+    trainerProfile?.shifts || trainerProfile?.schedule
+  );
+
+  const trainerName =
+    typeof trainerProfile?.name === 'string' && trainerProfile.name.trim()
+      ? trainerProfile.name
+      : 'sibaan';
+
+  const trainerSpecialty =
+    typeof trainerProfile?.specialty === 'string' && trainerProfile.specialty.trim()
+      ? trainerProfile.specialty
+      : 'Personal Training & Strength';
+
+  const trainerPhone =
+    typeof trainerProfile?.phone === 'string' && trainerProfile.phone.trim()
+      ? trainerProfile.phone
+      : '+91 9960904626';
+
+  const trainerEmail =
+    typeof trainerProfile?.email === 'string' && trainerProfile.email.trim()
+      ? trainerProfile.email
+      : 'trainer@respire.com';
+
+  const trainerExperience =
+    trainerProfile?.experience != null
+      ? String(trainerProfile.experience)
+      : '4+ Years';
+
+  const trainerRating =
+    trainerProfile?.rating != null
+      ? String(trainerProfile.rating)
+      : '4.8';
+
+  const trainerBio =
+    typeof trainerProfile?.bio === 'string' && trainerProfile.bio.trim()
+      ? trainerProfile.bio
+      : '';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
@@ -78,14 +145,14 @@ export default function TrainerProfileTab({
               border: '3px solid rgba(255, 255, 255, 0.25)',
             }}
           >
-            {trainerProfile?.photo ? (
+            {trainerProfile?.photo && typeof trainerProfile.photo === 'string' ? (
               <img
                 src={trainerProfile.photo}
-                alt={trainerProfile.name}
+                alt={trainerName}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             ) : (
-              (trainerProfile?.name || 'T')[0].toUpperCase()
+              trainerName[0].toUpperCase()
             )}
           </div>
 
@@ -127,18 +194,18 @@ export default function TrainerProfileTab({
                 }}
               >
                 <Star size={12} fill="#FDE047" />
-                <span>{trainerProfile?.rating || '4.8'} Rating</span>
+                <span>{trainerRating} Rating</span>
               </span>
             </div>
 
             <h2 style={{ fontSize: '1.9rem', fontWeight: 900, margin: '0 0 6px', letterSpacing: '-0.02em' }}>
-              {trainerProfile?.name || 'Trainer Coach'}
+              {trainerName}
             </h2>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', fontSize: '0.86rem', color: '#CBD5E1' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#86EFAC', fontWeight: 700 }}>
                 <Dumbbell size={15} />
-                {trainerProfile?.specialty || 'Personal Training & Strength'}
+                {trainerSpecialty}
               </span>
 
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -220,7 +287,7 @@ export default function TrainerProfileTab({
             </div>
           </div>
           <div style={{ fontSize: '1.7rem', fontWeight: 900, color: '#0F172A' }}>
-            {trainerProfile?.experience || '4+ Years'}
+            {trainerExperience}
           </div>
           <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600, marginTop: '2px' }}>
             Strength & Conditioning
@@ -269,11 +336,8 @@ export default function TrainerProfileTab({
               <Clock size={16} />
             </div>
           </div>
-          <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#0F172A', marginTop: '6px' }}>
-            Morning Shift
-          </div>
-          <div style={{ fontSize: '0.74rem', color: '#64748B', fontWeight: 600, marginTop: '2px' }}>
-            06:00 AM – 11:00 AM
+          <div style={{ fontSize: '0.92rem', fontWeight: 900, color: '#0F172A', marginTop: '6px' }}>
+            {shiftTime}
           </div>
         </div>
       </div>
@@ -321,7 +385,7 @@ export default function TrainerProfileTab({
                   Full Name
                 </div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
-                  {trainerProfile?.name || 'sibaan'}
+                  {trainerName}
                 </div>
               </div>
             </div>
@@ -343,7 +407,7 @@ export default function TrainerProfileTab({
                   Specialty & Role
                 </div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
-                  {trainerProfile?.specialty || 'Personal Training & Strength'}
+                  {trainerSpecialty}
                 </div>
               </div>
             </div>
@@ -365,7 +429,7 @@ export default function TrainerProfileTab({
                   Contact Phone
                 </div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0F172A' }}>
-                  {trainerProfile?.phone || '+91 9960904626'}
+                  {trainerPhone}
                 </div>
               </div>
             </div>
@@ -387,7 +451,7 @@ export default function TrainerProfileTab({
                   Portal Email
                 </div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0F172A', wordBreak: 'break-all' }}>
-                  {trainerProfile?.email || 'trainer@respire.com'}
+                  {trainerEmail}
                 </div>
               </div>
             </div>
@@ -433,7 +497,7 @@ export default function TrainerProfileTab({
               </div>
             </div>
 
-            {trainerProfile?.bio && (
+            {trainerBio && (
               <div
                 style={{
                   padding: '12px 14px',
@@ -446,7 +510,7 @@ export default function TrainerProfileTab({
                   Coach Bio
                 </div>
                 <div style={{ fontSize: '0.84rem', color: '#064E3B', lineHeight: 1.45 }}>
-                  {trainerProfile.bio}
+                  {trainerBio}
                 </div>
               </div>
             )}
