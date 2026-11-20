@@ -945,33 +945,24 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 </div>
               </div>
 
-              {/* SIDE-BY-SIDE 2-COLUMN GRID: ADD-ON SERVICES & SPECIAL TRAINING (PT) */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '14px', alignItems: 'start' }}>
+              {/* EXACT IMAGE 1 STYLE: SIDE-BY-SIDE 1fr 1fr WITH CLEAN WHITE/GREY BORDER */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'start' }}>
                 {/* 1. Add-on Services (Left) */}
-                <div
-                  ref={addonDropdownRef}
-                  style={{
-                    position: 'relative',
-                    backgroundColor: '#F8FAFC',
-                    border: '1.5px solid #CBD5E1',
-                    borderRadius: '12px',
-                    padding: '11px 13px',
-                  }}
-                >
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#334155', marginBottom: '6px', textTransform: 'uppercase' }}>
+                <div ref={addonDropdownRef} style={{ position: 'relative' }}>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
                     ADD-ON SERVICES
                   </label>
 
-                  {/* Dropdown Header Trigger */}
+                  {/* Dropdown Header Trigger - Same as Image 1 select */}
                   <button
                     type="button"
                     onClick={() => setIsAddonDropdownOpen(!isAddonDropdownOpen)}
                     style={{
                       width: '100%',
-                      padding: '7px 11px',
-                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      borderRadius: '9px',
                       border: '1.5px solid #CBD5E1',
-                      fontSize: '0.82rem',
+                      fontSize: '0.88rem',
                       backgroundColor: '#FFFFFF',
                       color: '#0F172A',
                       display: 'flex',
@@ -980,13 +971,12 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                       cursor: 'pointer',
                       textAlign: 'left',
                       boxSizing: 'border-box',
-                      minHeight: '35px',
                     }}
                   >
                     <span style={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      -- Select Add-on Service --
+                      -- Select Add-on Service to Enroll / Remove --
                     </span>
-                    <span style={{ fontSize: '0.65rem', color: '#64748B', marginLeft: '6px' }}>
+                    <span style={{ fontSize: '0.7rem', color: '#64748B', marginLeft: '6px' }}>
                       {isAddonDropdownOpen ? '▲' : '▼'}
                     </span>
                   </button>
@@ -999,10 +989,10 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                         top: '100%',
                         left: 0,
                         right: 0,
-                        zIndex: 40,
+                        zIndex: 50,
                         marginTop: '3px',
                         border: '1.5px solid #CBD5E1',
-                        borderRadius: '8px',
+                        borderRadius: '9px',
                         backgroundColor: '#FFFFFF',
                         overflow: 'hidden',
                         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
@@ -1023,14 +1013,13 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
-                              padding: '6px 11px',
+                              padding: '8px 12px',
                               borderBottom: '1px solid #F1F5F9',
                               cursor: 'pointer',
                               backgroundColor: isEnrolled ? '#F8FAFC' : '#FFFFFF',
                               color: '#0F172A',
                               fontWeight: isEnrolled ? 700 : 500,
-                              fontSize: '0.82rem',
-                              lineHeight: 1.35,
+                              fontSize: '0.84rem',
                               transition: 'background 0.12s ease',
                             }}
                             onMouseEnter={(e) => {
@@ -1074,7 +1063,6 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               }}
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.backgroundColor = '#F1F5F9';
-                                e.currentTarget.style.color = '#64748B';
                               }}
                             >
                               ✕
@@ -1086,7 +1074,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                       {/* Bottom Add Custom Service Row */}
                       <div
                         style={{
-                          padding: '6px 11px',
+                          padding: '7px 12px',
                           backgroundColor: '#FFFFFF',
                         }}
                       >
@@ -1094,7 +1082,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                           <div style={{ display: 'flex', gap: '6px' }}>
                             <input
                               type="text"
-                              placeholder="Service name..."
+                              placeholder="Type service name..."
                               value={newAddonName}
                               onChange={(e) => setNewAddonName(e.target.value)}
                               onKeyDown={(e) => {
@@ -1107,10 +1095,10 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               autoFocus
                               style={{
                                 flex: 1,
-                                padding: '4px 7px',
+                                padding: '5px 8px',
                                 borderRadius: '6px',
                                 border: '1.5px solid #CBD5E1',
-                                fontSize: '0.78rem',
+                                fontSize: '0.8rem',
                                 backgroundColor: '#FFFFFF',
                                 color: '#0F172A',
                               }}
@@ -1122,11 +1110,11 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                                 setIsAddingCustom(false);
                               }}
                               style={{
-                                padding: '4px 8px',
+                                padding: '5px 10px',
                                 borderRadius: '6px',
                                 backgroundColor: '#0F172A',
                                 color: '#FFFFFF',
-                                fontSize: '0.72rem',
+                                fontSize: '0.75rem',
                                 fontWeight: 700,
                                 border: 'none',
                                 cursor: 'pointer',
@@ -1138,17 +1126,17 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               type="button"
                               onClick={() => setIsAddingCustom(false)}
                               style={{
-                                padding: '4px 6px',
+                                padding: '5px 8px',
                                 borderRadius: '6px',
                                 backgroundColor: '#F1F5F9',
                                 color: '#64748B',
-                                fontSize: '0.72rem',
+                                fontSize: '0.75rem',
                                 fontWeight: 700,
                                 border: '1px solid #CBD5E1',
                                 cursor: 'pointer',
                               }}
                             >
-                              ✕
+                              Cancel
                             </button>
                           </div>
                         ) : (
@@ -1160,12 +1148,12 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               border: 'none',
                               padding: '2px 0',
                               color: '#334155',
-                              fontSize: '0.78rem',
+                              fontSize: '0.82rem',
                               fontWeight: 700,
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '4px',
+                              gap: '5px',
                             }}
                           >
                             <span>+ Add Custom Service</span>
@@ -1177,21 +1165,21 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
 
                   {/* Show Enrolled Services Badges */}
                   {form.addOns && form.addOns.length > 0 && (
-                    <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {form.addOns.map((ao) => (
                         <span
                           key={ao}
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '5px',
-                            padding: '3px 8px',
+                            gap: '6px',
+                            padding: '4px 10px',
                             borderRadius: '6px',
                             backgroundColor: '#FFFFFF',
                             color: '#0F172A',
-                            fontSize: '0.76rem',
+                            fontSize: '0.78rem',
                             fontWeight: 700,
-                            border: '1px solid #CBD5E1',
+                            border: '1.5px solid #CBD5E1',
                           }}
                         >
                           <span>✓ {ao}</span>
@@ -1205,7 +1193,7 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                               color: '#64748B',
                               cursor: 'pointer',
                               fontWeight: 800,
-                              fontSize: '0.8rem',
+                              fontSize: '0.84rem',
                               padding: '0 2px',
                               lineHeight: 1,
                             }}
@@ -1218,44 +1206,31 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   )}
                 </div>
 
-                {/* 2. Special Training / Personal Training (PT) Selection (Right) */}
-                <div
-                  style={{
-                    backgroundColor: '#F0FDF4',
-                    border: '1.5px solid #86EFAC',
-                    borderRadius: '12px',
-                    padding: '11px 13px',
-                  }}
-                >
+                {/* 2. Special Training / Personal Training (PT) Selection (Right) - Same as Image 1 */}
+                <div>
                   <label
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      fontSize: '0.72rem',
+                      display: 'block',
+                      fontSize: '0.74rem',
                       fontWeight: 800,
-                      color: '#166534',
-                      marginBottom: '6px',
+                      color: '#475569',
+                      marginBottom: '5px',
                     }}
                   >
-                    <span>⚡ SPECIAL TRAINING (PT)</span>
-                    <span style={{ fontSize: '0.68rem', color: '#15803D', fontWeight: 700 }}>
-                      {form.branchId === 'branch2' ? 'Vijaynagar' : 'Vishrambag'}
-                    </span>
+                    SPECIAL TRAINING / PERSONAL TRAINING (PT)
                   </label>
                   <select
                     value={form.specialTraining || 'none'}
                     onChange={(e) => handleSpecialTrainingChange(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '7px 10px',
-                      borderRadius: '8px',
-                      border: form.specialTraining && form.specialTraining !== 'none' ? '2px solid #00B84A' : '1.5px solid #CBD5E1',
-                      fontSize: '0.84rem',
+                      padding: '10px 12px',
+                      borderRadius: '9px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '0.88rem',
                       backgroundColor: '#FFFFFF',
-                      fontWeight: form.specialTraining && form.specialTraining !== 'none' ? 700 : 500,
+                      fontWeight: 500,
                       color: '#0F172A',
-                      minHeight: '35px',
                     }}
                   >
                     {currentBranchPT.map((pt) => (
@@ -1265,8 +1240,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                     ))}
                   </select>
                   {form.specialTraining && form.specialTraining !== 'none' && (
-                    <p style={{ margin: '6px 0 0', fontSize: '0.72rem', color: '#166534', fontWeight: 600 }}>
-                      ✓ {form.specialTrainingLabel}
+                    <p style={{ margin: '6px 0 0', fontSize: '0.74rem', color: '#008A38', fontWeight: 600 }}>
+                      ✓ Special PT: {form.specialTrainingLabel}
                     </p>
                   )}
                 </div>
