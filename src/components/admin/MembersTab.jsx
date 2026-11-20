@@ -14,8 +14,9 @@ import {
   Activity,
   Award,
   CheckCircle2,
+  Trash2,
 } from 'lucide-react';
-import { saveMemberToFirestore, updateMemberStatusInFirestore } from '../../services/firestoreService';
+import { saveMemberToFirestore, updateMemberStatusInFirestore } , deleteMemberFromFirestore } from '../../services/firestoreService';
 
 function getDaysRemaining(expiryDate) {
   const today = new Date('2026-11-18');
@@ -191,6 +192,18 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       setIsFormOpen(false);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteMember = async (member) => {
+    if (window.confirm(`Are you sure you want to permanently delete member ${member.name} (${member.id})?`)) {
+      try {
+        await deleteMemberFromFirestore(member.id);
+        setMembers((prev) => prev.filter((m) => m.id !== member.id));
+        showToast(`Deleted ${member.name} from Firebase`);
+      } catch (err) {
+        showToast(`Error deleting member: ${err.message}`);
+      }
     }
   };
 
@@ -474,6 +487,26 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                           >
                             {m.status === 'Active' ? <UserX size={14} /> : <UserCheck size={14} />}
                             <span>{m.status === 'Active' ? 'Deactivate' : 'Activate'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteMember(m)}
+                            title="Delete Member from Firebase"
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              backgroundColor: '#FEF2F2',
+                              color: '#DC2626',
+                              border: '1px solid #FECACA',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              fontSize: '0.76rem',
+                              fontWeight: 700,
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </td>

@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   Dumbbell,
 } from 'lucide-react';
-import { saveTrainerToFirestore } from '../../services/firestoreService';
+import { saveTrainerToFirestore, deleteTrainerFromFirestore } from '../../services/firestoreService';
 
 export default function TrainersTab({ trainers, setTrainers, members, setMembers, activeBranchId = 'vishrambag', isSuperAdmin = false, showToast }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -139,6 +139,18 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
     showToast(`Added ${newShift.shift} shift to ${scheduleModalTrainer.name}'s schedule`);
   };
 
+  const handleDeleteTrainer = async (trainer) => {
+    if (window.confirm(`Are you sure you want to permanently delete trainer ${trainer.name}?`)) {
+      try {
+        await deleteTrainerFromFirestore(trainer.id);
+        setTrainers((prev) => prev.filter((t) => t.id !== trainer.id));
+        showToast(`Deleted ${trainer.name} from Firebase`);
+      } catch (err) {
+        showToast(`Error deleting trainer: ${err.message}`);
+      }
+    }
+  };
+
   const handleRemoveShift = (idx) => {
     if (!scheduleModalTrainer) return;
     const updatedSchedule = scheduleModalTrainer.schedule.filter((_, i) => i !== idx);
@@ -177,8 +189,32 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
       </div>
 
       {/* Trainers Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '20px' }}>
-        {trainers.map((t) => {
+      {trainers.length === 0 ? (
+        <div
+          style={{
+            padding: '48px 24px',
+            textAlign: 'center',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '20px',
+            border: '2px dashed #E2E8F0',
+            color: '#64748B',
+          }}
+        >
+          <Dumbbell size={36} color="#00C952" style={{ margin: '0 auto 12px' }} />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>
+            No Trainers Registered Yet
+          </h3>
+          <p style={{ fontSize: '0.86rem', color: '#64748B', marginBottom: '18px' }}>
+            Click the button below to add your certified gym trainers directly to Firebase.
+          </p>
+          <button onClick={openAddModal} className="btn btn-primary btn-sm" style={{ borderRadius: '10px' }}>
+            <UserPlus size={16} />
+            <span>Add New Trainer</span>
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '20px' }}>
+          {trainers.map((t) => {
           const assignedMembers = members.filter((m) => m.trainerId === t.id && m.status === 'Active');
 
           return (
@@ -278,10 +314,10 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                   }}
                 >
                   <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <Clock size={12} color="#00B84A" /> Current Schedule ({t.schedule.length} Shifts)
+                    <Clock size={12} color="#00B84A" /> Current Schedule ({(t.schedule || []).length} Shifts)
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {t.schedule.map((s, idx) => (
+                    {(t.schedule || []).map((s, idx) => (
                       <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#334155' }}>
                         <span style={{ fontWeight: 700 }}>{s.shift} ({s.day})</span>
                         <span style={{ color: '#008A38', fontWeight: 700 }}>{s.time}</span>
@@ -292,7 +328,7 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '8px', borderTop: '1px solid #F1F5F9', paddingTop: '14px' }}>
                 <button
                   onClick={() => setAssignModalTrainer(t)}
                   style={{
@@ -344,11 +380,30 @@ export default function TrainersTab({ trainers, setTrainers, members, setMembers
                 >
                   <Edit3 size={13} /> Profile
                 </button>
+                <button
+                  onClick={() => handleDeleteTrainer(t)}
+                  title="Delete Trainer from Firebase"
+                  style={{
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEF2F2',
+                    color: '#DC2626',
+                    border: '1px solid #FECACA',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Trash2 size={13} />
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+      )}
 
       {/* Add / Edit Trainer Profile Modal */}
       {isFormOpen && (

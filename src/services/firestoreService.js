@@ -42,6 +42,44 @@ let isSeeding = false;
  * Seeds initial gym data into Firestore ONLY if not already initialized.
  * Uses deterministic document IDs and setDoc({ merge: true }) so NO DUPLICATES can ever be created.
  */
+export async function purgeAllDummyDataFromFirestore() {
+  const dummyMemberIds = [
+    'RF-1001', 'RF-1002', 'RF-1003', 'RF-1004', 'RF-1005', 'RF-1006', 'RF-1007', 'RF-1008',
+    'RF-2001', 'RF-2002', 'RF-2003', 'RF-2004'
+  ];
+  const dummyTrainerIds = ['tr-1', 'tr-2', 'tr-3', 'tr-4', 'tr-5'];
+  const dummyAddonIds = ['ao-1', 'ao-2', 'ao-3', 'ao-4', 'ao-5', 'ao-6', 'ao-7', 'ao-8', 'ao-9', 'ao-10'];
+
+  try {
+    for (const id of dummyMemberIds) {
+      await deleteDoc(doc(db, 'members', id)).catch(() => {});
+    }
+    for (const id of dummyTrainerIds) {
+      await deleteDoc(doc(db, 'trainers', id)).catch(() => {});
+    }
+    for (const id of dummyAddonIds) {
+      await deleteDoc(doc(db, 'addons', id)).catch(() => {});
+    }
+  } catch (err) {
+    console.warn('Dummy cleanup notice:', err);
+  }
+}
+
+export async function deleteMemberFromFirestore(memberId) {
+  const memberRef = doc(db, 'members', memberId);
+  await deleteDoc(memberRef);
+}
+
+export async function deleteTrainerFromFirestore(trainerId) {
+  const trRef = doc(db, 'trainers', trainerId);
+  await deleteDoc(trRef);
+}
+
+export async function deleteAddonFromFirestore(addonId) {
+  const addonRef = doc(db, 'addons', addonId);
+  await deleteDoc(addonRef);
+}
+
 export async function seedInitialDataIfEmpty() {
   if (isSeeding) {
     return { success: true, message: 'Seeding already in progress' };
@@ -49,41 +87,22 @@ export async function seedInitialDataIfEmpty() {
 
   try {
     isSeeding = true;
+    await purgeAllDummyDataFromFirestore();
 
-    // Check system seed lock document
-    const seedLockRef = doc(db, 'system', 'seed_status');
+    const seedLockRef = doc(db, 'system', 'seed_status_v3');
     const seedLockSnap = await getDoc(seedLockRef).catch(() => null);
 
     if (seedLockSnap && seedLockSnap.exists() && seedLockSnap.data()?.isSeeded) {
       isSeeding = false;
-      return { success: true, message: 'Database already seeded' };
+      return { success: true, message: 'Database already initialized' };
     }
 
-    // 1. Seed Membership Plans (idempotent setDoc by plan.id)
+    // Seed ONLY official plans (no mock members or trainers)
     for (const plan of INITIAL_PLANS) {
       const planRef = doc(db, 'plans', plan.id);
       await setDoc(planRef, { ...plan, updatedAt: serverTimestamp() }, { merge: true });
     }
 
-    // 2. Seed Trainers (idempotent setDoc by trainer.id)
-    for (const trainer of INITIAL_TRAINERS) {
-      const trRef = doc(db, 'trainers', trainer.id);
-      await setDoc(trRef, { ...trainer, updatedAt: serverTimestamp() }, { merge: true });
-    }
-
-    // 3. Seed Initial Members (idempotent setDoc by member.id)
-    for (const member of INITIAL_MEMBERS) {
-      const memberRef = doc(db, 'members', member.id);
-      await setDoc(memberRef, { ...member, updatedAt: serverTimestamp() }, { merge: true });
-    }
-
-    // 4. Seed Initial Addon Revenue (idempotent setDoc by addon.id)
-    for (const addon of INITIAL_ADDON_REVENUE) {
-      const addonRef = doc(db, 'addons', addon.id);
-      await setDoc(addonRef, { ...addon, updatedAt: serverTimestamp() }, { merge: true });
-    }
-
-    // 5. Seed Official Personal Training (PT) Rates (idempotent setDoc)
     await setDoc(
       doc(db, 'system', 'pt_rates'),
       {
@@ -93,40 +112,31 @@ export async function seedInitialDataIfEmpty() {
       { merge: true }
     );
 
-    // Mark system seed lock doc as completed
     await setDoc(
       seedLockRef,
       {
         isSeeded: true,
         seededAt: serverTimestamp(),
-        version: '1.0.0',
+        version: '3.0.0',
       },
       { merge: true }
     );
 
     isSeeding = false;
-    return { success: true, message: 'Initial data seeded successfully without duplicates' };
+    return { success: true, message: 'Official gym plans initialized' };
   } catch (error) {
     isSeeding = false;
-    console.warn('Firestore seeding notice (using local fallback if offline/restricted):', error.message);
+    console.warn('Firestore seeding notice:', error.message);
     return { success: false, error: error.message };
   }
 }
 
-/**
- * Subscribes to a Firestore collection with real-time onSnapshot.
- * Automatically deduplicates items by doc.id and handles cleanup.
- */
-export function subscribeToCollection(collectionName, onData, onError, fallbackData = []) {
+export function subscribeToCollection(collectionName, onData, onError) {
   try {
     const colRef = collection(db, collectionName);
     const unsubscribe = onSnapshot(
       colRef,
       (snapshot) => {
-        if (snapshot.empty && fallbackData && fallbackData.length > 0) {
-          onData(deduplicateById(fallbackData));
-          return;
-        }
         const items = snapshot.docs.map((d) => ({
           id: d.id,
           ...d.data(),
@@ -136,22 +146,18 @@ export function subscribeToCollection(collectionName, onData, onError, fallbackD
       (error) => {
         console.warn(`Firestore subscription notice for [${collectionName}]:`, error.message);
         if (onError) onError(error);
-        if (fallbackData) onData(deduplicateById(fallbackData));
+        onData([]);
       }
     );
 
     return unsubscribe;
   } catch (err) {
     console.warn(`Firestore connect notice for [${collectionName}]:`, err.message);
-    if (fallbackData) onData(deduplicateById(fallbackData));
+    onData([]);
     return () => {};
   }
 }
 
-/**
- * Adds or updates a member in Firestore idempotently.
- * Checks for duplicate phone numbers across members.
- */
 export async function saveMemberToFirestore(member, existingMembers = []) {
   if (!member.id) {
     throw new Error('Member ID is required');

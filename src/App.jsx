@@ -30,41 +30,20 @@ function PublicLayout({ children }) {
 }
 
 export default function App() {
-  const [plans, setPlans] = useState(() => {
-    try {
-      const raw = localStorage.getItem('rf_official_plans_v3');
-      return raw ? JSON.parse(raw) : INITIAL_PLANS;
-    } catch {
-      return INITIAL_PLANS;
-    }
-  });
+  const [plans, setPlans] = useState(INITIAL_PLANS);
 
-  // Sync plans live from Firestore
+  // Sync plans live directly from Firestore
   useEffect(() => {
-    const unsubscribe = subscribeToCollection(
-      'plans',
-      (data) => {
-        if (data && data.length > 0) {
-          setPlans(deduplicateById(data));
-        }
-      },
-      null,
-      INITIAL_PLANS
-    );
+    const unsubscribe = subscribeToCollection('plans', (data) => {
+      if (data && data.length > 0) {
+        setPlans(deduplicateById(data));
+      }
+    });
 
     return () => {
       if (unsubscribe) unsubscribe();
     };
   }, []);
-
-  // Cache to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('rf_official_plans_v3', JSON.stringify(plans));
-    } catch {
-      // ignore storage errors
-    }
-  }, [plans]);
 
   const location = useLocation();
   const isHomePage = location.pathname === '/';

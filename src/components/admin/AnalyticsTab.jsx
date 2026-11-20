@@ -10,6 +10,7 @@ import {
   Users,
 } from 'lucide-react';
 import { MONTHLY_ANALYTICS, BRANCH_MONTHLY_ANALYTICS } from './initialData';
+import { saveAddonToFirestore } from '../../services/firestoreService';
 
 export default function AnalyticsTab({ members, plans, addonRevenue, setAddonRevenue, activeBranchId = 'all', showToast }) {
   const [selectedService, setSelectedService] = useState('Massage');
@@ -45,15 +46,16 @@ export default function AnalyticsTab({ members, plans, addonRevenue, setAddonRev
     return sum + (p ? p.price : 5500);
   }, 0);
 
-  const latestMonth = chartSeries[chartSeries.length - 1];
-  const totalSubscriptionRev = latestMonth.subscriptionRev + livePlanRevenue;
+  const defaultMonth = { month: 'Nov', subscriptionRev: 0, addonRev: 0, newMembers: 0, churned: 0 };
+  const latestMonth = chartSeries.length > 0 ? chartSeries[chartSeries.length - 1] : defaultMonth;
+  const totalSubscriptionRev = (latestMonth?.subscriptionRev || 0) + livePlanRevenue;
   const totalAddonRev = aggregatedAddons.reduce((sum, a) => sum + a.revenue, 0);
   const totalNewMembersThisMonth = latestMonth.newMembers;
   const churnedCount = latestMonth.churned + deactivatedMembers.length;
   const churnRate = ((churnedCount / Math.max(1, 70 + activeMembers.length)) * 100).toFixed(1);
 
-  const maxMonthlyRev = Math.max(...chartSeries.map((d) => d.subscriptionRev + d.addonRev));
-  const maxGrowth = Math.max(...chartSeries.map((d) => d.newMembers));
+  const maxMonthlyRev = Math.max(1, ...chartSeries.map((d) => d.subscriptionRev + d.addonRev));
+  const maxGrowth = Math.max(1, ...chartSeries.map((d) => d.newMembers));
   const maxAddon = Math.max(1, ...aggregatedAddons.map((a) => a.revenue));
 
   const handleLogAddon = (e) => {
@@ -61,13 +63,28 @@ export default function AnalyticsTab({ members, plans, addonRevenue, setAddonRev
     const amt = Number(logAmount);
     if (!amt || amt <= 0) return;
     const targetBranch = activeBranchId === 'all' ? 'vishrambag' : activeBranchId;
-    setAddonRevenue((prev) =>
-      prev.map((item) =>
-        item.service === selectedService && item.branchId === targetBranch
-          ? { ...item, sessions: item.sessions + 1, revenue: item.revenue + amt }
-          : item
-      )
+    const existing = addonRevenue.find(
+      (a) => a.service === selectedService && a.branchId === targetBranch
     );
+    const updatedAddon = existing
+      ? { ...existing, sessions: existing.sessions + 1, revenue: existing.revenue + amt }
+      : {
+          id: `ao-${Date.now()}`,
+          branchId: targetBranch,
+          service: selectedService,
+          sessions: 1,
+          revenue: amt,
+          color: '#00B84A',
+        };
+
+    saveAddonToFirestore(updatedAddon).catch(console.warn);
+
+    setAddonRevenue((prev) => {
+      const filtered = prev.filter(
+        (a) => !(a.service === selectedService && a.branchId === targetBranch)
+      );
+      return [...filtered, updatedAddon];
+    });
     showToast(`Logged ₹${amt.toLocaleString('en-IN')} under ${selectedService} add-on revenue`);
   };
 

@@ -1,30 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  Users,
-  CreditCard,
-  Dumbbell,
-  BarChart3,
-  LogOut,
-  Menu,
-  X,
-  CheckCircle2,
-  ShieldCheck,
-  Bell,
-  ArrowLeft,
-  Building2,
-  MessageSquare,
-  Globe,
-} from 'lucide-react';
-import {
-  BRANCHES,
-  INITIAL_MEMBERS,
-  INITIAL_PLANS,
-  INITIAL_TRAINERS,
-  INITIAL_ADDON_REVENUE,
-} from './initialData';
 import {
   seedInitialDataIfEmpty,
+  purgeAllDummyDataFromFirestore,
   subscribeToCollection,
   deduplicateById,
 } from '../../services/firestoreService';
@@ -36,13 +13,6 @@ import TrainersTab from './TrainersTab';
 import AnalyticsTab from './AnalyticsTab';
 import InquiriesTab from './InquiriesTab';
 
-function loadState(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
 }
 
 export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: propOnLogout, plans: propPlans, setPlans: propSetPlans }) {
@@ -59,54 +29,67 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [toast, setToast] = useState('');
 
-  // Synchronized state with localStorage fallback
-  const [members, setMembers] = useState(() => loadState('rf_admin_members_v3', INITIAL_MEMBERS));
-  const [trainers, setTrainers] = useState(() => loadState('rf_admin_trainers_v3', INITIAL_TRAINERS));
-  const [addonRevenue, setAddonRevenue] = useState(() => loadState('rf_admin_addons_v3', INITIAL_ADDON_REVENUE));
+  // Clean state - strictly direct from Firebase Firestore, ZERO localStorage
+  const [members, setMembers] = useState([]);
+  const [trainers, setTrainers] = useState([]);
+  const [addonRevenue, setAddonRevenue] = useState([]);
   const [inquiries, setInquiries] = useState([]);
 
-  // Managed plans (either from props or local state synced to Firestore)
-  const [localPlans, setLocalPlans] = useState(() => loadState('rf_official_plans_v2', INITIAL_PLANS));
+  // Managed plans (synced live from Firestore)
+  const [localPlans, setLocalPlans] = useState(INITIAL_PLANS);
   const plans = propPlans || localPlans;
   const setPlans = propSetPlans || setLocalPlans;
 
-  // Real-time Firestore sync & idempotent database seeding
+  // Real-time Firestore sync & database cleaning
   useEffect(() => {
-    // 1. Seed initial gym data if Firestore collection is fresh (seed lock prevents duplicates)
+    // 0. Purge all legacy dummy data keys from browser localStorage
+    const keysToPurge = [
+      'rf_admin_members_v3',
+      'rf_admin_trainers_v3',
+      'rf_admin_addons_v3',
+      'rf_admin_members',
+      'rf_admin_trainers',
+      'rf_official_plans_v2',
+      'rf_official_plans_v3',
+    ];
+    keysToPurge.forEach((key) => {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        // ignore
+      }
+    });
+
+    // 1. Purge legacy dummy documents and seed official plans
+    purgeAllDummyDataFromFirestore().catch(console.warn);
     seedInitialDataIfEmpty().catch(console.warn);
 
     // 2. Subscribe to Firestore members collection
     const unsubMembers = subscribeToCollection('members', (data) => {
-      if (data && data.length > 0) {
-        setMembers((prev) => deduplicateById([...data]));
-      }
-    }, null, INITIAL_MEMBERS);
+      setMembers(deduplicateById(data || []));
+    });
 
     // 3. Subscribe to Firestore trainers collection
     const unsubTrainers = subscribeToCollection('trainers', (data) => {
-      if (data && data.length > 0) {
-        setTrainers((prev) => deduplicateById([...data]));
-      }
-    }, null, INITIAL_TRAINERS);
+      setTrainers(deduplicateById(data || []));
+    });
 
     // 4. Subscribe to Firestore plans collection
     const unsubPlans = subscribeToCollection('plans', (data) => {
       if (data && data.length > 0) {
-        setPlans((prev) => deduplicateById([...data]));
+        setPlans(deduplicateById(data));
       }
-    }, null, INITIAL_PLANS);
+    });
 
     // 5. Subscribe to Firestore addons collection
     const unsubAddons = subscribeToCollection('addons', (data) => {
-      if (data && data.length > 0) {
-        setAddonRevenue((prev) => deduplicateById([...data]));
-      }
-    }, null, INITIAL_ADDON_REVENUE);
+      setAddonRevenue(deduplicateById(data || []));
+    });
 
     // 6. Subscribe to Firestore inquiries collection (real-time website leads)
     const unsubInquiries = subscribeToCollection('inquiries', (data) => {
-      setInquiries(deduplicateById(data));
-    }, null, []);
+      setInquiries(deduplicateById(data || []));
+    });
 
     return () => {
       if (unsubMembers) unsubMembers();
@@ -116,17 +99,6 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
       if (unsubInquiries) unsubInquiries();
     };
   }, []);
-
-  // Sync to local cache
-  useEffect(() => {
-    try {
-      localStorage.setItem('rf_admin_members_v3', JSON.stringify(deduplicateById(members)));
-      localStorage.setItem('rf_admin_trainers_v3', JSON.stringify(deduplicateById(trainers)));
-      localStorage.setItem('rf_admin_addons_v3', JSON.stringify(deduplicateById(addonRevenue)));
-    } catch {
-      // ignore
-    }
-  }, [members, trainers, addonRevenue]);
 
   const showToast = (msg) => {
     setToast(msg);
