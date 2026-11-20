@@ -88,8 +88,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     trainerId: '',
     specialTraining: 'none',
     specialTrainingLabel: '',
-    joinDate: '2026-11-18',
-    expiryDate: addMonths('2026-11-18', 1),
+    joinDate: new Date().toISOString().split('T')[0],
+    expiryDate: addMonths(new Date().toISOString().split('T')[0], 1),
     program: 'Beginner',
     addOns: [],
     weight: '70 kg',
@@ -119,7 +119,8 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
       trainerId: branchTrainers[0]?.id || '',
       specialTraining: 'none',
       specialTrainingLabel: '',
-      expiryDate: addMonths('2026-11-18', defaultPlan?.durationMonths || 1),
+      expiryDate: addMonths(new Date().toISOString().split('T')[0], defaultPlan?.durationMonths || 1),
+      joinDate: new Date().toISOString().split('T')[0],
     });
     setIsFormOpen(true);
   };
@@ -336,7 +337,30 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
     return true;
   });
 
-  const addonOptions = ['Personal Training', 'Massage', 'Steam Bath', 'Zumba', 'Yoga'];
+  const [addonOptions, setAddonOptions] = useState([
+    'Personal Training',
+    'Massage',
+    'Steam Bath',
+    'Zumba',
+    'Yoga',
+  ]);
+  const [newAddonName, setNewAddonName] = useState('');
+
+  const handleAddCustomAddon = () => {
+    const trimmed = newAddonName.trim();
+    if (!trimmed) return;
+    if (!addonOptions.includes(trimmed)) {
+      setAddonOptions((prev) => [...prev, trimmed]);
+    }
+    if (!form.addOns.includes(trimmed)) {
+      setForm((prev) => ({
+        ...prev,
+        addOns: [...prev.addOns, trimmed],
+      }));
+    }
+    setNewAddonName('');
+    showToast(`Added '${trimmed}' to Add-on Services`);
+  };
 
   return (
     <div>
@@ -882,7 +906,17 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                   <input
                     type="date"
                     value={form.joinDate}
-                    onChange={(e) => setForm({ ...form, joinDate: e.target.value })}
+                    onChange={(e) => {
+                      const newJoinDate = e.target.value;
+                      const selectedPlan = plans.find((p) => p.id === form.planId);
+                      setForm({
+                        ...form,
+                        joinDate: newJoinDate,
+                        expiryDate: selectedPlan
+                          ? addMonths(newJoinDate, selectedPlan.durationMonths)
+                          : form.expiryDate,
+                      });
+                    }}
                     style={{ width: '100%', padding: '9px 10px', borderRadius: '9px', border: '1.5px solid #CBD5E1', fontSize: '0.84rem' }}
                   />
                 </div>
@@ -909,32 +943,119 @@ export default function MembersTab({ members, setMembers, plans, trainers, activ
                 </div>
               </div>
 
-              {/* Add-on Services */}
+              {/* Add-on Services - Structured Dropdown & Add Service Input */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '6px' }}>ADD-ON SERVICES</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {addonOptions.map((ao) => {
-                    const checked = form.addOns.includes(ao);
-                    return (
-                      <button
-                        type="button"
+                <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 800, color: '#475569', marginBottom: '5px' }}>
+                  ADD-ON SERVICES
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <select
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        handleToggleAddon(e.target.value);
+                      }
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: '9px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '0.88rem',
+                      backgroundColor: '#FFFFFF',
+                      color: '#0F172A',
+                    }}
+                  >
+                    <option value="">-- Select Add-on Service to Enroll / Remove --</option>
+                    {addonOptions.map((ao) => (
+                      <option key={ao} value={ao}>
+                        {form.addOns.includes(ao) ? `✓ ${ao} (Enrolled - click to remove)` : `+ ${ao}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Show Enrolled Services Badges */}
+                {form.addOns && form.addOns.length > 0 && (
+                  <div style={{ marginTop: '8px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {form.addOns.map((ao) => (
+                      <span
                         key={ao}
-                        onClick={() => handleToggleAddon(ao)}
                         style={{
-                          padding: '6px 12px',
-                          borderRadius: '999px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          backgroundColor: '#DCFCE7',
+                          color: '#15803D',
                           fontSize: '0.78rem',
                           fontWeight: 700,
-                          backgroundColor: checked ? '#00B84A' : '#F1F5F9',
-                          color: checked ? '#FFFFFF' : '#475569',
-                          border: checked ? '1px solid #00B84A' : '1px solid #E2E8F0',
+                          border: '1px solid #86EFAC',
                         }}
                       >
-                        {checked ? '✓ ' : '+ '}
-                        {ao}
-                      </button>
-                    );
-                  })}
+                        <span>✓ {ao}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAddon(ao)}
+                          title="Remove service"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#DC2626',
+                            cursor: 'pointer',
+                            fontWeight: 900,
+                            fontSize: '0.88rem',
+                            padding: '0 2px',
+                            lineHeight: 1,
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Inline New Service Creation Input */}
+                <div style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Type new service name (e.g. Diet Plan, CrossFit)..."
+                    value={newAddonName}
+                    onChange={(e) => setNewAddonName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomAddon();
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '9px 12px',
+                      borderRadius: '9px',
+                      border: '1.5px solid #CBD5E1',
+                      fontSize: '0.84rem',
+                      backgroundColor: '#FFFFFF',
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomAddon}
+                    style={{
+                      padding: '9px 15px',
+                      borderRadius: '9px',
+                      backgroundColor: '#00B84A',
+                      color: '#FFFFFF',
+                      fontSize: '0.8rem',
+                      fontWeight: 800,
+                      border: 'none',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    + Add New Service
+                  </button>
                 </div>
 
                 {form.addOns.includes('Personal Training') && (
