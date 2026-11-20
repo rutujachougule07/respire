@@ -449,6 +449,78 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   const [formData, setFormData] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Custom programs state & handlers
+  const [showAddProgramForm, setShowAddProgramForm] = useState(false);
+  const [newProgramData, setNewProgramData] = useState({
+    title: '',
+    subtitle: '',
+    description: '',
+    schedule: '4-5 Days / Week (60 Mins)',
+    focus: 'Functional Conditioning, Core Stability, Strength',
+    image: '',
+  });
+
+  const handleAddCustomProgram = () => {
+    if (!newProgramData.title.trim()) {
+      notify('Please enter a program name (e.g. CrossFit, Fat Loss)');
+      return;
+    }
+    const currentList = Array.isArray(formData.customPrograms) ? [...formData.customPrograms] : [];
+    const newProg = {
+      id: `prog-${Date.now()}`,
+      title: newProgramData.title.trim(),
+      category: newProgramData.title.trim(),
+      subtitle: newProgramData.subtitle.trim() || `${newProgramData.title.trim()} Conditioning`,
+      description: newProgramData.description.trim() || 'Structured workout curriculum tailored for specific fitness outcomes under professional guidance.',
+      schedule: newProgramData.schedule.trim() || '4-5 Days / Week (60 Mins)',
+      focus: newProgramData.focus.trim() || 'Functional Conditioning, Core Stability, Strength',
+      image: newProgramData.image || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop',
+    };
+    const updated = {
+      ...formData,
+      customPrograms: [...currentList, newProg],
+    };
+    setFormData(updated);
+    updateSection('programs', updated);
+    setShowAddProgramForm(false);
+    setNewProgramData({
+      title: '',
+      subtitle: '',
+      description: '',
+      schedule: '4-5 Days / Week (60 Mins)',
+      focus: 'Functional Conditioning, Core Stability, Strength',
+      image: '',
+    });
+    notify(`✓ Added "${newProg.title}" program!`);
+  };
+
+  const handleDeleteCustomProgram = (idx) => {
+    const currentList = Array.isArray(formData.customPrograms) ? [...formData.customPrograms] : [];
+    const progTitle = currentList[idx]?.title || 'Program';
+    if (!window.confirm(`Are you sure you want to delete "${progTitle}" program?`)) return;
+    currentList.splice(idx, 1);
+    const updated = {
+      ...formData,
+      customPrograms: currentList,
+    };
+    setFormData(updated);
+    updateSection('programs', updated);
+    notify(`✓ Removed "${progTitle}" program.`);
+  };
+
+  const handleUpdateCustomProgram = (idx, field, value) => {
+    const currentList = Array.isArray(formData.customPrograms) ? [...formData.customPrograms] : [];
+    if (currentList[idx]) {
+      currentList[idx] = { ...currentList[idx], [field]: value };
+      const updated = {
+        ...formData,
+        customPrograms: currentList,
+      };
+      setFormData(updated);
+      autoSaveSection(updated);
+    }
+  };
+
   const getSectionKey = (subTab) => {
     switch (subTab) {
       case 'home':
@@ -1529,7 +1601,275 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                   </div>
                 );
               })}
+
+              {/* Custom Additional Programs */}
+              {(formData.customPrograms || []).map((prog, cIdx) => (
+                <div
+                  key={prog.id || cIdx}
+                  style={{
+                    padding: '20px',
+                    borderRadius: '14px',
+                    border: '1.5px solid #86EFAC',
+                    backgroundColor: '#F0FDF4',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.74rem', fontWeight: 900, backgroundColor: '#00B84A', color: '#fff', padding: '3px 8px', borderRadius: '6px' }}>CUSTOM PROGRAM</span>
+                      <strong style={{ fontSize: '1.02rem', color: '#0F172A' }}>{prog.title}</strong>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCustomProgram(cIdx)}
+                      title="Delete this program"
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '8px',
+                        backgroundColor: '#FEF2F2',
+                        color: '#DC2626',
+                        border: '1px solid #FECACA',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+
+                  <ImageDropzone
+                    label={`${prog.title} Cover Image`}
+                    helperText={`Drag and drop visual photo for ${prog.title}.`}
+                    aspectLabel="16:9 Landscape"
+                    value={prog.image}
+                    defaultImage="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop"
+                    onChange={(newImg) => {
+                      handleUpdateCustomProgram(cIdx, 'image', newImg);
+                    }}
+                    onReset={() => {
+                      handleUpdateCustomProgram(cIdx, 'image', 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop');
+                    }}
+                  />
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
+                    <div>
+                      <label style={labelStyle}>Program Title</label>
+                      <input
+                        type="text"
+                        value={prog.title || ''}
+                        onChange={(e) => handleUpdateCustomProgram(cIdx, 'title', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Subtitle</label>
+                      <input
+                        type="text"
+                        value={prog.subtitle || ''}
+                        onChange={(e) => handleUpdateCustomProgram(cIdx, 'subtitle', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '12px' }}>
+                    <label style={labelStyle}>Description</label>
+                    <textarea
+                      rows={2}
+                      value={prog.description || ''}
+                      onChange={(e) => handleUpdateCustomProgram(cIdx, 'description', e.target.value)}
+                      style={textareaStyle}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
+                    <div>
+                      <label style={labelStyle}>Schedule (Cadence)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 4-5 Days / Week (60 Mins)"
+                        value={prog.schedule || ''}
+                        onChange={(e) => handleUpdateCustomProgram(cIdx, 'schedule', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Focus Points (comma separated)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Core, Functional Training, HIIT"
+                        value={Array.isArray(prog.focus) ? prog.focus.join(', ') : (prog.focus || '')}
+                        onChange={(e) => handleUpdateCustomProgram(cIdx, 'focus', e.target.value)}
+                        style={inputStyle}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+
+            {/* Add New Program Button / Inline Form */}
+            {!showAddProgramForm ? (
+              <button
+                type="button"
+                onClick={() => setShowAddProgramForm(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '16px 20px',
+                  borderRadius: '14px',
+                  border: '2px dashed #00B84A',
+                  backgroundColor: '#F0FDF4',
+                  color: '#008A38',
+                  fontWeight: 800,
+                  fontSize: '0.92rem',
+                  cursor: 'pointer',
+                  width: '100%',
+                  marginTop: '18px',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <Plus size={18} />
+                <span>+ Add New Workout Program (e.g. CrossFit, Fat Loss, Powerlifting)</span>
+              </button>
+            ) : (
+              <div
+                style={{
+                  marginTop: '18px',
+                  padding: '22px',
+                  borderRadius: '16px',
+                  backgroundColor: '#FFFFFF',
+                  border: '2px solid #00B84A',
+                  boxShadow: '0 8px 24px rgba(0, 184, 74, 0.12)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontWeight: 900, color: '#0F172A', fontSize: '1.05rem' }}>
+                    ➕ Add New Workout Program
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddProgramForm(false)}
+                    style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={labelStyle}>Program Name *</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. CrossFit / Functional, Fat Loss, Strength & Power"
+                      value={newProgramData.title}
+                      onChange={(e) => setNewProgramData({ ...newProgramData, title: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Subtitle</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. High-Intensity Conditioning & Agility"
+                      value={newProgramData.subtitle}
+                      onChange={(e) => setNewProgramData({ ...newProgramData, subtitle: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <ImageDropzone
+                  label="Program Cover Image"
+                  helperText="Drag and drop 16:9 photo for this program."
+                  aspectLabel="16:9 Landscape"
+                  value={newProgramData.image}
+                  defaultImage="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop"
+                  onChange={(newImg) => setNewProgramData({ ...newProgramData, image: newImg })}
+                  onReset={() => setNewProgramData({ ...newProgramData, image: '' })}
+                />
+
+                <div>
+                  <label style={labelStyle}>Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Comprehensive overview of training method and target audience..."
+                    value={newProgramData.description}
+                    onChange={(e) => setNewProgramData({ ...newProgramData, description: e.target.value })}
+                    style={textareaStyle}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <label style={labelStyle}>Cadence / Schedule</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 4-5 Days / Week (60 Mins)"
+                      value={newProgramData.schedule}
+                      onChange={(e) => setNewProgramData({ ...newProgramData, schedule: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Core Focus Points (comma separated)</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Explosive Power, Core Stability, Endurance"
+                      value={newProgramData.focus}
+                      onChange={(e) => setNewProgramData({ ...newProgramData, focus: e.target.value })}
+                      style={inputStyle}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={handleAddCustomProgram}
+                    style={{
+                      padding: '10px 22px',
+                      borderRadius: '10px',
+                      backgroundColor: '#00B84A',
+                      color: '#FFFFFF',
+                      fontWeight: 800,
+                      fontSize: '0.86rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>Publish Program</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddProgramForm(false)}
+                    style={{
+                      padding: '10px 16px',
+                      borderRadius: '10px',
+                      backgroundColor: '#F1F5F9',
+                      color: '#475569',
+                      fontWeight: 700,
+                      fontSize: '0.86rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div style={{ marginTop: '20px' }}>
               <button
@@ -1605,12 +1945,12 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                   onClick={() => {
                     const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
                     currentReasons.push({
-                      title: 'New Value Proposition',
-                      badge: 'Certified Experts',
-                      desc: 'Customized training protocol and verified results tailored to each member.',
+                      title: '',
+                      badge: '',
+                      desc: '',
                     });
                     autoSaveSection({ ...formData, reasons: currentReasons });
-                    notify('✓ Added new Reason card!');
+                    notify('✓ Added new blank Reason card!');
                   }}
                   style={{
                     display: 'inline-flex',
@@ -1643,7 +1983,9 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>Card #{rIdx + 1} — {reason.title}</span>
+                      <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#008A38' }}>
+                        Card #{rIdx + 1} — {reason.title || 'New Blank Reason Card'}
+                      </span>
                       <button
                         type="button"
                         onClick={() => {
@@ -1676,6 +2018,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                         <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Title</label>
                         <input
                           type="text"
+                          placeholder="Enter reason title (e.g. Certified Trainers)..."
                           value={reason.title || ''}
                           onChange={(e) => {
                             const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
@@ -1689,6 +2032,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                         <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Badge Tag</label>
                         <input
                           type="text"
+                          placeholder="Enter badge tag (optional)..."
                           value={reason.badge || ''}
                           onChange={(e) => {
                             const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
@@ -1704,6 +2048,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                       <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B' }}>Description</label>
                       <textarea
                         rows={2}
+                        placeholder="Enter reason description..."
                         value={reason.desc || ''}
                         onChange={(e) => {
                           const currentReasons = [...(formData.reasons || DEFAULT_WEBSITE_CONTENT.whyUs.reasons)];
