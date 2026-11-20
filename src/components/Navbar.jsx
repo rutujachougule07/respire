@@ -17,24 +17,29 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 30);
 
       if (isHomePage) {
-        const sections = ['hero', 'about', 'services', 'membership', 'programs', 'features', 'why-us', 'contact'];
-        const scrollPosition = window.scrollY + 180;
+        if (window.scrollY < 120) {
+          setActiveSection('hero');
+          return;
+        }
 
+        const sections = ['contact', 'features', 'programs', 'membership', 'services', 'about', 'hero'];
         for (const section of sections) {
           const el = document.getElementById(section);
           if (el) {
-            const top = el.offsetTop;
-            const height = el.offsetHeight;
-            if (scrollPosition >= top && scrollPosition < top + height) {
+            const rect = el.getBoundingClientRect();
+            // Active if top of section is within focal viewing area
+            if (rect.top <= 220 && rect.bottom > 120) {
               setActiveSection(section);
-              break;
+              return;
             }
           }
         }
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run once on mount to set initial active section
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
@@ -197,9 +202,9 @@ export default function Navbar() {
             className="desktop-nav"
           >
             {navLinks.map((link) => {
-              const isCurrentRoute =
-                location.pathname === link.path ||
-                (isHomePage && link.path === '/' && activeSection === link.id);
+              const isCurrentRoute = isHomePage
+                ? activeSection === link.id
+                : location.pathname === link.path;
 
               return (
                 <a
@@ -299,9 +304,9 @@ export default function Navbar() {
             }}
           >
             {navLinks.map((link) => {
-              const isCurrentRoute =
-                location.pathname === link.path ||
-                (isHomePage && link.path === '/' && activeSection === link.id);
+              const isCurrentRoute = isHomePage
+                ? activeSection === link.id
+                : location.pathname === link.path;
 
               return (
                 <a
