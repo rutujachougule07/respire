@@ -158,22 +158,22 @@ export default function Services() {
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
                   border: isHovered
-                    ? '1.5px solid #00B84A'
-                    : '1.5px solid rgba(0, 184, 74, 0.14)',
+                    ? '1.5px solid #CBD5E1'
+                    : '1.5px solid #E2E8F0',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
                   transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                   transform: isHovered ? 'translateY(-6px)' : 'translateY(0)',
                   boxShadow: isHovered
-                    ? '0 22px 42px rgba(0, 184, 74, 0.16)'
-                    : '0 10px 28px rgba(15, 23, 42, 0.06)',
+                    ? '0 20px 38px rgba(15, 23, 42, 0.10)'
+                    : '0 8px 24px rgba(15, 23, 42, 0.05)',
                 }}
               >
                 {/* Image Banner */}
                 <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
                   <img
-                    src={srv.image}
+                    src={srv.image || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop'}
                     alt={srv.title}
                     className="img-cover"
                     style={{
@@ -185,7 +185,8 @@ export default function Services() {
                     style={{
                       position: 'absolute',
                       inset: 0,
-                      background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0, 92, 37, 0.65) 100%)',
+                      background: 'linear-gradient(180deg, rgba(0,0,0,0.04) 0%, transparent 60%)',
+                      pointerEvents: 'none',
                     }}
                   />
 
@@ -243,8 +244,7 @@ export default function Services() {
                       fontSize: '1.45rem',
                       fontWeight: 800,
                       marginBottom: '10px',
-                      color: isHovered ? '#008A38' : '#0F172A',
-                      transition: 'color 0.2s ease',
+                      color: '#0F172A',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -304,11 +304,9 @@ export default function Services() {
                       width: '100%',
                       padding: '12px 18px',
                       borderRadius: '10px',
-                      background: isHovered
-                        ? 'linear-gradient(135deg, #00D256 0%, #008A37 100%)'
-                        : '#F1FBF5',
-                      color: isHovered ? '#FFFFFF' : '#007A31',
-                      border: '1px solid rgba(0, 184, 74, 0.25)',
+                      background: isHovered ? '#0F172A' : '#F8FAFC',
+                      color: isHovered ? '#FFFFFF' : '#0F172A',
+                      border: '1.5px solid #E2E8F0',
                       fontSize: '0.85rem',
                       fontWeight: 800,
                       textTransform: 'uppercase',
@@ -318,6 +316,7 @@ export default function Services() {
                       justifyContent: 'center',
                       gap: '8px',
                       transition: 'all 0.25s ease',
+                      cursor: 'pointer',
                     }}
                   >
                     <span>Inquire About {srv.title}</span>

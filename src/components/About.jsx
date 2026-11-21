@@ -11,7 +11,7 @@ export default function About() {
   }
 
   const aboutImage =
-    aboutData.image ??
+    (aboutData.image && typeof aboutData.image === 'string' && aboutData.image.trim()) ||
     'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1200&auto=format&fit=crop';
   const eyebrow = aboutData.eyebrow ?? '• A PART OF MAHABAL GROUP •';
   const title = aboutData.title ?? 'ABOUT MAHABAL GROUP & RESPIRE';

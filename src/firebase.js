@@ -1,8 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, setLogLevel } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
+
+// Suppress internal Firestore WebChannel reconnect logs when internet/Wi-Fi fluctuates
+setLogLevel('error');
 
 // Firebase configuration for Respire Fitness
 export const firebaseConfig = {

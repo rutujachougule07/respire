@@ -85,11 +85,11 @@ export default function HomePage({ plans }) {
                 )}
               </div>
 
-              {cs.image && (
+              {(cs.image && typeof cs.image === 'string' && cs.image.trim().length > 0) ? (
                 <div style={{ marginBottom: '40px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 16px 36px rgba(0,0,0,0.06)' }}>
                   <img src={cs.image} alt={cs.title} style={{ width: '100%', maxHeight: '480px', objectFit: 'cover' }} />
                 </div>
-              )}
+              ) : null}
 
               {cs.items && cs.items.length > 0 && (
                 <div

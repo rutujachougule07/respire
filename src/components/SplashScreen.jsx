@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight } from 'lucide-react';
 
 export default function SplashScreen({ onFinish }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -23,7 +22,9 @@ export default function SplashScreen({ onFinish }) {
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
-          console.warn('Video auto-playback deferred or prevented:', err);
+          // If aborted because background tab or battery saver, ignore cleanly
+          if (err?.name === 'AbortError') return;
+          console.debug('Video auto-playback deferred:', err);
         });
       }
     }
@@ -51,7 +52,6 @@ export default function SplashScreen({ onFinish }) {
 
   return (
     <div
-      onClick={handleFinish}
       className={`respire-splash-screen ${isFadingOut ? 'fade-out' : ''}`}
       style={{
         position: 'fixed',
@@ -76,47 +76,6 @@ export default function SplashScreen({ onFinish }) {
         pointerEvents: isFadingOut ? 'none' : 'auto',
       }}
     >
-      {/* Skip Button */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleFinish();
-        }}
-        style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          backgroundColor: 'rgba(0, 184, 74, 0.92)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-          color: '#FFFFFF',
-          padding: '8px 16px',
-          borderRadius: '9999px',
-          fontSize: '0.82rem',
-          fontWeight: 800,
-          letterSpacing: '0.5px',
-          cursor: 'pointer',
-          boxShadow: '0 4px 20px rgba(0, 184, 74, 0.45)',
-          zIndex: 1000000,
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.06)';
-          e.currentTarget.style.backgroundColor = '#00D154';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.backgroundColor = 'rgba(0, 184, 74, 0.92)';
-        }}
-      >
-        <span>Skip</span>
-        <ChevronRight size={15} strokeWidth={2.8} />
-      </button>
-
       {/* Luxury Ambient Emerald Green Breathing Nebula */}
       <div
         style={{
