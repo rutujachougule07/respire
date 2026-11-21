@@ -515,26 +515,6 @@ export default function PlansRenewalsTab({ plans, setPlans, members, setMembers,
                   : 'Live pricing table synced with website • View-only mode for Branch Managers'}
               </div>
             </div>
-            {isSuperAdmin && (
-              <button
-                onClick={openAddPlan}
-                style={{
-                  padding: '7px 14px',
-                  borderRadius: '8px',
-                  backgroundColor: '#FFFFFF',
-                  color: '#007A31',
-                  fontSize: '0.78rem',
-                  fontWeight: 800,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer',
-                  border: 'none',
-                }}
-              >
-                <Plus size={14} /> Add Fee Tier
-              </button>
-            )}
           </div>
 
           {/* Branch Filter Tabs for Plans */}
