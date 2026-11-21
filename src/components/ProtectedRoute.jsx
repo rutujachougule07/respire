@@ -30,11 +30,6 @@ export default function ProtectedRoute({ children }) {
             marginBottom: '16px',
           }}
         />
-        <style>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
         <p style={{ color: '#94A3B8', fontSize: '0.95rem', fontWeight: 600 }}>
           Authenticating Respire Admin Portal...
         </p>

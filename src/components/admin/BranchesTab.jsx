@@ -7,10 +7,10 @@ export default function BranchesTab({ members, trainers, plans, onSelectBranch }
     <div>
       <div style={{ marginBottom: '22px' }}>
         <h2 style={{ fontSize: '1.55rem', fontWeight: 900, color: '#0F172A', marginBottom: '4px' }}>
-          All Branches & Branch Managers
+          Respire Branches & Managers
         </h2>
         <p style={{ fontSize: '0.88rem', color: '#64748B' }}>
-          Super Admin master view of both Respire Fitness branches and their respective branch managers.
+          Super Admin view of Vishrambag and Vijaynagar branches with assigned managers.
         </p>
       </div>
 

@@ -198,12 +198,14 @@ export function TrainerAuthProvider({ children }) {
   };
 
   const updateProfile = async (updates) => {
-    if (!trainerProfile?.id) throw new Error('Trainer ID is missing');
-    const safeUpdates = await updateTrainerProfileInFirestore(trainerProfile.id, updates);
-    const updated = { ...trainerProfile, ...safeUpdates };
+    const trainerId = trainerProfile?.id || trainerSession?.trainerId;
+    if (!trainerId) throw new Error('Trainer ID is missing. Please refresh or re-login.');
+    const safeUpdates = await updateTrainerProfileInFirestore(trainerId, updates);
+    const updated = { ...(trainerProfile || {}), ...safeUpdates, id: trainerId };
     setTrainerProfile(updated);
     try {
       localStorage.setItem('rf_trainer_profile', JSON.stringify(updated));
+      sessionStorage.setItem('rf_trainer_profile', JSON.stringify(updated));
     } catch {
       // ignore
     }

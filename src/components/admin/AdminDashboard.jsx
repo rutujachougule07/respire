@@ -269,55 +269,28 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
           </button>
         </div>
 
-        {/* Role Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+        {/* Active Branch Display - Only show when a specific branch is active; Never show 'All Branches' */}
+        {selectedBranch !== 'all' && (currentBranchMeta || adminInfo?.branchName) && (
           <div
             style={{
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '4px 10px',
-              borderRadius: '999px',
-              backgroundColor: isSuperAdmin
-                ? 'rgba(23, 44, 131, 0.08)'
-                : 'rgba(0, 184, 74, 0.08)',
-              border: isSuperAdmin
-                ? '1px solid rgba(23, 44, 131, 0.25)'
-                : '1px solid rgba(0, 184, 74, 0.25)',
-              fontSize: '0.7rem',
+              gap: '8px',
+              padding: '9px 12px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(0, 184, 74, 0.08)',
+              border: '1px solid rgba(0, 184, 74, 0.25)',
+              fontSize: '0.78rem',
+              color: '#008A38',
               fontWeight: 800,
-              color: isSuperAdmin ? '#172C83' : '#008A38',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
             }}
           >
-            <ShieldCheck size={12} />
-            <span>{isSuperAdmin ? 'Super Admin' : 'Branch Manager'}</span>
+            <Building2 size={14} color="#008A38" style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {currentBranchMeta?.name || adminInfo?.branchName}
+            </span>
           </div>
-        </div>
-
-        {/* Active Branch Display */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '8px 10px',
-            borderRadius: '8px',
-            backgroundColor: '#F8FAFC',
-            border: '1px solid #E2E8F0',
-            fontSize: '0.74rem',
-            color: '#334155',
-            fontWeight: 700,
-          }}
-        >
-          <Building2 size={13} color="#008A38" style={{ flexShrink: 0 }} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {isSuperAdmin && selectedBranch === 'all'
-              ? 'All Branches (Vishrambag & Vijaynagar)'
-              : currentBranchMeta?.name || adminInfo?.branchName || 'Respire Fitness'}
-          </span>
-        </div>
+        )}
       </div>
 
       {/* 2. SCROLLABLE NAVIGATION LINKS */}
@@ -584,7 +557,7 @@ export default function AdminDashboard({ adminInfo: propAdminInfo, onLogout: pro
               >
                 {currentBranchMeta
                   ? `${currentBranchMeta.name} • ${currentBranchMeta.phone}`
-                  : 'Super Admin Master Control • All Branches Combined'}
+                  : 'Super Admin Master Control'}
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 900, color: '#0F172A' }}>
                 {isSuperAdmin

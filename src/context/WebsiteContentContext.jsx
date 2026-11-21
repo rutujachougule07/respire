@@ -2,6 +2,15 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
+export const DEFAULT_INQUIRY_SERVICES = [
+  'Personal Training',
+  'Sports Massage',
+  'Steam Bath',
+  'Zumba Dance Cardio',
+  'Yoga & Mobility',
+  'General Gym Membership',
+];
+
 export const DEFAULT_WEBSITE_CONTENT = {
   sectionVisibility: {
     hero: true,
@@ -219,6 +228,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
       coach: 'Elite Performance Director',
       image: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1000&auto=format&fit=crop',
     },
+    customPrograms: [],
   },
   tracking: {
     visible: true,
@@ -260,6 +270,16 @@ export const DEFAULT_WEBSITE_CONTENT = {
     title: 'CONNECT WITH RESPIRE FITNESS',
     subtitle:
       'Visit either of our premium Sangli branches — Vishrambag or Vijaynagar — or submit an inquiry below.',
+    vishrambagPhone: '+91 7798001777',
+    vijaynagarPhone: '+91 9172848777',
+    inquiryServices: [
+      'Personal Training',
+      'Sports Massage',
+      'Steam Bath',
+      'Zumba Dance Cardio',
+      'Yoga & Mobility',
+      'General Gym Membership',
+    ],
   },
 };
 

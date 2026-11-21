@@ -17,8 +17,10 @@ export default function Programs() {
     programsData.subtitle ??
     'Whether taking your first steps into strength training or chasing elite athletic milestones, our progressive curriculums guide your evolution with certified expertise.';
 
-  const programs = {
+  const basePrograms = {
     beginner: {
+      id: 'beginner',
+      title: 'Beginner',
       category: 'Beginner',
       subtitle: programsData.beginner?.subtitle ?? 'Foundation, Mobility & Proper Lifting Form',
       description: programsData.beginner?.description ?? 'Ideal for newcomers or those returning to fitness after a hiatus. We focus on building neuromuscular mind-muscle connection, joint stability, core resilience, and safe movement mechanics under certified trainer supervision.',
@@ -31,6 +33,8 @@ export default function Programs() {
       ],
     },
     intermediate: {
+      id: 'intermediate',
+      title: 'Intermediate',
       category: 'Intermediate',
       subtitle: programsData.intermediate?.subtitle ?? 'Hypertrophy, Strength & Progressive Overload',
       description: programsData.intermediate?.description ?? 'Structured for members with at least 6 months of training experience. We utilize scientific periodization, push-pull-legs or upper-lower splits, time under tension, and progressive overload to sculpt lean muscle and maximize power output.',
@@ -43,6 +47,8 @@ export default function Programs() {
       ],
     },
     advanced: {
+      id: 'advanced',
+      title: 'Advanced',
       category: 'Advanced',
       subtitle: programsData.advanced?.subtitle ?? 'Elite Conditioning, Powerlifting & Athletic Output',
       description: programsData.advanced?.description ?? 'Engineered for athletes, powerlifters, and high-performance fitness enthusiasts. Features complex compound training, high-intensity functional circuits, plyometrics, and periodized deload weeks to reach the pinnacle of human capability.',
@@ -56,7 +62,38 @@ export default function Programs() {
     },
   };
 
-  const current = programs[activeTab];
+  const customProgramsList = Array.isArray(programsData.customPrograms) ? programsData.customPrograms : [];
+  const customMap = {};
+  customProgramsList.forEach((cp, idx) => {
+    const key = cp.id || `custom-${idx}`;
+    const focusArr = Array.isArray(cp.focus)
+      ? cp.focus
+      : (typeof cp.focus === 'string' && cp.focus.trim()
+          ? cp.focus.split(',').map((s) => s.trim()).filter(Boolean)
+          : ['Targeted Conditioning', 'Form Optimization', 'Functional Output', 'Recovery Sync']);
+    const lecturesArr = Array.isArray(cp.lectures) && cp.lectures.length > 0
+      ? cp.lectures
+      : [
+          { title: `${cp.title || 'Curriculum'} Protocol Masterclass`, duration: '20 min', trainer: 'Certified Coach' },
+          { title: 'Technique, Form & Movement Safety', duration: '15 min', trainer: 'Lead Trainer' },
+        ];
+    customMap[key] = {
+      id: key,
+      category: cp.category || cp.title || `Program ${idx + 1}`,
+      title: cp.title || `Program ${idx + 1}`,
+      subtitle: cp.subtitle || `${cp.title} Regimen`,
+      description: cp.description || 'Structured workout curriculum tailored for specific fitness outcomes under professional guidance.',
+      schedule: cp.schedule || '4-5 Days / Week (60 Mins)',
+      focus: focusArr,
+      image: cp.image || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop',
+      lectures: lecturesArr,
+    };
+  });
+
+  const allPrograms = { ...basePrograms, ...customMap };
+  const current = allPrograms[activeTab] || basePrograms.beginner || Object.values(allPrograms)[0];
+  const currentFocus = Array.isArray(current?.focus) ? current.focus : [];
+  const currentLectures = Array.isArray(current?.lectures) ? current.lectures : [];
 
   const scrollToContact = () => {
     const el = document.getElementById('contact');
@@ -112,8 +149,10 @@ export default function Programs() {
             flexWrap: 'wrap',
           }}
         >
-          {['beginner', 'intermediate', 'advanced'].map((key) => {
+          {Object.keys(allPrograms).map((key) => {
+            const prog = allPrograms[key];
             const isActive = activeTab === key;
+            const tabLabel = prog?.category || prog?.title || key;
             return (
               <button
                 key={key}
@@ -134,7 +173,7 @@ export default function Programs() {
                   transform: isActive ? 'scale(1.04)' : 'scale(1)',
                 }}
               >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
+                {tabLabel}
               </button>
             );
           })}
@@ -166,7 +205,7 @@ export default function Programs() {
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
                 padding: '28px',
-                backgroundImage: `linear-gradient(180deg, rgba(0, 130, 52, 0.16) 0%, rgba(0, 82, 33, 0.90) 85%), url(${current.image})`,
+                backgroundImage: `linear-gradient(180deg, rgba(0, 130, 52, 0.16) 0%, rgba(0, 82, 33, 0.90) 85%), url(${current?.image || 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000&auto=format&fit=crop'})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}
@@ -188,7 +227,7 @@ export default function Programs() {
                   boxShadow: '0 6px 16px rgba(0,0,0,0.16)',
                 }}
               >
-                {current.category} TIER
+                {current?.category || current?.title || 'Program'} TIER
               </div>
 
               {/* Recorded Video Lectures Preview Box */}
@@ -220,7 +259,7 @@ export default function Programs() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {current.lectures.map((lec, lIdx) => (
+                  {currentLectures.map((lec, lIdx) => (
                     <div
                       key={lIdx}
                       style={{
@@ -272,7 +311,10 @@ export default function Programs() {
             </div>
 
             {/* Right: Program Details */}
-            <div style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div
+              className="program-details-pane"
+              style={{ padding: '40px 36px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+            >
               <div>
                 <span
                   style={{
@@ -283,7 +325,7 @@ export default function Programs() {
                     letterSpacing: '0.08em',
                   }}
                 >
-                  {current.subtitle}
+                  {current?.subtitle}
                 </span>
 
                 <h3
@@ -295,7 +337,7 @@ export default function Programs() {
                     marginBottom: '16px',
                   }}
                 >
-                  {current.category} Program Curriculum
+                  {current?.category || current?.title} Program Curriculum
                 </h3>
 
                 <p
@@ -306,7 +348,7 @@ export default function Programs() {
                     marginBottom: '24px',
                   }}
                 >
-                  {current.description}
+                  {current?.description}
                 </p>
 
                 {/* Schedule badge */}
@@ -324,7 +366,7 @@ export default function Programs() {
                 >
                   <Clock size={16} color="#172C83" />
                   <span style={{ fontSize: '0.86rem', color: '#172C83', fontWeight: 700 }}>
-                    Recommended Cadence: {current.schedule}
+                    Recommended Cadence: {current?.schedule}
                   </span>
                 </div>
 
@@ -343,8 +385,8 @@ export default function Programs() {
                     Core Training Focus Areas:
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '12px' }}>
-                    {current.focus.map((item, fIdx) => (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                    {currentFocus.map((item, fIdx) => (
                       <div
                         key={fIdx}
                         style={{
@@ -364,17 +406,48 @@ export default function Programs() {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <div style={{ borderTop: '1px solid rgba(15, 23, 42, 0.08)', paddingTop: '24px' }}>
-                <button onClick={scrollToContact} className="btn btn-primary" style={{ fontWeight: 800 }}>
-                  <span>Start Your {current.category} Program</span>
-                  <ArrowRight size={16} />
+              {/* Action Button - Fully Responsive on Mobile View */}
+              <div style={{ borderTop: '1px solid rgba(15, 23, 42, 0.08)', paddingTop: '24px', width: '100%' }}>
+                <button
+                  type="button"
+                  onClick={scrollToContact}
+                  className="btn btn-primary program-cta-btn"
+                  style={{
+                    fontWeight: 800,
+                    width: '100%',
+                    maxWidth: '100%',
+                    boxSizing: 'border-box',
+                    textAlign: 'center',
+                    justifyContent: 'center',
+                    padding: '14px 20px',
+                    fontSize: '0.9rem',
+                    whiteSpace: 'normal',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  <span>Start Your {current?.category || current?.title} Program</span>
+                  <ArrowRight size={16} style={{ flexShrink: 0 }} />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .program-details-pane {
+            padding: 24px 16px !important;
+          }
+          .program-cta-btn {
+            font-size: 0.82rem !important;
+            padding: 12px 14px !important;
+            letter-spacing: 0.02em !important;
+            white-space: normal !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

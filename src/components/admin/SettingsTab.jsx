@@ -650,46 +650,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
 
   // Custom Sections Management
   const customSections = content?.customSections || [];
-  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
-  const [newSectionForm, setNewSectionForm] = useState({
-    title: '',
-    tabLabel: '',
-    eyebrow: '',
-    description: '',
-    image: '',
-    items: [{ title: '', badge: '', desc: '' }],
-  });
-
-  const handleAddCustomSection = async (e) => {
-    e.preventDefault();
-    if (!newSectionForm.title.trim()) {
-      notify('Please enter a section title.');
-      return;
-    }
-    const newSection = {
-      id: `sec_${Date.now()}`,
-      title: newSectionForm.title.trim(),
-      tabLabel: newSectionForm.tabLabel.trim() || newSectionForm.title.trim(),
-      eyebrow: newSectionForm.eyebrow.trim(),
-      description: newSectionForm.description.trim(),
-      image: newSectionForm.image || '',
-      visible: true,
-      items: (newSectionForm.items || []).filter((it) => it.title && it.title.trim()),
-    };
-    const updatedCustom = [...customSections, newSection];
-    await updateSection('customSections', updatedCustom);
-    notify('✓ New website section created!');
-    setShowAddSectionModal(false);
-    setNewSectionForm({
-      title: '',
-      tabLabel: '',
-      eyebrow: '',
-      description: '',
-      image: '',
-      items: [{ title: '', badge: '', desc: '' }],
-    });
-    setCurrentSubTab(`custom_${newSection.id}`);
-  };
 
   const handleUpdateCustomSection = async (sectionId, updatedFields) => {
     const updatedCustom = customSections.map((cs) =>
@@ -911,38 +871,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
             </button>
           );
         })}
-
-        {/* Add Section Button */}
-        <button
-          type="button"
-          onClick={() => setShowAddSectionModal(true)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '10px 18px',
-            borderRadius: '12px',
-            border: '1.5px dashed #00B84A',
-            backgroundColor: '#ECFDF3',
-            color: '#008A38',
-            fontWeight: 800,
-            fontSize: '0.84rem',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            transition: 'all 0.18s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#00B84A';
-            e.currentTarget.style.color = '#FFFFFF';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#ECFDF3';
-            e.currentTarget.style.color = '#008A38';
-          }}
-        >
-          <Plus size={16} />
-          <span>+ Add Section</span>
-        </button>
       </div>
 
       {/* TAB CONTENT AREA */}
@@ -2150,6 +2078,136 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
               </div>
             </div>
 
+            {/* Inquiry Services Dropdown List Manager */}
+            <div
+              style={{
+                marginTop: '20px',
+                padding: '20px',
+                borderRadius: '14px',
+                backgroundColor: '#F8FCFA',
+                border: '1.5px solid #D1FAE5',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <h4 style={{ fontSize: '0.98rem', fontWeight: 900, color: '#0F172A', margin: '0 0 4px 0' }}>
+                    Contact Form "Service of Interest" Dropdown
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: '#64748B', margin: 0 }}>
+                    Manage the list of services visitors can select when submitting a membership inquiry.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const sName = window.prompt('Enter new service name for Contact inquiry dropdown:');
+                    if (!sName || !sName.trim()) return;
+                    const trimmed = sName.trim();
+                    const currentList = Array.isArray(formData.inquiryServices) && formData.inquiryServices.length > 0
+                      ? [...formData.inquiryServices]
+                      : [
+                          'Personal Training',
+                          'Sports Massage',
+                          'Steam Bath',
+                          'Zumba Dance Cardio',
+                          'Yoga & Mobility',
+                          'General Gym Membership',
+                        ];
+                    if (currentList.some((s) => s.toLowerCase() === trimmed.toLowerCase())) {
+                      notify(`"${trimmed}" is already in the list!`);
+                      return;
+                    }
+                    currentList.push(trimmed);
+                    const updated = { ...formData, inquiryServices: currentList };
+                    autoSaveSection(updated);
+                    notify(`✓ Added "${trimmed}" to Contact Form dropdown!`);
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    backgroundColor: '#008A38',
+                    color: '#FFFFFF',
+                    padding: '7px 14px',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>+ Add Service to Dropdown</span>
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                {(Array.isArray(formData.inquiryServices) && formData.inquiryServices.length > 0
+                  ? formData.inquiryServices
+                  : [
+                      'Personal Training',
+                      'Sports Massage',
+                      'Steam Bath',
+                      'Zumba Dance Cardio',
+                      'Yoga & Mobility',
+                      'General Gym Membership',
+                    ]
+                ).map((srv, sIdx) => (
+                  <div
+                    key={`${srv}-${sIdx}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '6px 12px',
+                      borderRadius: '8px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #A7F3D0',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.02)',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#0F172A' }}>{srv}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentList = Array.isArray(formData.inquiryServices) && formData.inquiryServices.length > 0
+                          ? [...formData.inquiryServices]
+                          : [
+                              'Personal Training',
+                              'Sports Massage',
+                              'Steam Bath',
+                              'Zumba Dance Cardio',
+                              'Yoga & Mobility',
+                              'General Gym Membership',
+                            ];
+                        if (currentList.length <= 1) {
+                          notify('You must keep at least 1 service option.');
+                          return;
+                        }
+                        currentList.splice(sIdx, 1);
+                        const updated = { ...formData, inquiryServices: currentList };
+                        autoSaveSection(updated);
+                        notify(`✓ Removed "${srv}" from dropdown!`);
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#EF4444',
+                        cursor: 'pointer',
+                        padding: '2px',
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                      title="Remove from dropdown"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
               <button
                 type="button"
@@ -2675,151 +2733,6 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         })()}
 
       </div>
-
-      {/* Modal: Add New Website Section */}
-      {showAddSectionModal && (
-        <div
-          onClick={() => setShowAddSectionModal(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 2600,
-            backgroundColor: 'rgba(15, 23, 42, 0.7)',
-            backdropFilter: 'blur(6px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              maxWidth: '560px',
-              width: '100%',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.3)',
-              border: '1.5px solid #E2E8F0',
-            }}
-          >
-            <div
-              style={{
-                padding: '20px 24px',
-                borderBottom: '1px solid #E2E8F0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
-                color: '#FFFFFF',
-                borderTopLeftRadius: '20px',
-                borderTopRightRadius: '20px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(0, 184, 74, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#00D256' }}>
-                  <Plus size={20} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 900, margin: 0, color: '#FFFFFF' }}>Add New Website Section</h3>
-                  <div style={{ fontSize: '0.74rem', color: '#94A3B8' }}>Create and publish a new section on your landing page</div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowAddSectionModal(false)}
-                style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleAddCustomSection} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={labelStyle}>SECTION TITLE *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. World-Class Facilities, Member Transformations, Spa Sanctuary"
-                  value={newSectionForm.title}
-                  onChange={(e) => {
-                    const title = e.target.value;
-                    setNewSectionForm((prev) => ({
-                      ...prev,
-                      title,
-                      tabLabel: prev.tabLabel || title,
-                    }));
-                  }}
-                  style={inputStyle}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <label style={labelStyle}>TAB BUTTON NAME</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Facilities, Amenities"
-                    value={newSectionForm.tabLabel}
-                    onChange={(e) => setNewSectionForm((prev) => ({ ...prev, tabLabel: e.target.value }))}
-                    style={inputStyle}
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>EYEBROW / BADGE TAG</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Sangli's Finest"
-                    value={newSectionForm.eyebrow}
-                    onChange={(e) => setNewSectionForm((prev) => ({ ...prev, eyebrow: e.target.value }))}
-                    style={inputStyle}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={labelStyle}>SECTION DESCRIPTION</label>
-                <textarea
-                  rows={2}
-                  placeholder="Tell visitors about this section..."
-                  value={newSectionForm.description}
-                  onChange={(e) => setNewSectionForm((prev) => ({ ...prev, description: e.target.value }))}
-                  style={textareaStyle}
-                />
-              </div>
-
-              <div>
-                <ImageDropzone
-                  label="Section Photo / Cover Image"
-                  helperText="Drag and drop or paste image URL."
-                  aspectLabel="16:9 Landscape"
-                  value={newSectionForm.image}
-                  onChange={(img) => setNewSectionForm((prev) => ({ ...prev, image: img }))}
-                  onReset={() => setNewSectionForm((prev) => ({ ...prev, image: '' }))}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowAddSectionModal(false)}
-                  style={{ padding: '10px 18px', borderRadius: '10px', border: '1.5px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#475569', fontWeight: 700, fontSize: '0.84rem', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', backgroundColor: '#00B84A', color: '#FFFFFF', fontWeight: 800, fontSize: '0.84rem', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0, 184, 74, 0.3)' }}
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

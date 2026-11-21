@@ -20,13 +20,15 @@ export default function Footer({ onAdminLogin }) {
   const scrollTo = (id) => {
     const el = document.getElementById(id);
     if (el) {
-      const navHeight = 104;
+      const navHeight = 90;
       const elementPosition = el.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - navHeight;
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth',
       });
+    } else {
+      navigate('/contact');
     }
   };
 
@@ -67,6 +69,7 @@ export default function Footer({ onAdminLogin }) {
   return (
     <>
       <footer
+        className="respire-footer"
         style={{
           background: 'linear-gradient(145deg, #040404 0%, #0E1116 48%, #1C212A 100%)',
           color: '#FFFFFF',
@@ -103,24 +106,17 @@ export default function Footer({ onAdminLogin }) {
         />
 
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: '40px',
-              marginBottom: '56px',
-            }}
-          >
+          <div className="respire-footer-grid">
             {/* Column 1: Brand & Official Logo */}
-            <div style={{ maxWidth: '340px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '18px' }}>
+            <div className="respire-footer-col respire-footer-brand">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                 <img
                   src="/logo_white_text_header.png"
                   alt="Respire Fitness - A Mahabal Group Venture"
                   style={{
-                    height: '54px',
+                    height: '50px',
                     width: 'auto',
-                    maxWidth: '195px',
+                    maxWidth: '190px',
                     objectFit: 'contain',
                     filter: 'drop-shadow(0 2px 10px rgba(0, 184, 74, 0.25))',
                   }}
@@ -144,161 +140,189 @@ export default function Footer({ onAdminLogin }) {
                   fontWeight: 800,
                   color: '#00D256',
                   letterSpacing: '0.07em',
-                  marginBottom: '18px',
+                  marginBottom: '16px',
                 }}
               >
                 <Building2 size={14} />
                 <span>A MAHABAL GROUP VENTURE</span>
               </div>
 
-              <p style={{ fontSize: '0.9rem', color: '#9CA3AF', lineHeight: 1.65 }}>
-                Sangli's premier luxury gym and wellness sanctuary, located at R City Mall, Vishrambag. Elevating fitness through certified sports science and luxury recovery.
+              <p style={{ fontSize: '0.88rem', color: '#9CA3AF', lineHeight: 1.6, margin: 0 }}>
+                Sangli's premier luxury gym and wellness sanctuary, located at R City Mall, Vishrambag & Krishna Heights, Vijaynagar. Elevating fitness through certified sports science and luxury recovery.
               </p>
             </div>
 
-            {/* Column 2: Quick Navigation */}
-            <div>
-              <h4
-                style={{
-                  fontSize: '0.9rem',
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  marginBottom: '20px',
-                  borderLeft: '3px solid #00B84A',
-                  paddingLeft: '10px',
-                }}
-              >
-                Quick Navigation
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {[
-                  { label: 'Home', path: '/' },
-                  { label: 'About Us', path: '/about' },
-                  { label: 'Our Services', path: '/services' },
-                  { label: 'Membership Plans', path: '/membership' },
-                  { label: 'Workout Programs', path: '/programs' },
-                  { label: 'Contact Us', path: '/contact' },
-                ].map((item, idx) => (
-                  <li key={idx}>
+            {/* Mobile 2-Column Links Group (Quick Navigation + Our Services) */}
+            <div className="respire-footer-links-group">
+              {/* Column 2: Quick Navigation */}
+              <div className="respire-footer-col respire-footer-nav">
+                <h4
+                  style={{
+                    fontSize: '0.88rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '18px',
+                    borderLeft: '3px solid #00B84A',
+                    paddingLeft: '10px',
+                  }}
+                >
+                  Quick Links
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                  {[
+                    { label: 'Home', path: '/' },
+                    { label: 'About Us', path: '/about' },
+                    { label: 'Our Services', path: '/services' },
+                    { label: 'Membership Plans', path: '/membership' },
+                    { label: 'Workout Programs', path: '/programs' },
+                    { label: 'Contact Us', path: '/contact' },
+                  ].map((item, idx) => (
+                    <li key={idx}>
+                      <Link
+                        to={item.path}
+                        style={{
+                          fontSize: '0.85rem',
+                          color: '#9CA3AF',
+                          transition: 'all 0.2s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          textDecoration: 'none',
+                          wordBreak: 'break-word',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#00D256';
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#9CA3AF';
+                          e.currentTarget.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        <span style={{ color: '#00B84A' }}>›</span> {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
                     <Link
-                      to={item.path}
+                      to="/login"
                       style={{
-                        fontSize: '0.88rem',
-                        color: '#9CA3AF',
+                        fontSize: '0.85rem',
+                        color: '#00D256',
+                        fontWeight: 700,
                         transition: 'all 0.2s ease',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '6px',
                         textDecoration: 'none',
+                        wordBreak: 'break-word',
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#00D256';
                         e.currentTarget.style.transform = 'translateX(4px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#9CA3AF';
                         e.currentTarget.style.transform = 'translateX(0)';
                       }}
                     >
-                      <span>›</span> {item.label}
+                      <span>›</span> Staff Portal
                     </Link>
                   </li>
-                ))}
-                <li>
-                  <Link
-                    to="/login"
-                    style={{
-                      fontSize: '0.88rem',
-                      color: '#00D256',
-                      fontWeight: 700,
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      textDecoration: 'none',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
-                  >
-                    <span>›</span> Staff & Admin Portal
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/trainer-login"
-                    style={{
-                      fontSize: '0.88rem',
-                      color: '#00D256',
-                      fontWeight: 700,
-                      transition: 'all 0.2s ease',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      textDecoration: 'none',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateX(4px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateX(0)';
-                    }}
-                  >
-                    <span>›</span> Trainer Portal Login
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3: Core Services */}
-            <div>
-              <h4
-                style={{
-                  fontSize: '0.9rem',
-                  fontWeight: 800,
-                  color: '#FFFFFF',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  marginBottom: '20px',
-                  borderLeft: '3px solid #00B84A',
-                  paddingLeft: '10px',
-                }}
-              >
-                Our Services
-              </h4>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {[
-                  'Personal Training',
-                  'Massage',
-                  'Steam Bath',
-                  'Zumba',
-                  'Yoga',
-                  'Body Composition History',
-                  'Fitness Progress Monitoring',
-                ].map((srv, idx) => (
-                  <li key={idx} style={{ fontSize: '0.88rem', color: '#D1D5DB', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#00B84A' }} />
-                    <span>{srv}</span>
+                  <li>
+                    <Link
+                      to="/trainer-login"
+                      style={{
+                        fontSize: '0.85rem',
+                        color: '#00D256',
+                        fontWeight: 700,
+                        transition: 'all 0.2s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        textDecoration: 'none',
+                        wordBreak: 'break-word',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateX(4px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateX(0)';
+                      }}
+                    >
+                      <span>›</span> Trainer Portal
+                    </Link>
                   </li>
-                ))}
-              </ul>
+                </ul>
+              </div>
+
+              {/* Column 3: Core Services */}
+              <div className="respire-footer-col respire-footer-services">
+                <h4
+                  style={{
+                    fontSize: '0.88rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    marginBottom: '18px',
+                    borderLeft: '3px solid #00B84A',
+                    paddingLeft: '10px',
+                  }}
+                >
+                  Our Services
+                </h4>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '9px' }}>
+                  {[
+                    { name: 'Personal Training', path: '/services' },
+                    { name: 'Massage Therapy', path: '/services' },
+                    { name: 'Steam Bath', path: '/services' },
+                    { name: 'Zumba Dance', path: '/services' },
+                    { name: 'Yoga & Mobility', path: '/services' },
+                    { name: 'Smart Tracking', path: '/services' },
+                    { name: 'Body Composition', path: '/services' },
+                  ].map((srv, idx) => (
+                    <li key={idx}>
+                      <Link
+                        to={srv.path}
+                        style={{
+                          fontSize: '0.85rem',
+                          color: '#D1D5DB',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '7px',
+                          textDecoration: 'none',
+                          wordBreak: 'break-word',
+                          transition: 'all 0.18s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#00D256';
+                          e.currentTarget.style.transform = 'translateX(4px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#D1D5DB';
+                          e.currentTarget.style.transform = 'translateX(0)';
+                        }}
+                      >
+                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#00B84A', flexShrink: 0 }} />
+                        <span>{srv.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Column 4: Official Contact Address */}
-            <div>
+            <div className="respire-footer-col respire-footer-branches">
               <h4
                 style={{
-                  fontSize: '0.9rem',
+                  fontSize: '0.88rem',
                   fontWeight: 800,
                   color: '#FFFFFF',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
-                  marginBottom: '20px',
+                  marginBottom: '18px',
                   borderLeft: '3px solid #00B84A',
                   paddingLeft: '10px',
                 }}
@@ -308,21 +332,22 @@ export default function Footer({ onAdminLogin }) {
 
               {/* Branch 1: Vishrambag */}
               <div
+                className="respire-footer-branch-card"
                 style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.04)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '14px',
-                  padding: '14px 16px',
-                  marginBottom: '12px',
+                  padding: '13px 15px',
+                  marginBottom: '10px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                  <MapPin size={18} color="#00D256" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <MapPin size={17} color="#00D256" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '3px' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '2px' }}>
                       Respire Vishrambag Branch
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#D1D5DB', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '0.78rem', color: '#D1D5DB', lineHeight: 1.45 }}>
                       7th Floor, R City Mall, Opp. Safa Bakery, Vishrambag, Sangli.
                     </div>
                   </div>
@@ -332,37 +357,39 @@ export default function Footer({ onAdminLogin }) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    paddingTop: '8px',
+                    gap: '7px',
+                    paddingTop: '7px',
                     borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                     width: '100%',
                     color: '#00D256',
-                    fontSize: '0.86rem',
+                    fontSize: '0.84rem',
                     fontWeight: 800,
+                    textDecoration: 'none',
                   }}
                 >
-                  <Phone size={14} color="#00D256" />
+                  <Phone size={13} color="#00D256" />
                   <span>+91 7798001777</span>
                 </a>
               </div>
 
               {/* Branch 2: Vijaynagar */}
               <div
+                className="respire-footer-branch-card"
                 style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.04)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '14px',
-                  padding: '14px 16px',
+                  padding: '13px 15px',
                   marginBottom: '14px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '8px' }}>
-                  <MapPin size={18} color="#60A5FA" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <MapPin size={17} color="#60A5FA" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '3px' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '2px' }}>
                       Respire Vijaynagar Branch
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: '#D1D5DB', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '0.78rem', color: '#D1D5DB', lineHeight: 1.45 }}>
                       3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road, Vijaynagar, Sangli.
                     </div>
                   </div>
@@ -372,16 +399,17 @@ export default function Footer({ onAdminLogin }) {
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    paddingTop: '8px',
+                    gap: '7px',
+                    paddingTop: '7px',
                     borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                     width: '100%',
                     color: '#00D256',
-                    fontSize: '0.86rem',
+                    fontSize: '0.84rem',
                     fontWeight: 800,
+                    textDecoration: 'none',
                   }}
                 >
-                  <Phone size={14} color="#00D256" />
+                  <Phone size={13} color="#00D256" />
                   <span>+91 9172848777</span>
                 </a>
               </div>
@@ -389,7 +417,7 @@ export default function Footer({ onAdminLogin }) {
               <button
                 onClick={() => scrollTo('contact')}
                 className="btn btn-primary btn-sm"
-                style={{ width: '100%', fontSize: '0.84rem' }}
+                style={{ width: '100%', fontSize: '0.84rem', padding: '9px 16px' }}
               >
                 <span>Join Now</span>
                 <ArrowRight size={14} />
@@ -398,28 +426,131 @@ export default function Footer({ onAdminLogin }) {
           </div>
 
           {/* Bottom Copyright Bar */}
-          <div
-            style={{
-              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-              paddingTop: '24px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '16px',
-              fontSize: '0.84rem',
-              color: '#9CA3AF',
-            }}
-          >
+          <div className="respire-footer-bottom">
             <div>
               © {new Date().getFullYear()} <strong style={{ color: '#FFFFFF' }}>Respire Fitness</strong> – A Mahabal Group Venture. All rights reserved.
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '18px', paddingRight: '68px' }}>
+            <div className="respire-footer-bottom-info">
               <span>Vishrambag & Vijaynagar, Sangli</span>
             </div>
           </div>
         </div>
+
+        {/* Responsive Footer Embedded Stylesheet */}
+        <style>{`
+          .respire-footer {
+            padding-top: 72px;
+            padding-bottom: 32px;
+          }
+          .respire-footer-brand {
+            max-width: 340px;
+          }
+          .respire-footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 0.84rem;
+            color: #9CA3AF;
+          }
+          .respire-footer-bottom-info {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 18px;
+            padding-right: 68px;
+          }
+
+          /* Desktop (> 900px) */
+          @media (min-width: 901px) {
+            .respire-footer-grid {
+              display: grid;
+              grid-template-columns: 1.35fr 1fr 1fr 1.45fr;
+              gap: 36px;
+              margin-bottom: 52px;
+            }
+            .respire-footer-links-group {
+              display: contents;
+            }
+          }
+
+          /* Tablet (641px - 900px) */
+          @media (min-width: 641px) and (max-width: 900px) {
+            .respire-footer-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 32px;
+              margin-bottom: 40px;
+            }
+            .respire-footer-links-group {
+              display: contents;
+            }
+          }
+
+          /* Mobile Phone (<= 640px) */
+          @media (max-width: 640px) {
+            .respire-footer {
+              padding-top: 44px !important;
+              padding-bottom: 92px !important; /* Clears floating WhatsApp button */
+            }
+            .respire-footer-grid {
+              display: flex !important;
+              flex-direction: column !important;
+              gap: 26px !important;
+              margin-bottom: 28px !important;
+            }
+            .respire-footer-brand {
+              max-width: 100% !important;
+              padding-bottom: 8px;
+            }
+            /* 2-Column Side-by-Side Links on Mobile */
+            .respire-footer-links-group {
+              display: grid !important;
+              grid-template-columns: 1fr 1fr !important;
+              gap: 16px !important;
+              padding-top: 14px !important;
+              padding-bottom: 16px !important;
+              border-top: 1px solid rgba(255, 255, 255, 0.08);
+              border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .respire-footer-col h4 {
+              font-size: 0.82rem !important;
+              margin-bottom: 12px !important;
+              letter-spacing: 0.06em !important;
+            }
+            .respire-footer-col ul {
+              gap: 8px !important;
+            }
+            .respire-footer-col li,
+            .respire-footer-col a {
+              font-size: 0.81rem !important;
+              line-height: 1.4 !important;
+            }
+            .respire-footer-branches {
+              display: flex !important;
+              flex-direction: column !important;
+            }
+            .respire-footer-branch-card {
+              padding: 11px 13px !important;
+              margin-bottom: 10px !important;
+            }
+            .respire-footer-bottom {
+              flex-direction: column !important;
+              text-align: center !important;
+              gap: 8px !important;
+              padding-top: 18px !important;
+            }
+            .respire-footer-bottom-info {
+              padding-right: 0 !important;
+              justify-content: center !important;
+              font-size: 0.78rem !important;
+            }
+          }
+        `}</style>
       </footer>
 
       {/* Sleek, Compact, Crystal-Clear Admin Login Modal */}
@@ -738,17 +869,6 @@ export default function Footer({ onAdminLogin }) {
               </form>
             </div>
           </div>
-
-          <style>{`
-            @keyframes adminBackdropFade {
-              from { opacity: 0; }
-              to { opacity: 1; }
-            }
-            @keyframes adminModalPop {
-              from { opacity: 0; transform: scale(0.95) translateY(10px); }
-              to { opacity: 1; transform: scale(1) translateY(0); }
-            }
-          `}</style>
         </div>
       )}
     </>

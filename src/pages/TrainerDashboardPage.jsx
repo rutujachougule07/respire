@@ -636,39 +636,6 @@ export default function TrainerDashboardPage() {
             >
               <span>📍 {trainerProfile?.branchId === 'branch2' ? 'Vijaynagar Branch' : 'Vishrambag Branch'}</span>
             </div>
-
-            {/* Coach Profile Tag */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 12px',
-                borderRadius: '10px',
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-              }}
-            >
-              <div
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  backgroundColor: '#00B84A',
-                  color: '#FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.8rem',
-                  fontWeight: 900,
-                }}
-              >
-                {(trainerProfile?.name || 'C')[0]}
-              </div>
-              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0F172A' }}>
-                {trainerProfile?.name || 'Coach'}
-              </span>
-            </div>
           </div>
         </header>
 

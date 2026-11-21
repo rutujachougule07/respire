@@ -540,10 +540,12 @@ export async function deleteTrainerNoteFromFirestore(noteId) {
  */
 export async function updateTrainerProfileInFirestore(trainerId, updates) {
   const safeUpdates = {
-    phone: updates.phone || '',
-    bio: updates.bio || '',
-    specialty: updates.specialty || '',
-    experience: updates.experience || '',
+    ...(updates.name ? { name: updates.name.trim() } : {}),
+    ...(updates.shifts !== undefined ? { shifts: updates.shifts } : {}),
+    phone: updates.phone !== undefined ? updates.phone : '',
+    bio: updates.bio !== undefined ? updates.bio : '',
+    specialty: updates.specialty !== undefined ? updates.specialty : '',
+    experience: updates.experience !== undefined ? updates.experience : '',
     photo: updates.photo !== undefined ? updates.photo : '',
     updatedAt: serverTimestamp(),
   };

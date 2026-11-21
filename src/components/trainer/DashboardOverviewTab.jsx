@@ -80,70 +80,9 @@ export default function DashboardOverviewTab({
             <Dumbbell size={13} />
             <span>Respire Fitness Coach Hub</span>
           </div>
-          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px 0', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#0F172A', margin: '0', letterSpacing: '-0.02em' }}>
             Welcome back, {trainerProfile?.name || 'Coach'}!
           </h2>
-          <p style={{ color: '#64748B', fontSize: '0.88rem', margin: 0, maxWidth: '620px', lineHeight: 1.5 }}>
-            You have <strong style={{ color: '#008A38' }}>{todaySessions.length} session(s)</strong> scheduled today and <strong style={{ color: '#0F172A' }}>{myMembers.length} active client(s)</strong> assigned to your training roster.
-          </p>
-        </div>
-
-        {/* Quick Action Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <button
-            type="button"
-            onClick={onOpenScheduleModal}
-            style={{
-              backgroundColor: '#00B84A',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '10px',
-              padding: '10px 18px',
-              fontSize: '0.84rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 14px rgba(0, 184, 74, 0.25)',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#008A38')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#00B84A')}
-          >
-            <Plus size={16} />
-            <span>Schedule Session</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onOpenNoteModal}
-            style={{
-              backgroundColor: '#F8FAFC',
-              color: '#334155',
-              border: '1.5px solid #CBD5E1',
-              borderRadius: '10px',
-              padding: '10px 18px',
-              fontSize: '0.84rem',
-              fontWeight: 800,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#F1F5F9';
-              e.currentTarget.style.color = '#0F172A';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#F8FAFC';
-              e.currentTarget.style.color = '#334155';
-            }}
-          >
-            <FileText size={16} />
-            <span>Log Session Note</span>
-          </button>
         </div>
       </div>
 

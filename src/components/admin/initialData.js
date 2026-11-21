@@ -395,3 +395,13 @@ export const BRANCH_MONTHLY_ANALYTICS = {
 export const MONTHLY_ANALYTICS = [];
 
 export const INITIAL_ADDON_REVENUE = [];
+
+export const INITIAL_INQUIRY_SERVICES = [
+  'Personal Training',
+  'Sports Massage',
+  'Steam Bath',
+  'Zumba Dance Cardio',
+  'Yoga & Mobility',
+  'General Gym Membership',
+];
+

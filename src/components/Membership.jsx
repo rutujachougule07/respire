@@ -254,14 +254,14 @@ export default function Membership({ plans = [] }) {
                 cursor: 'pointer',
                 background:
                   selectedBranch === 'branch2'
-                    ? 'linear-gradient(135deg, #172C83 0%, #1E3AA8 100%)'
+                    ? 'linear-gradient(135deg, #00D256 0%, #008A37 100%)'
                     : 'transparent',
                 color: selectedBranch === 'branch2' ? '#FFFFFF' : '#475569',
                 fontWeight: 800,
                 fontSize: '0.92rem',
                 boxShadow:
                   selectedBranch === 'branch2'
-                    ? '0 8px 20px rgba(23, 44, 131, 0.35)'
+                    ? '0 8px 20px rgba(0, 184, 74, 0.35)'
                     : 'none',
                 transition: 'all 0.25s ease',
               }}
@@ -303,11 +303,8 @@ export default function Membership({ plans = [] }) {
         {/* Selected Branch Active Info Header Strip */}
         <div
           style={{
-            backgroundColor: selectedBranch === 'branch2' ? '#EEF2FF' : '#F0FDF4',
-            border:
-              selectedBranch === 'branch2'
-                ? '1px solid rgba(23, 44, 131, 0.2)'
-                : '1px solid rgba(0, 184, 74, 0.22)',
+            backgroundColor: '#F0FDF4',
+            border: '1px solid rgba(0, 184, 74, 0.22)',
             borderRadius: '16px',
             padding: '14px 20px',
             marginBottom: '32px',
@@ -321,14 +318,14 @@ export default function Membership({ plans = [] }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <MapPin
               size={18}
-              color={selectedBranch === 'branch2' ? '#172C83' : '#008A38'}
+              color="#008A38"
             />
             <div>
               <span
                 style={{
                   fontWeight: 900,
                   fontSize: '0.94rem',
-                  color: selectedBranch === 'branch2' ? '#172C83' : '#007A31',
+                  color: '#007A31',
                 }}
               >
                 Showing Official Plans for {currentBranch.name}
@@ -407,15 +404,6 @@ export default function Membership({ plans = [] }) {
                   }`);
 
             const isVijaynagar = selectedBranch === 'branch2';
-            const popularGradient = isVijaynagar
-              ? 'linear-gradient(155deg, #1E3AA8 0%, #172C83 60%, #0D1B54 100%)'
-              : 'linear-gradient(155deg, #00C952 0%, #009B3E 52%, #006B2B 100%)';
-            const popularBorder = isVijaynagar
-              ? '2px solid #2563EB'
-              : '2px solid #00B84A';
-            const popularShadow = isVijaynagar
-              ? '0 22px 45px rgba(23, 44, 131, 0.35)'
-              : '0 22px 45px rgba(0, 148, 59, 0.30)';
 
             const waDirectLink = `https://wa.me/${currentBranch.waNumber}?text=Hello%20${encodeURIComponent(
               currentBranch.name
@@ -427,19 +415,19 @@ export default function Membership({ plans = [] }) {
               <div
                 key={tier.id}
                 style={{
-                  background: isPopular ? popularGradient : '#FFFFFF',
+                  background: '#FFFFFF',
                   borderRadius: '20px',
                   border: isPopular
-                    ? popularBorder
+                    ? '2px solid #00B84A'
                     : '1.5px solid rgba(0, 184, 74, 0.18)',
                   padding: is5Cols ? '24px 14px' : '30px 22px',
                   display: 'flex',
                   flexDirection: 'column',
                   position: 'relative',
                   boxShadow: isPopular
-                    ? popularShadow
+                    ? '0 14px 34px rgba(0, 184, 74, 0.12)'
                     : '0 10px 28px rgba(15, 23, 42, 0.06)',
-                  transform: isPopular ? 'translateY(-6px)' : 'none',
+                  transform: isPopular ? 'translateY(-4px)' : 'none',
                   transition: 'transform 0.3s ease',
                 }}
               >
@@ -450,7 +438,7 @@ export default function Membership({ plans = [] }) {
                       top: '-13px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      backgroundColor: isVijaynagar ? '#00C952' : '#172C83',
+                      background: 'linear-gradient(135deg, #00D256 0%, #008A38 100%)',
                       color: '#FFFFFF',
                       padding: '4px 14px',
                       borderRadius: '999px',
@@ -458,7 +446,7 @@ export default function Membership({ plans = [] }) {
                       fontWeight: 900,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      boxShadow: '0 6px 16px rgba(0, 0, 0, 0.25)',
+                      boxShadow: '0 4px 12px rgba(0, 184, 74, 0.35)',
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -473,7 +461,7 @@ export default function Membership({ plans = [] }) {
                       display: 'inline-block',
                       fontSize: '0.72rem',
                       fontWeight: 800,
-                      color: isPopular ? '#D1FAE5' : '#008A38',
+                      color: '#008A38',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       marginBottom: '4px',
@@ -485,7 +473,7 @@ export default function Membership({ plans = [] }) {
                     style={{
                       fontSize: is5Cols ? '1.38rem' : '1.5rem',
                       fontWeight: 900,
-                      color: isPopular ? '#FFFFFF' : '#0F172A',
+                      color: '#0F172A',
                       marginBottom: '4px',
                       lineHeight: 1.2,
                     }}
@@ -495,9 +483,7 @@ export default function Membership({ plans = [] }) {
                   <div
                     style={{
                       fontSize: '0.8rem',
-                      color: isPopular
-                        ? 'rgba(255, 255, 255, 0.88)'
-                        : '#64748B',
+                      color: '#64748B',
                       fontWeight: 600,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -512,12 +498,8 @@ export default function Membership({ plans = [] }) {
                 {/* Official Fee Price Block */}
                 <div
                   style={{
-                    backgroundColor: isPopular
-                      ? 'rgba(255, 255, 255, 0.16)'
-                      : '#F2FBF6',
-                    border: isPopular
-                      ? '1px solid rgba(255, 255, 255, 0.3)'
-                      : '1px solid rgba(0, 184, 74, 0.25)',
+                    backgroundColor: '#F2FBF6',
+                    border: '1px solid rgba(0, 184, 74, 0.25)',
                     borderRadius: '12px',
                     padding: is5Cols ? '12px 10px' : '16px 18px',
                     marginBottom: is5Cols ? '16px' : '22px',
@@ -530,7 +512,7 @@ export default function Membership({ plans = [] }) {
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
-                      color: isPopular ? '#D1FAE5' : '#008A38',
+                      color: '#008A38',
                       marginBottom: '2px',
                     }}
                   >
@@ -540,7 +522,7 @@ export default function Membership({ plans = [] }) {
                     style={{
                       fontSize: is5Cols ? '1.78rem' : '2.1rem',
                       fontWeight: 900,
-                      color: isPopular ? '#FFFFFF' : '#0F172A',
+                      color: '#0F172A',
                       lineHeight: 1.1,
                       whiteSpace: 'nowrap',
                     }}
@@ -567,14 +549,14 @@ export default function Membership({ plans = [] }) {
                         alignItems: 'flex-start',
                         gap: '8px',
                         fontSize: is5Cols ? '0.8rem' : '0.86rem',
-                        color: isPopular ? '#FFFFFF' : '#334155',
+                        color: '#334155',
                         fontWeight: 500,
                         lineHeight: 1.35,
                       }}
                     >
                       <CheckCircle2
                         size={15}
-                        color={isPopular ? '#D1FAE5' : '#00B84A'}
+                        color="#00B84A"
                         style={{ flexShrink: 0, marginTop: '2px' }}
                       />
                       <span>{item}</span>
@@ -588,7 +570,7 @@ export default function Membership({ plans = [] }) {
                     href={waDirectLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`btn ${isPopular ? 'btn-white' : 'btn-primary'}`}
+                    className="btn btn-primary"
                     style={{
                       width: '100%',
                       fontSize: is5Cols ? '0.78rem' : '0.84rem',
@@ -640,8 +622,6 @@ export default function Membership({ plans = [] }) {
             ...defaultPtData,
             categories,
           };
-          const isVjn = ptBranchKey === 'branch2';
-
           return (
             <div
               style={{
@@ -649,8 +629,8 @@ export default function Membership({ plans = [] }) {
                 margin: '0 auto 40px',
                 padding: '28px clamp(18px, 3vw, 28px)',
                 borderRadius: '22px',
-                backgroundColor: isVjn ? '#F5F7FD' : '#F4FBF7',
-                border: isVjn ? '1.5px solid rgba(23, 44, 131, 0.22)' : '1.5px solid rgba(0, 184, 74, 0.25)',
+                backgroundColor: '#F4FBF7',
+                border: '1.5px solid rgba(0, 184, 74, 0.25)',
                 boxShadow: '0 10px 28px rgba(15, 23, 42, 0.05)',
                 position: 'relative',
                 overflow: 'hidden',
@@ -666,7 +646,7 @@ export default function Membership({ plans = [] }) {
                   gap: '16px',
                   marginBottom: '26px',
                   paddingBottom: '20px',
-                  borderBottom: isVjn ? '1px solid rgba(23, 44, 131, 0.16)' : '1px solid rgba(0, 184, 74, 0.18)',
+                  borderBottom: '1px solid rgba(0, 184, 74, 0.18)',
                 }}
               >
                 <div style={{ flex: '1 1 500px' }}>
@@ -677,9 +657,9 @@ export default function Membership({ plans = [] }) {
                       gap: '7px',
                       padding: '4px 12px',
                       borderRadius: '999px',
-                      backgroundColor: isVjn ? 'rgba(23, 44, 131, 0.12)' : 'rgba(0, 184, 74, 0.14)',
-                      border: isVjn ? '1px solid rgba(23, 44, 131, 0.3)' : '1px solid rgba(0, 184, 74, 0.35)',
-                      color: isVjn ? '#172C83' : '#008A38',
+                      backgroundColor: 'rgba(0, 184, 74, 0.14)',
+                      border: '1px solid rgba(0, 184, 74, 0.35)',
+                      color: '#008A38',
                       fontSize: '0.74rem',
                       fontWeight: 800,
                       letterSpacing: '0.06em',
@@ -702,7 +682,7 @@ export default function Membership({ plans = [] }) {
                     }}
                   >
                     1-ON-1 CERTIFIED{' '}
-                    <span style={{ color: isVjn ? '#172C83' : '#008A38' }}>
+                    <span style={{ color: '#008A38' }}>
                       PERSONAL TRAINING PACKAGES
                     </span>
                   </h3>
@@ -729,14 +709,12 @@ export default function Membership({ plans = [] }) {
                     gap: '8px',
                     padding: '10px 18px',
                     borderRadius: '12px',
-                    backgroundColor: isVjn ? '#172C83' : '#008A38',
+                    backgroundColor: '#008A38',
                     color: '#FFFFFF',
                     fontWeight: 800,
                     fontSize: '0.84rem',
                     textDecoration: 'none',
-                    boxShadow: isVjn
-                      ? '0 6px 16px rgba(23, 44, 131, 0.25)'
-                      : '0 6px 16px rgba(0, 184, 74, 0.25)',
+                    boxShadow: '0 6px 16px rgba(0, 184, 74, 0.25)',
                     transition: 'all 0.2s ease',
                   }}
                 >
@@ -765,18 +743,14 @@ export default function Membership({ plans = [] }) {
                       key={cat.id}
                       style={{
                         backgroundColor: '#FFFFFF',
-                        borderRadius: '16px',
+                        borderRadius: '18px',
                         border: isPremium
-                          ? isVjn
-                            ? '2px solid #172C83'
-                            : '2px solid #00C952'
+                          ? '2px solid #00C952'
                           : '1px solid #E2E8F0',
                         boxShadow: isPremium
-                          ? isVjn
-                            ? '0 8px 20px rgba(23, 44, 131, 0.1)'
-                            : '0 8px 20px rgba(0, 184, 74, 0.1)'
-                          : '0 2px 10px rgba(15, 23, 42, 0.03)',
-                        padding: '16px 18px',
+                          ? '0 10px 24px rgba(0, 184, 74, 0.12)'
+                          : '0 4px 14px rgba(15, 23, 42, 0.04)',
+                        padding: '24px 22px',
                         display: 'flex',
                         flexDirection: 'column',
                         position: 'relative',
@@ -787,22 +761,20 @@ export default function Membership({ plans = [] }) {
                         <div
                           style={{
                             position: 'absolute',
-                            top: '-10px',
-                            right: '16px',
-                            background: isVjn
-                              ? 'linear-gradient(135deg, #172C83 0%, #1E3AA8 100%)'
-                              : 'linear-gradient(135deg, #00D256 0%, #007A31 100%)',
+                            top: '-11px',
+                            right: '18px',
+                            background: 'linear-gradient(135deg, #00D256 0%, #007A31 100%)',
                             color: '#FFFFFF',
-                            fontSize: '0.66rem',
+                            fontSize: '0.68rem',
                             fontWeight: 900,
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
-                            padding: '2px 10px',
+                            padding: '3px 12px',
                             borderRadius: '999px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.14)',
                           }}
                         >
-                          {isVjn ? '★ Senior Master Coach' : '★ Elite Transformation'}
+                          {cat.badge ? `★ ${cat.badge}` : '★ Senior Master Coach'}
                         </div>
                       )}
 
@@ -812,37 +784,34 @@ export default function Membership({ plans = [] }) {
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '4px',
-                            padding: '2px 8px',
-                            borderRadius: '5px',
+                            gap: '5px',
+                            padding: '3px 10px',
+                            borderRadius: '6px',
                             backgroundColor: isPremium
-                              ? isVjn
-                                ? 'rgba(23, 44, 131, 0.1)'
-                                : 'rgba(0, 184, 74, 0.12)'
+                              ? 'rgba(0, 184, 74, 0.12)'
                               : '#F1F5F9',
                             color: isPremium
-                              ? isVjn
-                                ? '#172C83'
-                                : '#008A38'
+                              ? '#008A38'
                               : '#475569',
-                            fontSize: '0.68rem',
+                            fontSize: '0.7rem',
                             fontWeight: 800,
                             textTransform: 'uppercase',
                             letterSpacing: '0.04em',
-                            marginBottom: '4px',
+                            marginBottom: '8px',
                           }}
                         >
-                          <Award size={11} />
+                          <Award size={12} />
                           <span>{cat.badge}</span>
                         </div>
 
                         <h4
                           style={{
-                            fontSize: '1.18rem',
+                            fontSize: '1.24rem',
                             fontWeight: 900,
                             color: '#0F172A',
-                            margin: '0 0 8px',
+                            margin: '0 0 10px',
                             letterSpacing: '-0.01em',
+                            lineHeight: 1.3,
                           }}
                         >
                           {cat.title}
@@ -851,10 +820,10 @@ export default function Membership({ plans = [] }) {
                         {cat.description ? (
                           <p
                             style={{
-                              fontSize: '0.8rem',
+                              fontSize: '0.85rem',
                               color: '#64748B',
-                              lineHeight: 1.35,
-                              margin: '0 0 10px',
+                              lineHeight: 1.5,
+                              margin: '0 0 14px',
                             }}
                           >
                             {cat.description}
@@ -866,8 +835,8 @@ export default function Membership({ plans = [] }) {
                           style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '6px',
-                            marginBottom: '12px',
+                            gap: '8px',
+                            marginBottom: '16px',
                           }}
                         >
                           {(cat.pricing || []).map((tier, pIdx) => {
@@ -879,13 +848,11 @@ export default function Membership({ plans = [] }) {
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'space-between',
-                                  padding: '8px 12px',
-                                  borderRadius: '9px',
-                                  backgroundColor: isAlt ? '#F8FAFC' : isVjn ? '#EEF2FF' : '#ECFDF3',
+                                  padding: '10px 14px',
+                                  borderRadius: '10px',
+                                  backgroundColor: isAlt ? '#F8FAFC' : '#ECFDF3',
                                   border: isAlt
                                     ? '1px solid #E2E8F0'
-                                    : isVjn
-                                    ? '1.5px solid rgba(23, 44, 131, 0.35)'
                                     : '1.5px solid rgba(0, 184, 74, 0.35)',
                                 }}
                               >
@@ -894,21 +861,21 @@ export default function Membership({ plans = [] }) {
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      gap: '5px',
-                                      fontSize: '0.82rem',
+                                      gap: '6px',
+                                      fontSize: '0.84rem',
                                       fontWeight: 800,
                                       color: '#0F172A',
-                                      marginBottom: tier.sessions ? '2px' : '0',
+                                      marginBottom: tier.sessions ? '3px' : '0',
                                     }}
                                   >
                                     <span>{tier.planName}</span>
                                     {tier.tag && (
                                       <span
                                         style={{
-                                          fontSize: '0.62rem',
-                                          padding: '1px 5px',
-                                          borderRadius: '3px',
-                                          backgroundColor: isAlt ? '#E2E8F0' : isVjn ? '#172C83' : '#008A38',
+                                          fontSize: '0.64rem',
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          backgroundColor: isAlt ? '#E2E8F0' : '#008A38',
                                           color: isAlt ? '#475569' : '#FFFFFF',
                                           fontWeight: 700,
                                         }}
@@ -918,7 +885,7 @@ export default function Membership({ plans = [] }) {
                                     )}
                                   </div>
                                   {tier.sessions && (
-                                    <div style={{ fontSize: '0.7rem', color: '#64748B', fontWeight: 600 }}>
+                                    <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>
                                       {tier.sessions}
                                     </div>
                                   )}
@@ -927,16 +894,16 @@ export default function Membership({ plans = [] }) {
                                 <div style={{ textAlign: 'right' }}>
                                   <div
                                     style={{
-                                      fontSize: '1.2rem',
+                                      fontSize: '1.24rem',
                                       fontWeight: 900,
-                                      color: isAlt ? '#0F172A' : isVjn ? '#172C83' : '#008A38',
+                                      color: isAlt ? '#0F172A' : '#008A38',
                                       letterSpacing: '-0.02em',
-                                      lineHeight: 1.1,
+                                      lineHeight: 1.15,
                                     }}
                                   >
                                     {tier.priceDisplay}
                                   </div>
-                                  <div style={{ fontSize: '0.64rem', color: '#94A3B8', fontWeight: 700 }}>
+                                  <div style={{ fontSize: '0.66rem', color: '#94A3B8', fontWeight: 700 }}>
                                     per month
                                   </div>
                                 </div>
@@ -946,36 +913,36 @@ export default function Membership({ plans = [] }) {
                         </div>
 
                         {/* Feature Bullet Points */}
-                        <div style={{ marginBottom: '12px' }}>
+                        <div style={{ marginBottom: '16px' }}>
                           <div
                             style={{
-                              fontSize: '0.68rem',
+                              fontSize: '0.7rem',
                               fontWeight: 800,
                               color: '#94A3B8',
                               textTransform: 'uppercase',
                               letterSpacing: '0.06em',
-                              marginBottom: '5px',
+                              marginBottom: '8px',
                             }}
                           >
                             What's Included:
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
                             {(cat.features || []).map((feat, fIdx) => (
                               <div
                                 key={fIdx}
                                 style={{
                                   display: 'flex',
                                   alignItems: 'flex-start',
-                                  gap: '6px',
-                                  fontSize: '0.78rem',
+                                  gap: '7px',
+                                  fontSize: '0.82rem',
                                   color: '#334155',
                                   fontWeight: 600,
-                                  lineHeight: 1.3,
+                                  lineHeight: 1.45,
                                 }}
                               >
                                 <CheckCircle2
-                                  size={13}
-                                  color={isVjn ? '#172C83' : '#00B84A'}
+                                  size={14}
+                                  color="#00B84A"
                                   style={{ flexShrink: 0, marginTop: '2px' }}
                                 />
                                 <span>{feat}</span>
@@ -986,7 +953,7 @@ export default function Membership({ plans = [] }) {
                       </div>
 
                       {/* CTAs */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'auto', paddingTop: '6px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: 'auto', paddingTop: '10px' }}>
                         <a
                           href={waLink}
                           target="_blank"
@@ -1002,8 +969,8 @@ export default function Membership({ plans = [] }) {
                             justifyContent: 'center',
                             gap: '6px',
                             textDecoration: 'none',
-                            backgroundColor: isVjn ? '#172C83' : '#008A38',
-                            borderColor: isVjn ? '#172C83' : '#008A38',
+                            backgroundColor: '#008A38',
+                            borderColor: '#008A38',
                             fontWeight: 800,
                           }}
                         >
@@ -1114,8 +1081,7 @@ export default function Membership({ plans = [] }) {
               ];
 
           const brandGreen = '#008A38';
-          const brandBlue = '#172C83';
-          const accentColor = isVijaynagar ? brandBlue : brandGreen;
+          const accentColor = brandGreen;
 
           return (
             <div style={{ marginBottom: '44px' }}>
@@ -1170,12 +1136,8 @@ export default function Membership({ plans = [] }) {
                     gap: '8px',
                     padding: '8px 18px',
                     borderRadius: '999px',
-                    backgroundColor: isVijaynagar
-                      ? 'rgba(23, 44, 131, 0.07)'
-                      : 'rgba(0, 184, 74, 0.08)',
-                    border: isVijaynagar
-                      ? '1px solid rgba(23, 44, 131, 0.22)'
-                      : '1px solid rgba(0, 184, 74, 0.22)',
+                    backgroundColor: 'rgba(0, 184, 74, 0.08)',
+                    border: '1px solid rgba(0, 184, 74, 0.22)',
                     color: accentColor,
                     fontSize: '0.86rem',
                     fontWeight: 800,
@@ -1204,19 +1166,15 @@ export default function Membership({ plans = [] }) {
                     <CardWrapper
                       key={idx}
                       {...wrapperProps}
-                      className={`terms-pillar-card ${isVijaynagar ? 'vijaynagar' : ''}`}
+                      className="terms-pillar-card"
                       style={{
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: '14px',
                         padding: '20px 18px',
-                        background: isVijaynagar
-                          ? 'linear-gradient(135deg, #F8FAFC 0%, #EEF2FF 100%)'
-                          : 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
+                        background: 'linear-gradient(135deg, #F8FCFA 0%, #F1FBF5 100%)',
                         borderRadius: '16px',
-                        border: isVijaynagar
-                          ? '1.5px solid rgba(23, 44, 131, 0.2)'
-                          : '1.5px solid rgba(0, 184, 74, 0.2)',
+                        border: '1.5px solid rgba(0, 184, 74, 0.2)',
                         boxShadow: '0 6px 20px rgba(15, 23, 42, 0.04)',
                         cursor: item.phone ? 'pointer' : 'default',
                         ...wrapperProps.style,
@@ -1227,12 +1185,8 @@ export default function Membership({ plans = [] }) {
                           width: '38px',
                           height: '38px',
                           borderRadius: '10px',
-                          backgroundColor: isVijaynagar
-                            ? 'rgba(23, 44, 131, 0.12)'
-                            : 'rgba(0, 184, 74, 0.12)',
-                          border: isVijaynagar
-                            ? '1px solid rgba(23, 44, 131, 0.25)'
-                            : '1px solid rgba(0, 184, 74, 0.25)',
+                          backgroundColor: 'rgba(0, 184, 74, 0.12)',
+                          border: '1px solid rgba(0, 184, 74, 0.25)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -1277,7 +1231,7 @@ export default function Membership({ plans = [] }) {
                   style={{
                     marginTop: '16px',
                     padding: '16px 22px',
-                    background: 'linear-gradient(135deg, #090E21 0%, #172C83 100%)',
+                    background: 'linear-gradient(135deg, #005A24 0%, #008A38 100%)',
                     borderRadius: '16px',
                     color: '#FFFFFF',
                     display: 'flex',
@@ -1285,7 +1239,7 @@ export default function Membership({ plans = [] }) {
                     justifyContent: 'space-between',
                     flexWrap: 'wrap',
                     gap: '14px',
-                    boxShadow: '0 8px 24px rgba(23, 44, 131, 0.16)',
+                    boxShadow: '0 8px 24px rgba(0, 184, 74, 0.2)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -1294,11 +1248,11 @@ export default function Membership({ plans = [] }) {
                         width: '38px',
                         height: '38px',
                         borderRadius: '10px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.14)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.18)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#67E8F9',
+                        color: '#A7F3D0',
                         flexShrink: 0,
                       }}
                     >
@@ -1308,7 +1262,7 @@ export default function Membership({ plans = [] }) {
                       <div style={{ fontSize: '0.94rem', fontWeight: 800, color: '#FFFFFF' }}>
                         ❖ {currentBranch.motto.quote1}
                       </div>
-                      <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#38BDF8' }}>
+                      <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#A7F3D0' }}>
                         ❖ {currentBranch.motto.quote2}
                       </div>
                     </div>
@@ -1394,10 +1348,6 @@ export default function Membership({ plans = [] }) {
           transform: translateY(-3px);
           box-shadow: 0 10px 24px rgba(0, 184, 74, 0.14) !important;
           border-color: rgba(0, 184, 74, 0.45) !important;
-        }
-        .terms-pillar-card.vijaynagar:hover {
-          box-shadow: 0 10px 24px rgba(23, 44, 131, 0.16) !important;
-          border-color: rgba(23, 44, 131, 0.45) !important;
         }
       `}</style>
     </section>

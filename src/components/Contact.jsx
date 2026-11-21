@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MapPin, Clock, Send, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { submitInquiryToFirestore } from '../services/firestoreService';
 import { useWebsiteContent } from '../context/WebsiteContentContext';
@@ -18,14 +18,46 @@ export default function Contact() {
     'Visit either of our premium Sangli branches — Vishrambag or Vijaynagar — or submit an inquiry below.';
   const vishrambagPhone = contactData.vishrambagPhone ?? '+91 7798001777';
   const vijaynagarPhone = contactData.vijaynagarPhone ?? '+91 9172848777';
+
+  // Dynamic services list configured from Admin Dashboard
+  const defaultServices = [
+    'Personal Training',
+    'Sports Massage',
+    'Steam Bath',
+    'Zumba Dance Cardio',
+    'Yoga & Mobility',
+    'General Gym Membership',
+  ];
+
+  const servicesList = useMemo(() => {
+    if (Array.isArray(contactData.inquiryServices) && contactData.inquiryServices.length > 0) {
+      return contactData.inquiryServices;
+    }
+    if (Array.isArray(content?.services?.items) && content.services.items.length > 0) {
+      const titles = content.services.items.map((it) => it.title).filter(Boolean);
+      if (!titles.includes('General Gym Membership')) {
+        titles.push('General Gym Membership');
+      }
+      return titles;
+    }
+    return defaultServices;
+  }, [contactData.inquiryServices, content?.services?.items]);
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     branch: 'Respire Vishrambag Branch',
-    service: 'Personal Training',
+    service: servicesList[0] || 'Personal Training',
     program: 'Beginner',
     notes: '',
   });
+
+  // Keep selected service valid if admin modifies or removes a service
+  useEffect(() => {
+    if (servicesList.length > 0 && !servicesList.includes(formData.service)) {
+      setFormData((prev) => ({ ...prev, service: servicesList[0] }));
+    }
+  }, [servicesList]);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -340,12 +372,11 @@ export default function Contact() {
                         outline: 'none',
                       }}
                     >
-                      <option value="Personal Training">Personal Training</option>
-                      <option value="Massage">Sports Massage</option>
-                      <option value="Steam Bath">Steam Bath</option>
-                      <option value="Zumba">Zumba Dance Cardio</option>
-                      <option value="Yoga">Yoga & Mobility</option>
-                      <option value="General Gym Membership">General Gym Membership</option>
+                      {servicesList.map((serviceName, idx) => (
+                        <option key={idx} value={serviceName}>
+                          {serviceName}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
