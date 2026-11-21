@@ -29,6 +29,7 @@ import {
 import { useWebsiteContent, DEFAULT_WEBSITE_CONTENT } from '../../context/WebsiteContentContext';
 import { db } from '../../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { storeMediaBlob, getMediaBlob, deleteMediaBlob, uploadToFirebaseStorage } from '../../utils/mediaStorage';
 
 /**
  * Universal Drag-and-Drop Image Uploader Component
@@ -446,6 +447,401 @@ function ImageDropzone({
   );
 }
 
+/**
+ * Universal Drag-and-Drop Video Uploader Component
+ * Mirrors ImageDropzone pattern exactly: Video Preview with floating Edit (✏️) and Delete (🗑️) buttons,
+ * clean dashed dropzone when empty, click-to-browse, drag-and-drop, and 1-click reset.
+ * Backed by resilient IndexedDB storage for zero quota issues with large video binaries.
+ */
+function VideoDropzone({
+  label = 'Opening Intro Video',
+  helperText,
+  value,
+  onChange,
+  defaultVideo = '/video.webm',
+  onReset,
+}) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isReplacing, setIsReplacing] = useState(false);
+  const [previewSrc, setPreviewSrc] = useState(null);
+  const fileInputRef = useRef(null);
+
+  // Synchronize preview URL (resolving IndexedDB blob or direct URL)
+  useEffect(() => {
+    let activeBlobUrl = null;
+    let isCancelled = false;
+
+    async function syncPreview() {
+      if (!value) {
+        setPreviewSrc(null);
+        setIsReplacing(false);
+        return;
+      }
+
+      if (typeof value === 'string' && value.startsWith('indexeddb://')) {
+        try {
+          const blob = await getMediaBlob('splash_video');
+          if (!isCancelled && blob && blob.size > 0) {
+            activeBlobUrl = URL.createObjectURL(blob);
+            setPreviewSrc(activeBlobUrl);
+            return;
+          }
+        } catch (e) {
+          console.warn('Could not read preview from IndexedDB:', e);
+        }
+      }
+
+      if (!isCancelled) {
+        setPreviewSrc(value);
+      }
+    }
+
+    syncPreview();
+
+    return () => {
+      isCancelled = true;
+      if (activeBlobUrl) {
+        URL.revokeObjectURL(activeBlobUrl);
+      }
+    };
+  }, [value]);
+
+  const processFile = async (file) => {
+    if (!file || (!file.type.startsWith('video/') && !file.name.match(/\.(mp4|webm|mov|mkv)$/i))) {
+      alert('Please select a valid video file (MP4, WebM, MOV).');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      // 1. Immediately create local Object URL for instant zero-lag preview & playback
+      const localUrl = URL.createObjectURL(file);
+      setPreviewSrc(localUrl);
+
+      // 2. Persist binary file to IndexedDB (handles large videos with zero quota issues)
+      await storeMediaBlob('splash_video', file);
+
+      setIsProcessing(false);
+      setIsReplacing(false);
+
+      // 3. Notify parent with the persistent identifier
+      onChange('indexeddb://splash_video');
+
+      // 4. In background, attempt upload to Firebase Storage if available
+      uploadToFirebaseStorage('splash_video/intro.mp4', file).then((remoteUrl) => {
+        if (remoteUrl) {
+          onChange(remoteUrl);
+        }
+      });
+    } catch (err) {
+      console.error('Failed to process video file:', err);
+      setIsProcessing(false);
+      setIsReplacing(false);
+      alert('Failed to process video file. Please try again.');
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const hasVideo = Boolean((previewSrc && previewSrc.trim().length > 0) || (value && typeof value === 'string' && value.trim().length > 0));
+  const showDropzone = !hasVideo || isReplacing;
+  const isCustom = hasVideo && defaultVideo && value !== defaultVideo;
+
+  return (
+    <div
+      style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: '14px',
+        border: '1.5px solid #E2E8F0',
+        padding: '18px',
+        marginBottom: '18px',
+      }}
+    >
+      {/* Header with Label and Aspect ratio pill */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A' }}>{label}</span>
+          <span
+            style={{
+              fontSize: '0.7rem',
+              color: '#008A38',
+              backgroundColor: '#ECFDF3',
+              border: '1px solid rgba(0, 184, 74, 0.25)',
+              padding: '2px 8px',
+              borderRadius: '6px',
+              fontWeight: 700,
+            }}
+          >
+            16:9 Video
+          </span>
+        </div>
+
+        {isCustom && onReset && (
+          <button
+            type="button"
+            onClick={async () => {
+              await deleteMediaBlob('splash_video');
+              setPreviewSrc(defaultVideo || '/video.mp4');
+              setIsReplacing(false);
+              onReset();
+            }}
+            style={{
+              fontSize: '0.72rem',
+              color: '#B91C1C',
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FCA5A5',
+              padding: '3px 8px',
+              borderRadius: '6px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <RotateCcw size={11} />
+            <span>Reset to Original</span>
+          </button>
+        )}
+      </div>
+
+      {helperText && (
+        <p style={{ fontSize: '0.76rem', color: '#64748B', margin: '0 0 12px' }}>{helperText}</p>
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/mp4,video/webm,video/quicktime"
+        onChange={(e) => {
+          if (e.target.files && e.target.files[0]) {
+            processFile(e.target.files[0]);
+            e.target.value = '';
+          }
+        }}
+        style={{ display: 'none' }}
+      />
+
+      {/* STATE 1: Empty or In Replace Mode -> Show Dashed Drag & Drop Box */}
+      {showDropzone ? (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          style={{
+            border: isDragging ? '2px dashed #00B84A' : '2px dashed #CBD5E1',
+            borderRadius: '12px',
+            padding: '34px 16px',
+            backgroundColor: isDragging ? 'rgba(0, 184, 74, 0.08)' : '#F8FAFC',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.18s ease',
+            transform: isDragging ? 'scale(1.01)' : 'scale(1)',
+            boxShadow: isDragging ? '0 8px 24px rgba(0, 184, 74, 0.18)' : 'none',
+          }}
+        >
+          <div
+            style={{
+              width: '46px',
+              height: '46px',
+              borderRadius: '50%',
+              backgroundColor: isDragging ? '#00B84A' : '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '10px',
+              boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
+              color: isDragging ? '#FFFFFF' : '#008A38',
+              transition: 'all 0.18s ease',
+            }}
+          >
+            <UploadCloud size={24} />
+          </div>
+
+          <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', marginBottom: '4px', textAlign: 'center' }}>
+            {isProcessing ? 'Loading Video...' : isDragging ? 'Drop Video to Upload!' : 'Drag & Drop Your Video Here'}
+          </div>
+          <div style={{ fontSize: '0.76rem', color: '#64748B', textAlign: 'center' }}>
+            or <span style={{ color: '#008A38', fontWeight: 800, textDecoration: 'underline' }}>Browse from Device</span> • MP4, WebM
+          </div>
+
+          {isReplacing && hasVideo && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsReplacing(false);
+              }}
+              style={{
+                marginTop: '12px',
+                background: '#FFFFFF',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                padding: '5px 12px',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                color: '#64748B',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              }}
+            >
+              <X size={13} />
+              <span>Cancel (Keep Current Video)</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        /* STATE 2: Video Present -> Show Video Preview with floating Edit (✏️) & Delete (🗑️) icon buttons */
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          style={{
+            position: 'relative',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            border: isDragging ? '2px dashed #00B84A' : '1.5px solid #0F172A',
+            backgroundColor: '#050806',
+            maxHeight: '380px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+            transition: 'border 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {/* Video Player */}
+          <video
+            key={previewSrc || value}
+            controls
+            playsInline
+            style={{
+              width: '100%',
+              maxHeight: '380px',
+              display: 'block',
+              objectFit: 'contain',
+              backgroundColor: '#000000',
+            }}
+          >
+            {previewSrc ? (
+              <>
+                <source src={previewSrc} type={previewSrc.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
+                {previewSrc === '/video.mp4' && <source src="/video.webm" type="video/webm" />}
+                {previewSrc === '/video.webm' && <source src="/video.mp4" type="video/mp4" />}
+              </>
+            ) : (
+              <>
+                <source src="/video.webm" type="video/webm" />
+                <source src="/video.mp4" type="video/mp4" />
+              </>
+            )}
+            Your browser does not support video playback.
+          </video>
+
+          {/* Floating Action Pill Buttons (Edit & Delete) — Identical to ImageDropzone */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              display: 'flex',
+              gap: '8px',
+              zIndex: 10,
+            }}
+          >
+            {/* Edit Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsReplacing(true);
+                setTimeout(() => fileInputRef.current && fileInputRef.current.click(), 50);
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                border: '1px solid #CBD5E1',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                color: '#0F172A',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                backdropFilter: 'blur(6px)',
+              }}
+            >
+              <Edit3 size={13} color="#008A38" />
+              <span>Edit</span>
+            </button>
+
+            {/* Delete Button */}
+            <button
+              type="button"
+              onClick={async () => {
+                if (window.confirm('Delete this opening video? The website will open directly without video.')) {
+                  await deleteMediaBlob('splash_video');
+                  setPreviewSrc(null);
+                  setIsReplacing(false);
+                  onChange('');
+                }
+              }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                backgroundColor: 'rgba(254, 242, 242, 0.95)',
+                border: '1px solid #FCA5A5',
+                borderRadius: '8px',
+                padding: '6px 12px',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                color: '#DC2626',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                backdropFilter: 'blur(6px)',
+              }}
+            >
+              <Trash2 size={13} />
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, showToast }) {
   const { content, updateSection, toggleSectionVisibility, resetSection, resetAllToDefaults } = useWebsiteContent();
 
@@ -733,6 +1129,10 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     const sectionKey = getSectionKey(currentSubTab);
     try {
       await updateSection(sectionKey, formData);
+      if (sectionKey === 'splashVideo') {
+        const isEnabled = formData.enabled !== false && formData.videoUrl !== '';
+        await toggleSectionVisibility('splash', isEnabled);
+      }
       notify(`✓ Published live to website!`);
     } catch (err) {
       console.error(err);
@@ -908,380 +1308,75 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
         {/* ============================================================ */}
         {currentSubTab === 'splash_video' && (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '22px' }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '5px',
-                      padding: '3px 10px',
-                      borderRadius: '999px',
-                      backgroundColor: 'rgba(0, 184, 74, 0.1)',
-                      color: '#008A38',
-                      fontSize: '0.74rem',
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.04em',
-                    }}
-                  >
-                    <Video size={13} />
-                    Opening Experience
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.74rem',
-                      backgroundColor: '#F1F5F9',
-                      color: '#475569',
-                      padding: '3px 10px',
-                      borderRadius: '999px',
-                      fontWeight: 700,
-                    }}
-                  >
-                    3D Brand Splash
-                  </span>
-                </div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px 0' }}>
                   Opening Intro Video (Splash Screen)
                 </h3>
-                <p style={{ color: '#64748B', fontSize: '0.86rem', margin: 0, maxWidth: '680px' }}>
-                  वेबसाइट उघडल्यावर प्ले होणारा ३D Logo व ब्रँडिंग व्हिडिओ येथून थेट एडिट, अपलोड किंवा बदलू शकता.
+                <p style={{ color: '#64748B', fontSize: '0.86rem', margin: 0 }}>
+                  Manage the intro video that plays when visitors open the website.
                 </p>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <a
-                  href={formData.videoUrl || '/video.mp4'}
-                  download="Respire_Intro_Video.mp4"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 14px',
-                    borderRadius: '8px',
-                    backgroundColor: '#F1F5F9',
-                    border: '1px solid #CBD5E1',
-                    color: '#334155',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Film size={14} />
-                  <span>Download Video</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Video Active / Disabled Switch Card */}
-            <div
-              style={{
-                padding: '16px 20px',
-                borderRadius: '14px',
-                backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#ECFDF3' : '#F8FAFC',
-                border: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '1.5px solid #A7F3D0' : '1.5px solid #E2E8F0',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '14px',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span
-                    style={{
-                      width: '10px',
-                      height: '10px',
-                      borderRadius: '50%',
-                      backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#00B84A' : '#94A3B8',
-                    }}
-                  />
-                  <strong style={{ fontSize: '0.94rem', color: '#0F172A' }}>
-                    {(formData.enabled !== false && content?.sectionVisibility?.splash !== false)
-                      ? 'Intro Video Status: ACTIVE (व्हिडिओ चालू आहे)'
-                      : 'Intro Video Status: DISABLED (व्हिडिओ बंद आहे)'}
-                  </strong>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: '#64748B', margin: '4px 0 0 18px' }}>
-                  {(formData.enabled !== false && content?.sectionVisibility?.splash !== false)
-                    ? 'Visitors will see the 3D video introduction when opening the website.'
-                    : 'Visitors will land directly on the Home page without any intro video.'}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  const currentStatus = (formData.enabled !== false && content?.sectionVisibility?.splash !== false);
-                  const newStatus = !currentStatus;
-                  const updated = { ...formData, enabled: newStatus };
-                  await autoSaveSection(updated);
-                  await toggleSectionVisibility('splash', newStatus);
-                  notify(newStatus ? '✓ Intro video activated on website!' : '✓ Intro video disabled!');
-                }}
+              <a
+                href={formData.videoUrl || '/video.mp4'}
+                download="Respire_Intro_Video.mp4"
+                target="_blank"
+                rel="noreferrer"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  padding: '8px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#008A38' : '#F1F5F9',
-                  color: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#FFFFFF' : '#475569',
-                  border: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? 'none' : '1.5px solid #CBD5E1',
-                  fontSize: '0.84rem',
-                  fontWeight: 800,
+                  padding: '8px 14px',
+                  borderRadius: '8px',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#334155',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  textDecoration: 'none',
                   cursor: 'pointer',
                 }}
               >
-                {(formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? (
-                  <>
-                    <Eye size={15} />
-                    <span>Active (Click to Turn Off)</span>
-                  </>
-                ) : (
-                  <>
-                    <EyeOff size={15} />
-                    <span>Disabled (Click to Turn On)</span>
-                  </>
-                )}
-              </button>
+                <Film size={14} />
+                <span>Download Video</span>
+              </a>
             </div>
 
-            {/* 2-Column Grid: Form Inputs (Left) and Live Video Preview (Right) */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'start' }}>
-              {/* Left Column: Video Controls */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                {/* Upload Video From PC */}
-                <div
-                  style={{
-                    padding: '20px',
-                    borderRadius: '14px',
-                    border: '1.5px dashed #00B84A',
-                    backgroundColor: '#F0FDF4',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    <UploadCloud size={20} color="#008A38" />
-                    <strong style={{ fontSize: '0.92rem', color: '#0F172A' }}>
-                      Upload New Video File
-                    </strong>
-                  </div>
-                  <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '0 0 12px 0' }}>
-                    Choose an MP4 or WebM video file from your computer (Recommended: 1080p or 720p, under 15MB).
-                  </p>
+            <VideoDropzone
+              label="Intro Splash Video"
+              helperText="Upload, edit, or delete the website opening video. Use the Edit and Delete buttons on the top right of the video to update or remove it."
+              value={formData.videoUrl !== undefined ? formData.videoUrl : DEFAULT_WEBSITE_CONTENT.splashVideo.videoUrl}
+              defaultVideo={DEFAULT_WEBSITE_CONTENT.splashVideo.videoUrl}
+              onChange={async (newVid) => {
+                const isDeleted = !newVid;
+                const updated = {
+                  ...formData,
+                  videoUrl: newVid,
+                  videoWebmUrl: '',
+                  enabled: !isDeleted,
+                };
+                setFormData(updated);
+                await updateSection('splashVideo', updated);
+                await toggleSectionVisibility('splash', !isDeleted);
+                notify(newVid ? '✓ Video updated live on website!' : '✓ Video deleted! Website will open directly without video.');
+              }}
+              onReset={async () => {
+                await deleteMediaBlob('splash_video');
+                const updated = {
+                  ...formData,
+                  videoUrl: DEFAULT_WEBSITE_CONTENT.splashVideo.videoUrl,
+                  videoWebmUrl: DEFAULT_WEBSITE_CONTENT.splashVideo.videoWebmUrl,
+                  enabled: true,
+                };
+                setFormData(updated);
+                await updateSection('splashVideo', updated);
+                await toggleSectionVisibility('splash', true);
+                notify('✓ Restored official 3D branding video!');
+              }}
+            />
 
-                  <input
-                    type="file"
-                    accept="video/mp4,video/webm,video/quicktime"
-                    id="splash_video_file_picker"
-                    style={{ display: 'none' }}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        const result = event.target?.result;
-                        if (result) {
-                          const updated = {
-                            ...formData,
-                            videoUrl: result,
-                            uploadedFileName: file.name,
-                          };
-                          autoSaveSection(updated);
-                          notify(`✓ Uploaded "${file.name}" as new intro video!`);
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                  />
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      onClick={() => document.getElementById('splash_video_file_picker')?.click()}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        padding: '9px 16px',
-                        borderRadius: '8px',
-                        backgroundColor: '#008A38',
-                        color: '#FFFFFF',
-                        border: 'none',
-                        fontSize: '0.82rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(0, 138, 56, 0.25)',
-                      }}
-                    >
-                      <Plus size={15} />
-                      <span>Browse Video File</span>
-                    </button>
-
-                    {formData.uploadedFileName && (
-                      <span style={{ fontSize: '0.78rem', color: '#166534', fontWeight: 700, backgroundColor: '#DCFCE7', padding: '4px 10px', borderRadius: '6px' }}>
-                        ✓ {formData.uploadedFileName}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Primary Video URL Input */}
-                <div>
-                  <label style={labelStyle}>
-                    Primary MP4 Video URL / Path *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.videoUrl !== undefined ? formData.videoUrl : '/video.mp4'}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      autoSaveSection({ ...formData, videoUrl: val, uploadedFileName: '' });
-                    }}
-                    placeholder="/video.mp4 or https://.../video.mp4"
-                    style={inputStyle}
-                  />
-                  <span style={{ fontSize: '0.74rem', color: '#64748B', display: 'block', marginTop: '4px' }}>
-                    Default official video is <code>/video.mp4</code>. You can paste an external URL or use the upload button above.
-                  </span>
-                </div>
-
-                {/* Fallback WebM URL */}
-                <div>
-                  <label style={labelStyle}>
-                    Secondary WebM URL (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.videoWebmUrl !== undefined ? formData.videoWebmUrl : '/video.webm'}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      autoSaveSection({ ...formData, videoWebmUrl: val });
-                    }}
-                    placeholder="/video.webm"
-                    style={inputStyle}
-                  />
-                  <span style={{ fontSize: '0.74rem', color: '#64748B', display: 'block', marginTop: '4px' }}>
-                    WebM format provides faster loading for Google Chrome and Firefox browsers.
-                  </span>
-                </div>
-
-                {/* Duration Control */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label style={{ ...labelStyle, margin: 0 }}>
-                      Video Auto-Play Duration Limit
-                    </label>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 900, color: '#008A38' }}>
-                      {formData.durationSeconds !== undefined ? formData.durationSeconds : 10} Seconds
-                    </span>
-                  </div>
-
-                  <input
-                    type="range"
-                    min="3"
-                    max="20"
-                    step="1"
-                    value={formData.durationSeconds !== undefined ? formData.durationSeconds : 10}
-                    onChange={(e) => {
-                      const val = Number(e.target.value);
-                      autoSaveSection({ ...formData, durationSeconds: val });
-                    }}
-                    style={{ width: '100%', accentColor: '#008A38', cursor: 'pointer' }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94A3B8', marginTop: '2px' }}>
-                    <span>Fast (3s)</span>
-                    <span>Standard (10s)</span>
-                    <span>Cinematic (20s)</span>
-                  </div>
-                </div>
-
-                {/* Quick Action Reset */}
-                <div style={{ paddingTop: '8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!window.confirm('Restore official 3D Respire Branding video?')) return;
-                      const updated = {
-                        enabled: true,
-                        videoUrl: '/video.mp4',
-                        videoWebmUrl: '/video.webm',
-                        durationSeconds: 10,
-                        title: '3D RESPIRE Opening Brand Video',
-                      };
-                      autoSaveSection(updated);
-                      notify('✓ Restored official 3D Respire Branding Video!');
-                    }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '8px 14px',
-                      borderRadius: '8px',
-                      backgroundColor: '#F8FAFC',
-                      border: '1px solid #CBD5E1',
-                      color: '#475569',
-                      fontSize: '0.78rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <RotateCcw size={13} />
-                    <span>Restore Official 3D Video</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column: Live Video Player Preview */}
-              <div
-                style={{
-                  backgroundColor: '#0F172A',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  color: '#FFFFFF',
-                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Play size={15} color="#00D256" />
-                    <span style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      Live Video Player Preview
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
-                    HTML5 Player
-                  </span>
-                </div>
-
-                {/* Video Tag */}
-                <div style={{ borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000000', marginBottom: '12px', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <video
-                    key={formData.videoUrl || '/video.mp4'}
-                    controls
-                    playsInline
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                  >
-                    {formData.videoWebmUrl && <source src={formData.videoWebmUrl} type="video/webm" />}
-                    <source src={formData.videoUrl || '/video.mp4'} type="video/mp4" />
-                    Your browser does not support video playback.
-                  </video>
-                </div>
-
-                <div style={{ fontSize: '0.78rem', color: '#CBD5E1', lineHeight: 1.5 }}>
-                  <strong style={{ color: '#00D256' }}>✓ Live Preview:</strong> You can test video playback, sound, and visual fidelity using the player above. Any change made on the left updates this preview instantly.
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Save & Reset Row */}
-            <div style={{ marginTop: '28px', paddingTop: '18px', borderTop: '1px solid #E2E8F0', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ marginTop: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={handleSaveSection}
@@ -1292,17 +1387,17 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                   gap: '8px',
                   backgroundColor: '#008A38',
                   color: '#FFFFFF',
-                  padding: '11px 24px',
+                  padding: '10px 22px',
                   borderRadius: '10px',
                   fontWeight: 800,
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   border: 'none',
                   cursor: isSaving ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 14px rgba(0, 138, 56, 0.3)',
+                  boxShadow: '0 4px 12px rgba(0, 138, 56, 0.25)',
                 }}
               >
-                <Save size={16} />
-                <span>{isSaving ? 'Publishing...' : 'Save & Publish Live'}</span>
+                <Save size={15} />
+                <span>{isSaving ? 'Saving...' : 'Save & Publish Live'}</span>
               </button>
 
               <button
@@ -1314,15 +1409,15 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                   gap: '8px',
                   backgroundColor: '#F8FAFC',
                   color: '#64748B',
-                  padding: '11px 18px',
+                  padding: '10px 16px',
                   borderRadius: '10px',
                   fontWeight: 700,
-                  fontSize: '0.86rem',
+                  fontSize: '0.84rem',
                   border: '1px solid #CBD5E1',
                   cursor: 'pointer',
                 }}
               >
-                <RotateCcw size={15} />
+                <RotateCcw size={14} />
                 <span>Reset to Default</span>
               </button>
             </div>

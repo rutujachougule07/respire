@@ -26,7 +26,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
   customSections: [],
   splashVideo: {
     enabled: true,
-    videoUrl: '/video.mp4',
+    videoUrl: '/video.webm',
     videoWebmUrl: '/video.webm',
     durationSeconds: 10,
     title: '3D RESPIRE Opening Brand Video',
@@ -454,26 +454,46 @@ export function WebsiteContentProvider({ children }) {
     setContent((prev) => {
       const prevSection = prev[sectionKey] || {};
       const mergedSection = deepMerge(prevSection, data);
+
+      let updatedVis = prev.sectionVisibility || {};
+      if (sectionKey === 'splashVideo' && data.enabled !== undefined) {
+        updatedVis = { ...updatedVis, splash: data.enabled };
+      }
+
       const updated = {
         ...prev,
+        sectionVisibility: updatedVis,
         [sectionKey]: mergedSection,
       };
 
+      // Sanitize oversized binary from localStorage & broadcast to prevent QuotaExceededError
+      const safeForStorage = { ...updated };
+      if (safeForStorage.splashVideo?.videoUrl && safeForStorage.splashVideo.videoUrl.length > 50000) {
+        safeForStorage.splashVideo = {
+          ...safeForStorage.splashVideo,
+          videoUrl: 'indexeddb://splash_video',
+        };
+      }
+
       try {
-        localStorage.setItem('rf_website_content_v1', JSON.stringify(updated));
+        localStorage.setItem('rf_website_content_v1', JSON.stringify(safeForStorage));
       } catch (e) {
         console.warn('localStorage quota warning:', e);
       }
 
       // Also store individual section as safe fallback
       try {
-        localStorage.setItem(`rf_section_${sectionKey}`, JSON.stringify(mergedSection));
+        const safeSection = { ...mergedSection };
+        if (safeSection.videoUrl && safeSection.videoUrl.length > 50000) {
+          safeSection.videoUrl = 'indexeddb://splash_video';
+        }
+        localStorage.setItem(`rf_section_${sectionKey}`, JSON.stringify(safeSection));
       } catch {
         // ignore
       }
 
       // Broadcast immediately across all open tabs & windows
-      broadcastContentUpdate(updated);
+      broadcastContentUpdate(safeForStorage);
 
       // Same-tab dispatch
       try {
@@ -485,18 +505,22 @@ export function WebsiteContentProvider({ children }) {
       return updated;
     });
 
-    // 2. Persist to Firestore: save to 'settings' (guaranteed allowed collection) and 'system'
-    // Also save to an isolated document per section so 1MB per-doc limit is never reached!
+    // 2. Persist to Firestore: sanitize oversized data first so 1MB per-doc limit is NEVER exceeded
+    const firestoreData = { ...data };
+    if (firestoreData.videoUrl && firestoreData.videoUrl.length > 50000) {
+      firestoreData.videoUrl = 'indexeddb://splash_video';
+    }
+
     try {
-      await setDoc(doc(db, 'settings', 'websiteContent'), { [sectionKey]: data }, { merge: true }).catch(() => {});
+      await setDoc(doc(db, 'settings', 'websiteContent'), { [sectionKey]: firestoreData }, { merge: true }).catch(() => {});
     } catch {}
 
     try {
-      await setDoc(doc(db, 'settings', `section_${sectionKey}`), data, { merge: true }).catch(() => {});
+      await setDoc(doc(db, 'settings', `section_${sectionKey}`), firestoreData, { merge: true }).catch(() => {});
     } catch {}
 
     try {
-      await setDoc(doc(db, 'system', 'website_content'), { [sectionKey]: data }, { merge: true }).catch(() => {});
+      await setDoc(doc(db, 'system', 'website_content'), { [sectionKey]: firestoreData }, { merge: true }).catch(() => {});
     } catch {}
   };
 
@@ -507,10 +531,17 @@ export function WebsiteContentProvider({ children }) {
       const currentSection = prev[sectionKey] || {};
       const updatedSection = { ...currentSection, visible: isVisible };
 
+      // Keep splashVideo.enabled and sectionVisibility.splash in 100% sync
+      let updatedSplashVideo = prev.splashVideo;
+      if (sectionKey === 'splash') {
+        updatedSplashVideo = { ...(prev.splashVideo || {}), enabled: isVisible };
+      }
+
       const updatedContent = {
         ...prev,
         sectionVisibility: updatedVis,
         [sectionKey]: updatedSection,
+        ...(sectionKey === 'splash' ? { splashVideo: updatedSplashVideo } : {}),
       };
 
       try {
@@ -536,6 +567,7 @@ export function WebsiteContentProvider({ children }) {
         {
           sectionVisibility: { [sectionKey]: isVisible },
           [sectionKey]: { visible: isVisible },
+          ...(sectionKey === 'splash' ? { splashVideo: { enabled: isVisible } } : {}),
         },
         { merge: true }
       ).catch(() => {});
@@ -547,6 +579,7 @@ export function WebsiteContentProvider({ children }) {
         {
           sectionVisibility: { [sectionKey]: isVisible },
           [sectionKey]: { visible: isVisible },
+          ...(sectionKey === 'splash' ? { splashVideo: { enabled: isVisible } } : {}),
         },
         { merge: true }
       ).catch(() => {});

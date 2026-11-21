@@ -1,19 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useWebsiteContent } from '../context/WebsiteContentContext';
+import { getMediaBlob } from '../utils/mediaStorage';
 
 export default function SplashScreen({ onFinish }) {
   const { content } = useWebsiteContent();
   const splashData = content?.splashVideo || {};
 
-  const isEnabled = splashData.enabled !== false && content?.sectionVisibility?.splash !== false;
+  // Check if disabled or deleted:
+  // Note: if videoUrl is explicitly empty string '', the video was deleted!
+  const isDeleted = splashData.videoUrl === '';
+  const isEnabled = splashData.enabled !== false && content?.sectionVisibility?.splash !== false && !isDeleted;
 
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(isEnabled);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [resolvedVideoUrl, setResolvedVideoUrl] = useState(null);
+  const [isReady, setIsReady] = useState(false);
   const videoRef = useRef(null);
   const finishedRef = useRef(false);
 
-  const videoMp4 = splashData.videoUrl || '/video.mp4';
-  const videoWebm = splashData.videoWebmUrl || '/video.webm';
   const durationSec = Number(splashData.durationSeconds) || 10;
 
   const handleFinish = () => {
@@ -23,16 +27,75 @@ export default function SplashScreen({ onFinish }) {
     setTimeout(() => {
       setIsVisible(false);
       if (onFinish) onFinish();
-    }, 600);
+    }, 500);
   };
 
+  // Resolve video source: IndexedDB (for uploaded videos) or static/cloud URL
   useEffect(() => {
     if (!isEnabled) {
       if (onFinish) onFinish();
       return;
     }
 
-    // Attempt programmatic autoplay with error catch to satisfy all browser security policies
+    let activeBlobUrl = null;
+    let isCancelled = false;
+
+    async function loadVideoSource() {
+      const rawUrl = splashData.videoUrl;
+
+      // 1. If explicit URL provided that is NOT indexeddb
+      if (rawUrl && typeof rawUrl === 'string' && !rawUrl.startsWith('indexeddb://')) {
+        if (!isCancelled) {
+          // If rawUrl is legacy /video.mp4, use /video.webm so modern browsers decode smoothly
+          const cleanUrl = rawUrl === '/video.mp4' ? '/video.webm' : rawUrl;
+          setResolvedVideoUrl(cleanUrl);
+          setIsReady(true);
+        }
+        return;
+      }
+
+      // 2. Load custom uploaded video from IndexedDB
+      try {
+        const blob = await getMediaBlob('splash_video');
+        if (!isCancelled && blob && blob.size > 0) {
+          activeBlobUrl = URL.createObjectURL(blob);
+          setResolvedVideoUrl(activeBlobUrl);
+          setIsReady(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('Could not read video from IndexedDB:', err);
+      }
+
+      // 3. Fallback to default official video if not deleted
+      if (!isCancelled) {
+        if (rawUrl !== '') {
+          setResolvedVideoUrl('/video.webm');
+        } else {
+          setResolvedVideoUrl(null);
+        }
+        setIsReady(true);
+      }
+    }
+
+    loadVideoSource();
+
+    return () => {
+      isCancelled = true;
+      if (activeBlobUrl) {
+        URL.revokeObjectURL(activeBlobUrl);
+      }
+    };
+  }, [splashData.videoUrl, isEnabled]);
+
+  useEffect(() => {
+    if (!isEnabled || !resolvedVideoUrl) {
+      if (isReady && !resolvedVideoUrl && onFinish) {
+        onFinish();
+      }
+      return;
+    }
+
     if (videoRef.current) {
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
@@ -42,7 +105,6 @@ export default function SplashScreen({ onFinish }) {
       }
     }
 
-    // Safety fallback timer based on configured duration
     const fallbackTimer = setTimeout(() => {
       handleFinish();
     }, (durationSec + 0.6) * 1000);
@@ -50,7 +112,7 @@ export default function SplashScreen({ onFinish }) {
     return () => {
       clearTimeout(fallbackTimer);
     };
-  }, [isEnabled, durationSec]);
+  }, [resolvedVideoUrl, isEnabled, isReady, durationSec]);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
@@ -61,7 +123,7 @@ export default function SplashScreen({ onFinish }) {
     }
   };
 
-  if (!isEnabled || !isVisible) return null;
+  if (!isEnabled || !isVisible || (isReady && !resolvedVideoUrl)) return null;
 
   return (
     <div
@@ -105,28 +167,31 @@ export default function SplashScreen({ onFinish }) {
         }}
       />
 
-      {/* 10-Second 3D RESPIRE Branding Video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        playsInline
-        disablePictureInPicture
-        controls={false}
-        controlsList="nodownload nofullscreen noremoteplayback"
-        preload="auto"
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={handleFinish}
-        onError={() => {
-          console.warn('Video playback encountered an issue, transitioning in website.');
-          handleFinish();
-        }}
-        className="respire-branding-video"
-      >
-        {videoWebm && <source src={videoWebm} type="video/webm" />}
-        {videoMp4 && <source src={videoMp4} type="video/mp4" />}
-        Your browser does not support HTML5 video playback.
-      </video>
+      {/* 3D RESPIRE Branding Video */}
+      {resolvedVideoUrl && (
+        <video
+          ref={videoRef}
+          key={resolvedVideoUrl}
+          autoPlay
+          muted
+          playsInline
+          disablePictureInPicture
+          controls={false}
+          controlsList="nodownload nofullscreen noremoteplayback"
+          preload="auto"
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleFinish}
+          onError={(err) => {
+            console.warn('Video playback encountered an issue, transitioning to website.', err);
+            handleFinish();
+          }}
+          className="respire-branding-video"
+        >
+          <source src={resolvedVideoUrl} type={resolvedVideoUrl.endsWith('.webm') ? 'video/webm' : 'video/mp4'} />
+          {resolvedVideoUrl === '/video.webm' && <source src="/video.mp4" type="video/mp4" />}
+          Your browser does not support HTML5 video playback.
+        </video>
+      )}
 
       {/* Responsive Styles: Perfect Full-Screen Desktop & Flawless Mobile View */}
       <style>{`
