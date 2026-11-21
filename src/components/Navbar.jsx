@@ -43,34 +43,46 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
 
-  const handleNavClick = (e, link) => {
-    setMobileMenuOpen(false);
+  const scrollToSection = (sectionId) => {
+    if (sectionId === 'hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navHeight = 90;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  };
 
-    if (isHomePage && link.id) {
-      e.preventDefault();
-      const element = document.getElementById(link.id);
-      if (element) {
-        const navHeight = 104;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - navHeight;
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth',
-        });
-      }
+  const handleNavClick = (e, linkOrId) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setMobileMenuOpen(false);
+    const targetId = typeof linkOrId === 'string' ? linkOrId : linkOrId?.id || 'hero';
+
+    if (isHomePage) {
+      scrollToSection(targetId);
+      window.history.replaceState(null, '', targetId === 'hero' ? '/' : `#${targetId}`);
     } else {
-      // If on another page, navigate directly to route
-      navigate(link.path);
+      navigate(`/#${targetId}`);
+      setTimeout(() => {
+        scrollToSection(targetId);
+      }, 120);
     }
   };
 
   const navLinks = [
     { label: 'Home', path: '/', id: 'hero' },
-    { label: 'About', path: '/about', id: 'about' },
-    { label: 'Services', path: '/services', id: 'services' },
-    { label: 'Membership', path: '/membership', id: 'membership' },
-    { label: 'Programs', path: '/programs', id: 'programs' },
-    { label: 'Contact', path: '/contact', id: 'contact' },
+    { label: 'About', path: '/#about', id: 'about' },
+    { label: 'Services', path: '/#services', id: 'services' },
+    { label: 'Membership', path: '/#membership', id: 'membership' },
+    { label: 'Programs', path: '/#programs', id: 'programs' },
+    { label: 'Contact', path: '/#contact', id: 'contact' },
   ];
 
   return (
@@ -258,14 +270,15 @@ export default function Navbar() {
 
           {/* Action CTA & Mobile Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Link
-              to="/contact"
+            <button
+              type="button"
+              onClick={(e) => handleNavClick(e, 'contact')}
               className="btn btn-primary btn-sm"
-              style={{ fontWeight: 800 }}
+              style={{ fontWeight: 800, cursor: 'pointer', border: 'none' }}
             >
               <span>Join Now</span>
               <ArrowRight size={15} />
-            </Link>
+            </button>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -344,14 +357,14 @@ export default function Navbar() {
                 <MapPin size={14} color="#172C83" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <span><strong>Vijaynagar:</strong> 3rd Floor, Krishna Heights • <a href="tel:+919172848777" style={{ color: '#008A38', fontWeight: 800 }}>9172848777</a></span>
               </div>
-              <Link
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
+              <button
+                type="button"
+                onClick={(e) => handleNavClick(e, 'contact')}
                 className="btn btn-primary"
-                style={{ width: '100%', textAlign: 'center' }}
+                style={{ width: '100%', textAlign: 'center', cursor: 'pointer', border: 'none' }}
               >
                 Join Now
-              </Link>
+              </button>
             </div>
           </div>
         )}

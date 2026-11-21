@@ -56,7 +56,7 @@ export default function App() {
       {isHomePage && <SplashScreen />}
       <ScrollToTop />
       <Routes>
-        {/* Public Website Routes */}
+        {/* Public Website Routes - Unified Single Page Experience */}
         <Route
           path="/"
           element={
@@ -65,46 +65,11 @@ export default function App() {
             </PublicLayout>
           }
         />
-        <Route
-          path="/about"
-          element={
-            <PublicLayout>
-              <AboutPage />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/services"
-          element={
-            <PublicLayout>
-              <ServicesPage />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/membership"
-          element={
-            <PublicLayout>
-              <MembershipPage plans={plans} />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/programs"
-          element={
-            <PublicLayout>
-              <ProgramsPage />
-            </PublicLayout>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <PublicLayout>
-              <ContactPage />
-            </PublicLayout>
-          }
-        />
+        <Route path="/about" element={<Navigate to="/#about" replace />} />
+        <Route path="/services" element={<Navigate to="/#services" replace />} />
+        <Route path="/membership" element={<Navigate to="/#membership" replace />} />
+        <Route path="/programs" element={<Navigate to="/#programs" replace />} />
+        <Route path="/contact" element={<Navigate to="/#contact" replace />} />
 
         {/* Authentication Routes */}
         <Route path="/login" element={<LoginPage />} />

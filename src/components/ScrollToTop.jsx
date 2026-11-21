@@ -8,9 +8,18 @@ export default function ScrollToTop() {
     if (!hash) {
       window.scrollTo(0, 0);
     } else {
-      const element = document.getElementById(hash.replace('#', ''));
+      const id = hash.replace('#', '');
+      const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const navHeight = 90;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navHeight;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+          });
+        }, 100);
       }
     }
   }, [pathname, hash]);
