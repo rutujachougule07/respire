@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
+import { getMediaBlob } from '../utils/mediaStorage';
 
 export default function SplashScreen({ onFinish }) {
-  const [isVisible, setIsVisible] = useState(true);
+  const { content } = useWebsiteContent();
+  const splashData = content?.splashVideo || {};
+
+  // Check if explicitly disabled or deleted by admin
+  const isDeleted = splashData.videoUrl === '';
+  const isEnabled = splashData.enabled !== false && content?.sectionVisibility?.splash !== false && !isDeleted;
+
+  const [isVisible, setIsVisible] = useState(isEnabled);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [customVideoUrl, setCustomVideoUrl] = useState(null);
   const videoRef = useRef(null);
   const finishedRef = useRef(false);
 
@@ -16,7 +26,56 @@ export default function SplashScreen({ onFinish }) {
     }, 600);
   };
 
+  // If explicitly disabled or deleted, finish immediately
   useEffect(() => {
+    if (!isEnabled) {
+      handleFinish();
+    }
+  }, [isEnabled]);
+
+  // Check for custom uploaded video from IndexedDB or custom URL
+  useEffect(() => {
+    if (!isEnabled) return;
+    let activeBlobUrl = null;
+    let isCancelled = false;
+
+    async function checkCustomVideo() {
+      const rawUrl = splashData.videoUrl;
+      if (!rawUrl || rawUrl === '/video.webm' || rawUrl === '/video.mp4') {
+        // Default official video already playing via direct sources
+        return;
+      }
+
+      if (rawUrl.startsWith('indexeddb://')) {
+        try {
+          const blob = await getMediaBlob('splash_video');
+          if (!isCancelled && blob && blob.size > 0) {
+            activeBlobUrl = URL.createObjectURL(blob);
+            setCustomVideoUrl(activeBlobUrl);
+          }
+        } catch (e) {
+          console.warn('Could not read custom video from IndexedDB:', e);
+        }
+      } else if (rawUrl.startsWith('http') || rawUrl.startsWith('blob:') || rawUrl.startsWith('/')) {
+        if (!isCancelled) {
+          setCustomVideoUrl(rawUrl);
+        }
+      }
+    }
+
+    checkCustomVideo();
+
+    return () => {
+      isCancelled = true;
+      if (activeBlobUrl) {
+        URL.revokeObjectURL(activeBlobUrl);
+      }
+    };
+  }, [splashData.videoUrl, isEnabled]);
+
+  useEffect(() => {
+    if (!isEnabled) return;
+
     // Attempt programmatic autoplay with error catch to satisfy all browser security policies
     if (videoRef.current) {
       const playPromise = videoRef.current.play();
@@ -27,15 +86,15 @@ export default function SplashScreen({ onFinish }) {
       }
     }
 
-    // Safety fallback timer (video is 10.0s)
+    // Safety fallback timer (max 15s for custom video or 10.5s for default)
     const fallbackTimer = setTimeout(() => {
       handleFinish();
-    }, 10500);
+    }, 15000);
 
     return () => {
       clearTimeout(fallbackTimer);
     };
-  }, []);
+  }, [isEnabled, customVideoUrl]);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
@@ -46,7 +105,7 @@ export default function SplashScreen({ onFinish }) {
     }
   };
 
-  if (!isVisible) return null;
+  if (!isEnabled || !isVisible) return null;
 
   return (
     <div
@@ -90,9 +149,10 @@ export default function SplashScreen({ onFinish }) {
         }}
       />
 
-      {/* 10-Second 3D RESPIRE Branding Video */}
+      {/* Dynamic Custom or Default 10-Second 3D RESPIRE Branding Video */}
       <video
         ref={videoRef}
+        key={customVideoUrl || 'default-branding'}
         autoPlay
         muted
         playsInline
@@ -103,13 +163,19 @@ export default function SplashScreen({ onFinish }) {
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleFinish}
         onError={() => {
-          console.warn('Video playback encountered an issue, transitioning in website.');
+          console.warn('Video playback encountered an issue, transitioning to website.');
           handleFinish();
         }}
         className="respire-branding-video"
       >
-        <source src="/video.webm" type="video/webm" />
-        <source src="/video.mp4" type="video/mp4" />
+        {customVideoUrl ? (
+          <source src={customVideoUrl} type="video/mp4" />
+        ) : (
+          <>
+            <source src="/video.webm" type="video/webm" />
+            <source src="/video.mp4" type="video/mp4" />
+          </>
+        )}
         Your browser does not support HTML5 video playback.
       </video>
 
