@@ -90,11 +90,12 @@ export default function Navbar() {
           boxShadow: isScrolled ? '0 10px 30px rgba(15, 23, 42, 0.08)' : '0 2px 10px rgba(15, 23, 42, 0.03)',
         }}
       >
-        {/* Top Green Gradient Continuous Scrolling Marquee Banner */}
+        {/* Top Black Marquee Banner - Matching Footer Luxury Dark Theme */}
         <div
           className="topbar-marquee-wrapper"
           style={{
-            background: 'linear-gradient(90deg, #006E2C 0%, #00B84A 52%, #008A38 100%)',
+            background: 'linear-gradient(90deg, #040404 0%, #0E1116 50%, #040404 100%)',
+            borderBottom: '1px solid rgba(0, 184, 74, 0.25)',
             padding: '7px 0',
             fontSize: '0.78rem',
             color: '#FFFFFF',
@@ -111,40 +112,40 @@ export default function Navbar() {
                   paddingRight: '32px',
                 }}
               >
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 800, letterSpacing: '0.07em' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 800, letterSpacing: '0.07em', color: '#FFFFFF' }}>
                   <span
                     style={{
                       display: 'inline-block',
                       width: '6px',
                       height: '6px',
                       borderRadius: '50%',
-                      backgroundColor: '#FFFFFF',
-                      boxShadow: '0 0 8px rgba(255,255,255,0.85)',
+                      backgroundColor: '#00D256',
+                      boxShadow: '0 0 8px rgba(0,210,86,0.85)',
                     }}
                   />
                   A MAHABAL GROUP VENTURE
                 </span>
-                <span style={{ opacity: 0.45 }}>|</span>
-                <span style={{ fontWeight: 800 }}>Vishrambag Branch:</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
-                  <MapPin size={13} color="#FFFFFF" />
+                <span style={{ opacity: 0.35 }}>|</span>
+                <span style={{ fontWeight: 800, color: '#F1F5F9' }}>Vishrambag Branch:</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600, color: '#CBD5E1' }}>
+                  <MapPin size={13} color="#38BDF8" />
                   7th Floor, R City Mall, Opp. Safa Bakery, Sangli
                 </span>
                 <a href="tel:+917798001777" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 800, color: '#FFFFFF' }}>
                   <Phone size={13} color="#FFFFFF" />
                   7798001777
                 </a>
-                <span style={{ opacity: 0.45 }}>•</span>
-                <span style={{ fontWeight: 800 }}>Vijaynagar Branch:</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600 }}>
-                  <MapPin size={13} color="#FFFFFF" />
+                <span style={{ opacity: 0.35 }}>•</span>
+                <span style={{ fontWeight: 800, color: '#F1F5F9' }}>Vijaynagar Branch:</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 600, color: '#CBD5E1' }}>
+                  <MapPin size={13} color="#38BDF8" />
                   3rd Floor, Krishna Heights, Opp. KFC, Sangli-Miraj Road
                 </span>
                 <a href="tel:+919172848777" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontWeight: 800, color: '#FFFFFF' }}>
                   <Phone size={13} color="#FFFFFF" />
                   9172848777
                 </a>
-                <span style={{ opacity: 0.45 }}>•</span>
+                <span style={{ opacity: 0.35 }}>•</span>
               </div>
             ))}
           </div>

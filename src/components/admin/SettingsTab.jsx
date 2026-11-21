@@ -1365,8 +1365,8 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
                 await deleteMediaBlob('splash_video');
                 const updated = {
                   ...formData,
-                  videoUrl: DEFAULT_WEBSITE_CONTENT.splashVideo.videoUrl,
-                  videoWebmUrl: DEFAULT_WEBSITE_CONTENT.splashVideo.videoWebmUrl,
+                  videoUrl: '/video.webm',
+                  videoWebmUrl: '/video.webm',
                   enabled: true,
                 };
                 setFormData(updated);

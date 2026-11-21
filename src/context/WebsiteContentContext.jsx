@@ -26,10 +26,10 @@ export const DEFAULT_WEBSITE_CONTENT = {
   customSections: [],
   splashVideo: {
     enabled: true,
-    videoUrl: '/video.webm',
-    videoWebmUrl: '/video.webm',
-    durationSeconds: 10,
-    title: '3D RESPIRE Opening Brand Video',
+    videoUrl: '/trainer_intro.mp4',
+    videoWebmUrl: '',
+    durationSeconds: 22,
+    title: 'Respire Trainer Session Intro',
   },
   hero: {
     visible: true,
