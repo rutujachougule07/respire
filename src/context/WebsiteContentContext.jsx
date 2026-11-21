@@ -13,6 +13,7 @@ export const DEFAULT_INQUIRY_SERVICES = [
 
 export const DEFAULT_WEBSITE_CONTENT = {
   sectionVisibility: {
+    splash: true,
     hero: true,
     about: true,
     services: true,
@@ -23,6 +24,13 @@ export const DEFAULT_WEBSITE_CONTENT = {
     contact: true,
   },
   customSections: [],
+  splashVideo: {
+    enabled: true,
+    videoUrl: '/video.mp4',
+    videoWebmUrl: '/video.webm',
+    durationSeconds: 10,
+    title: '3D RESPIRE Opening Brand Video',
+  },
   hero: {
     visible: true,
     bgImage: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=90&w=2560&auto=format&fit=crop',

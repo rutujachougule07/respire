@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useWebsiteContent } from '../context/WebsiteContentContext';
 
 export default function SplashScreen({ onFinish }) {
+  const { content } = useWebsiteContent();
+  const splashData = content?.splashVideo || {};
+
+  const isEnabled = splashData.enabled !== false && content?.sectionVisibility?.splash !== false;
+
   const [isVisible, setIsVisible] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const videoRef = useRef(null);
   const finishedRef = useRef(false);
+
+  const videoMp4 = splashData.videoUrl || '/video.mp4';
+  const videoWebm = splashData.videoWebmUrl || '/video.webm';
+  const durationSec = Number(splashData.durationSeconds) || 10;
 
   const handleFinish = () => {
     if (finishedRef.current) return;
@@ -17,6 +27,11 @@ export default function SplashScreen({ onFinish }) {
   };
 
   useEffect(() => {
+    if (!isEnabled) {
+      if (onFinish) onFinish();
+      return;
+    }
+
     // Attempt programmatic autoplay with error catch to satisfy all browser security policies
     if (videoRef.current) {
       const playPromise = videoRef.current.play();
@@ -27,26 +42,26 @@ export default function SplashScreen({ onFinish }) {
       }
     }
 
-    // Safety fallback timer (video is 10.0s)
+    // Safety fallback timer based on configured duration
     const fallbackTimer = setTimeout(() => {
       handleFinish();
-    }, 10500);
+    }, (durationSec + 0.6) * 1000);
 
     return () => {
       clearTimeout(fallbackTimer);
     };
-  }, []);
+  }, [isEnabled, durationSec]);
 
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
     const current = videoRef.current.currentTime || 0;
-    const duration = videoRef.current.duration || 10;
+    const duration = videoRef.current.duration || durationSec;
     if (duration > 0 && duration - current <= 0.6 && !isFadingOut) {
       setIsFadingOut(true);
     }
   };
 
-  if (!isVisible) return null;
+  if (!isEnabled || !isVisible) return null;
 
   return (
     <div
@@ -108,8 +123,8 @@ export default function SplashScreen({ onFinish }) {
         }}
         className="respire-branding-video"
       >
-        <source src="/video.webm" type="video/webm" />
-        <source src="/video.mp4" type="video/mp4" />
+        {videoWebm && <source src={videoWebm} type="video/webm" />}
+        {videoMp4 && <source src={videoMp4} type="video/mp4" />}
         Your browser does not support HTML5 video playback.
       </video>
 

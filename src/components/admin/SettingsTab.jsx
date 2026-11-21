@@ -21,6 +21,10 @@ import {
   X,
   Eye,
   EyeOff,
+  Video,
+  Play,
+  Pause,
+  Film,
 } from 'lucide-react';
 import { useWebsiteContent, DEFAULT_WEBSITE_CONTENT } from '../../context/WebsiteContentContext';
 import { db } from '../../firebase';
@@ -523,6 +527,8 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
 
   const getSectionKey = (subTab) => {
     switch (subTab) {
+      case 'splash_video':
+        return 'splashVideo';
       case 'home':
         return 'hero';
       case 'about':
@@ -541,6 +547,11 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   };
 
   const isSectionVisible = (sectionKey) => {
+    if (sectionKey === 'splashVideo') {
+      if (content?.sectionVisibility?.splash === false) return false;
+      if (content?.splashVideo?.enabled === false) return false;
+      return true;
+    }
     if (content?.sectionVisibility?.[sectionKey] === false) return false;
     if (content?.[sectionKey]?.visible === false) return false;
     return true;
@@ -550,6 +561,14 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
     const sectionKey = getSectionKey(currentSubTab);
     const currentVis = isSectionVisible(sectionKey);
     const newVis = !currentVis;
+    if (sectionKey === 'splashVideo') {
+      await toggleSectionVisibility('splash', newVis);
+      const updated = { ...(content?.splashVideo || {}), enabled: newVis };
+      await updateSection('splashVideo', updated);
+      setFormData(updated);
+      notify(newVis ? '✓ Intro Video is now ACTIVE on website opening!' : '✓ Intro Video is now DISABLED (Direct Home Page)!');
+      return;
+    }
     await toggleSectionVisibility(sectionKey, newVis);
     notify(newVis ? `✓ ${sectionKey.toUpperCase()} section is now LIVE on website!` : `✓ ${sectionKey.toUpperCase()} section is now HIDDEN / REMOVED from website!`);
   };
@@ -732,6 +751,7 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
   };
 
   const baseTabs = [
+    { id: 'splash_video', label: 'Opening Video', icon: Video, desc: 'Intro 3D video on open' },
     { id: 'home', label: 'Home / Hero', icon: Home, desc: 'Visual banner & cue' },
     { id: 'about', label: 'About Us', icon: Info, desc: 'Heritage story & photo' },
     { id: 'services', label: 'Services', icon: Sparkles, desc: 'PT, Massage, Steam & images' },
@@ -883,6 +903,432 @@ export default function SettingsTab({ activeSubTab = 'home', onSubTabChange, sho
           boxShadow: '0 8px 30px rgba(15, 23, 42, 0.05)',
         }}
       >
+        {/* ============================================================ */}
+        {/* TAB: OPENING VIDEO / SPLASH SCREEN                          */}
+        {/* ============================================================ */}
+        {currentSubTab === 'splash_video' && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      backgroundColor: 'rgba(0, 184, 74, 0.1)',
+                      color: '#008A38',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    <Video size={13} />
+                    Opening Experience
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.74rem',
+                      backgroundColor: '#F1F5F9',
+                      color: '#475569',
+                      padding: '3px 10px',
+                      borderRadius: '999px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    3D Brand Splash
+                  </span>
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#0F172A', margin: '0 0 6px 0' }}>
+                  Opening Intro Video (Splash Screen)
+                </h3>
+                <p style={{ color: '#64748B', fontSize: '0.86rem', margin: 0, maxWidth: '680px' }}>
+                  वेबसाइट उघडल्यावर प्ले होणारा ३D Logo व ब्रँडिंग व्हिडिओ येथून थेट एडिट, अपलोड किंवा बदलू शकता.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href={formData.videoUrl || '/video.mp4'}
+                  download="Respire_Intro_Video.mp4"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    backgroundColor: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    color: '#334155',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Film size={14} />
+                  <span>Download Video</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Video Active / Disabled Switch Card */}
+            <div
+              style={{
+                padding: '16px 20px',
+                borderRadius: '14px',
+                backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#ECFDF3' : '#F8FAFC',
+                border: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '1.5px solid #A7F3D0' : '1.5px solid #E2E8F0',
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '14px',
+              }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#00B84A' : '#94A3B8',
+                    }}
+                  />
+                  <strong style={{ fontSize: '0.94rem', color: '#0F172A' }}>
+                    {(formData.enabled !== false && content?.sectionVisibility?.splash !== false)
+                      ? 'Intro Video Status: ACTIVE (व्हिडिओ चालू आहे)'
+                      : 'Intro Video Status: DISABLED (व्हिडिओ बंद आहे)'}
+                  </strong>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#64748B', margin: '4px 0 0 18px' }}>
+                  {(formData.enabled !== false && content?.sectionVisibility?.splash !== false)
+                    ? 'Visitors will see the 3D video introduction when opening the website.'
+                    : 'Visitors will land directly on the Home page without any intro video.'}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const currentStatus = (formData.enabled !== false && content?.sectionVisibility?.splash !== false);
+                  const newStatus = !currentStatus;
+                  const updated = { ...formData, enabled: newStatus };
+                  await autoSaveSection(updated);
+                  await toggleSectionVisibility('splash', newStatus);
+                  notify(newStatus ? '✓ Intro video activated on website!' : '✓ Intro video disabled!');
+                }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  backgroundColor: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#008A38' : '#F1F5F9',
+                  color: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? '#FFFFFF' : '#475569',
+                  border: (formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? 'none' : '1.5px solid #CBD5E1',
+                  fontSize: '0.84rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+              >
+                {(formData.enabled !== false && content?.sectionVisibility?.splash !== false) ? (
+                  <>
+                    <Eye size={15} />
+                    <span>Active (Click to Turn Off)</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff size={15} />
+                    <span>Disabled (Click to Turn On)</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* 2-Column Grid: Form Inputs (Left) and Live Video Preview (Right) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', alignItems: 'start' }}>
+              {/* Left Column: Video Controls */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {/* Upload Video From PC */}
+                <div
+                  style={{
+                    padding: '20px',
+                    borderRadius: '14px',
+                    border: '1.5px dashed #00B84A',
+                    backgroundColor: '#F0FDF4',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <UploadCloud size={20} color="#008A38" />
+                    <strong style={{ fontSize: '0.92rem', color: '#0F172A' }}>
+                      Upload New Video File
+                    </strong>
+                  </div>
+                  <p style={{ fontSize: '0.78rem', color: '#64748B', margin: '0 0 12px 0' }}>
+                    Choose an MP4 or WebM video file from your computer (Recommended: 1080p or 720p, under 15MB).
+                  </p>
+
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    id="splash_video_file_picker"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const result = event.target?.result;
+                        if (result) {
+                          const updated = {
+                            ...formData,
+                            videoUrl: result,
+                            uploadedFileName: file.name,
+                          };
+                          autoSaveSection(updated);
+                          notify(`✓ Uploaded "${file.name}" as new intro video!`);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('splash_video_file_picker')?.click()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '9px 16px',
+                        borderRadius: '8px',
+                        backgroundColor: '#008A38',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        fontSize: '0.82rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(0, 138, 56, 0.25)',
+                      }}
+                    >
+                      <Plus size={15} />
+                      <span>Browse Video File</span>
+                    </button>
+
+                    {formData.uploadedFileName && (
+                      <span style={{ fontSize: '0.78rem', color: '#166534', fontWeight: 700, backgroundColor: '#DCFCE7', padding: '4px 10px', borderRadius: '6px' }}>
+                        ✓ {formData.uploadedFileName}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Primary Video URL Input */}
+                <div>
+                  <label style={labelStyle}>
+                    Primary MP4 Video URL / Path *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.videoUrl !== undefined ? formData.videoUrl : '/video.mp4'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      autoSaveSection({ ...formData, videoUrl: val, uploadedFileName: '' });
+                    }}
+                    placeholder="/video.mp4 or https://.../video.mp4"
+                    style={inputStyle}
+                  />
+                  <span style={{ fontSize: '0.74rem', color: '#64748B', display: 'block', marginTop: '4px' }}>
+                    Default official video is <code>/video.mp4</code>. You can paste an external URL or use the upload button above.
+                  </span>
+                </div>
+
+                {/* Fallback WebM URL */}
+                <div>
+                  <label style={labelStyle}>
+                    Secondary WebM URL (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.videoWebmUrl !== undefined ? formData.videoWebmUrl : '/video.webm'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      autoSaveSection({ ...formData, videoWebmUrl: val });
+                    }}
+                    placeholder="/video.webm"
+                    style={inputStyle}
+                  />
+                  <span style={{ fontSize: '0.74rem', color: '#64748B', display: 'block', marginTop: '4px' }}>
+                    WebM format provides faster loading for Google Chrome and Firefox browsers.
+                  </span>
+                </div>
+
+                {/* Duration Control */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ ...labelStyle, margin: 0 }}>
+                      Video Auto-Play Duration Limit
+                    </label>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 900, color: '#008A38' }}>
+                      {formData.durationSeconds !== undefined ? formData.durationSeconds : 10} Seconds
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min="3"
+                    max="20"
+                    step="1"
+                    value={formData.durationSeconds !== undefined ? formData.durationSeconds : 10}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      autoSaveSection({ ...formData, durationSeconds: val });
+                    }}
+                    style={{ width: '100%', accentColor: '#008A38', cursor: 'pointer' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94A3B8', marginTop: '2px' }}>
+                    <span>Fast (3s)</span>
+                    <span>Standard (10s)</span>
+                    <span>Cinematic (20s)</span>
+                  </div>
+                </div>
+
+                {/* Quick Action Reset */}
+                <div style={{ paddingTop: '8px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!window.confirm('Restore official 3D Respire Branding video?')) return;
+                      const updated = {
+                        enabled: true,
+                        videoUrl: '/video.mp4',
+                        videoWebmUrl: '/video.webm',
+                        durationSeconds: 10,
+                        title: '3D RESPIRE Opening Brand Video',
+                      };
+                      autoSaveSection(updated);
+                      notify('✓ Restored official 3D Respire Branding Video!');
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #CBD5E1',
+                      color: '#475569',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <RotateCcw size={13} />
+                    <span>Restore Official 3D Video</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right Column: Live Video Player Preview */}
+              <div
+                style={{
+                  backgroundColor: '#0F172A',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  color: '#FFFFFF',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Play size={15} color="#00D256" />
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Live Video Player Preview
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', color: '#94A3B8' }}>
+                    HTML5 Player
+                  </span>
+                </div>
+
+                {/* Video Tag */}
+                <div style={{ borderRadius: '12px', overflow: 'hidden', backgroundColor: '#000000', marginBottom: '12px', aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <video
+                    key={formData.videoUrl || '/video.mp4'}
+                    controls
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  >
+                    {formData.videoWebmUrl && <source src={formData.videoWebmUrl} type="video/webm" />}
+                    <source src={formData.videoUrl || '/video.mp4'} type="video/mp4" />
+                    Your browser does not support video playback.
+                  </video>
+                </div>
+
+                <div style={{ fontSize: '0.78rem', color: '#CBD5E1', lineHeight: 1.5 }}>
+                  <strong style={{ color: '#00D256' }}>✓ Live Preview:</strong> You can test video playback, sound, and visual fidelity using the player above. Any change made on the left updates this preview instantly.
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Save & Reset Row */}
+            <div style={{ marginTop: '28px', paddingTop: '18px', borderTop: '1px solid #E2E8F0', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleSaveSection}
+                disabled={isSaving}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#008A38',
+                  color: '#FFFFFF',
+                  padding: '11px 24px',
+                  borderRadius: '10px',
+                  fontWeight: 800,
+                  fontSize: '0.88rem',
+                  border: 'none',
+                  cursor: isSaving ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 4px 14px rgba(0, 138, 56, 0.3)',
+                }}
+              >
+                <Save size={16} />
+                <span>{isSaving ? 'Publishing...' : 'Save & Publish Live'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetSection}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: '#F8FAFC',
+                  color: '#64748B',
+                  padding: '11px 18px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.86rem',
+                  border: '1px solid #CBD5E1',
+                  cursor: 'pointer',
+                }}
+              >
+                <RotateCcw size={15} />
+                <span>Reset to Default</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ============================================================ */}
         {/* TAB: HOME / HERO                                             */}
         {/* ============================================================ */}
